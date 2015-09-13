@@ -83,13 +83,13 @@ Ext.onReady( function() {
 						objectName: 'co',
 					},
 					indicator: {
-						value: 'indicators',
+						value: 'indicator',
 						name: NS.i18n.indicators || 'Indicators',
 						dimensionName: 'dx',
 						objectName: 'in'
 					},
 					dataElement: {
-						value: 'dataElements',
+						value: 'dataElement',
 						name: NS.i18n.data_elements || 'Data elements',
 						dimensionName: 'dx',
 						objectName: 'de'
@@ -101,7 +101,7 @@ Ext.onReady( function() {
 						objectName: 'dc'
 					},
 					dataSet: {
-						value: 'dataSets',
+						value: 'dataSet',
 						name: NS.i18n.data_sets || 'Data sets',
 						dimensionName: 'dx',
 						objectName: 'ds'
@@ -756,6 +756,16 @@ Ext.onReady( function() {
 
 				return array;
 			};
+
+            support.prototype.array.addObjectProperty = function(array, key, value) {
+                if (Ext.isArray(array)) {
+                    for (var i = 0; i < array.length; i++) {
+                        array[i][key] = value;
+                    }
+                }
+
+                return array;
+            };
 
 				// object
 			support.prototype.object = {};
