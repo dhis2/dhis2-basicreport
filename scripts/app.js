@@ -2472,7 +2472,7 @@ Ext.onReady( function() {
                         }                                    
 					}
 				}
-console.log(config);
+                
 				return config;
 			};
 
@@ -5766,7 +5766,7 @@ console.log(config);
 			if (!layout) {
 				return;
 			}
-
+console.log(layout);return;
 			ns.core.web.pivot.getData(layout, false);
 		};
 

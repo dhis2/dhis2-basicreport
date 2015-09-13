@@ -370,23 +370,7 @@ Ext.onReady( function() {
 
 				// filters: [Dimension]
 
-				// showRowTotals: boolean (true)
-
-				// showColTotals: boolean (true)
-
-				// showColSubTotals: boolean (true)
-
-				// showRowSubTotals: boolean (true)
-
-                // showDimensionLabels: boolean (false)
-
-				// hideEmptyRows: boolean (false)
-
-                // aggregationType: string ('DEFAULT') - 'DEFAULT', 'COUNT', 'SUM', 'STDDEV', 'VARIANCE', 'MIN', 'MAX'
-
-                // dataApprovalLevel: object
-
-				// showHierarchy: boolean (false)
+                // showHierarchy: boolean (false)
 
 				// displayDensity: string ('normal') - 'compact', 'normal', 'comfortable'
 
@@ -400,23 +384,9 @@ Ext.onReady( function() {
 
 				// sorting: transient object
 
-				// reportingPeriod: boolean (false) //report tables only
-
-				// organisationUnit: boolean (false) //report tables only
-
-				// parentOrganisationUnit: boolean (false) //report tables only
-
-				// regression: boolean (false)
-
-				// cumulative: boolean (false)
-
-				// sortOrder: integer (0) //-1, 0, 1
-
-				// topLimit: integer (100) //5, 10, 20, 50, 100
-
-                // displayProperty: string ('name') // 'name', 'shortname', null
-
                 // userOrgUnit: string
+
+                // relativePeriodDate: string
 
 				getValidatedDimensionArray = function(dimensionArray) {
 					var dimensionArray = Ext.clone(dimensionArray);
@@ -447,29 +417,6 @@ Ext.onReady( function() {
 
 					for (var i = 0; i < dimensions.length; i++) {
 						objectNameDimensionMap[dimensions[i].dimension] = dimensions[i];
-					}
-
-					if (layout.filters && layout.filters.length) {
-						for (var i = 0; i < layout.filters.length; i++) {
-
-							// Indicators as filter
-							if (layout.filters[i].dimension === dimConf.indicator.objectName) {
-								webAlert(NS.i18n.indicators_cannot_be_specified_as_filter || 'Indicators cannot be specified as filter');
-								return;
-							}
-
-							// Categories as filter
-							if (layout.filters[i].dimension === dimConf.category.objectName) {
-								webAlert(NS.i18n.categories_cannot_be_specified_as_filter || 'Categories cannot be specified as filter');
-								return;
-							}
-
-							// Data sets as filter
-							if (layout.filters[i].dimension === dimConf.dataSet.objectName) {
-								webAlert(NS.i18n.data_sets_cannot_be_specified_as_filter || 'Data sets cannot be specified as filter');
-								return;
-							}
-						}
 					}
 
 					// dc and in
@@ -506,7 +453,7 @@ Ext.onReady( function() {
 				};
 
 				return function() {
-					var objectNames = [],
+					var dimensionNames = [],
 						dimConf = conf.finals.dimension;
 
 					// config must be an object
@@ -515,13 +462,11 @@ Ext.onReady( function() {
 						return;
 					}
 
-					//config.columns = getValidatedDimensionArray(config.columns);
-					//config.rows = getValidatedDimensionArray(config.rows);
-					//config.filters = getValidatedDimensionArray(config.filters);
+                    config.columns = getValidatedDimensionArray(config.columns);
 
 					// at least one dimension specified as column or row
-					if (!(config.columns || config.rows)) {
-						webAlert(NS.i18n.at_least_one_dimension_must_be_specified_as_row_or_column);
+					if (!config.columns) {
+						webAlert('Specify at least one column dimension');
 						return;
 					}
 
@@ -530,13 +475,13 @@ Ext.onReady( function() {
 
 						// Object names
 						if (api.layout.Dimension(dims[i])) {
-							objectNames.push(dims[i].dimension);
+							dimensionNames.push(dims[i].dimension);
 						}
 					}
 
 					// at least one period
-					if (!Ext.Array.contains(objectNames, dimConf.period.objectName)) {
-						webAlert(NS.i18n.at_least_one_period_must_be_specified_as_column_row_or_filter);
+					if (!Ext.Array.contains(dimensionNames, dimConf.period.objectName)) {
+						webAlert('Select at least one period item');
 						return;
 					}
 
@@ -551,19 +496,7 @@ Ext.onReady( function() {
 
 					// layout
 					layout.columns = config.columns;
-					layout.rows = config.rows;
-					layout.filters = config.filters;
-
-					// properties
-					layout.showColTotals = Ext.isBoolean(config.colTotals) ? config.colTotals : (Ext.isBoolean(config.showColTotals) ? config.showColTotals : true);
-					layout.showRowTotals = Ext.isBoolean(config.rowTotals) ? config.rowTotals : (Ext.isBoolean(config.showRowTotals) ? config.showRowTotals : true);
-					layout.showColSubTotals = Ext.isBoolean(config.colSubTotals) ? config.colSubTotals : (Ext.isBoolean(config.showColSubTotals) ? config.showColSubTotals : true);
-					layout.showRowSubTotals = Ext.isBoolean(config.rowSubTotals) ? config.rowSubTotals : (Ext.isBoolean(config.showRowSubTotals) ? config.showRowSubTotals : true);
-					layout.showDimensionLabels = Ext.isBoolean(config.showDimensionLabels) ? config.showDimensionLabels : (Ext.isBoolean(config.showDimensionLabels) ? config.showDimensionLabels : true);
-					layout.hideEmptyRows = Ext.isBoolean(config.hideEmptyRows) ? config.hideEmptyRows : false;
-                    layout.aggregationType = Ext.isString(config.aggregationType) ? config.aggregationType : 'DEFAULT';
-					layout.dataApprovalLevel = Ext.isObject(config.dataApprovalLevel) && Ext.isString(config.dataApprovalLevel.id) ? config.dataApprovalLevel : null;
-
+                    
 					layout.showHierarchy = Ext.isBoolean(config.showHierarchy) ? config.showHierarchy : false;
 
 					layout.displayDensity = Ext.isString(config.displayDensity) && !Ext.isEmpty(config.displayDensity) ? config.displayDensity : 'normal';
@@ -575,31 +508,16 @@ Ext.onReady( function() {
 
 					layout.sorting = Ext.isObject(config.sorting) && Ext.isDefined(config.sorting.id) && Ext.isString(config.sorting.direction) ? config.sorting : null;
 
-					layout.reportingPeriod = Ext.isObject(config.reportParams) && Ext.isBoolean(config.reportParams.paramReportingPeriod) ? config.reportParams.paramReportingPeriod : (Ext.isBoolean(config.reportingPeriod) ? config.reportingPeriod : false);
-					layout.organisationUnit =  Ext.isObject(config.reportParams) && Ext.isBoolean(config.reportParams.paramOrganisationUnit) ? config.reportParams.paramOrganisationUnit : (Ext.isBoolean(config.organisationUnit) ? config.organisationUnit : false);
-					layout.parentOrganisationUnit =  Ext.isObject(config.reportParams) && Ext.isBoolean(config.reportParams.paramParentOrganisationUnit) ? config.reportParams.paramParentOrganisationUnit : (Ext.isBoolean(config.parentOrganisationUnit) ? config.parentOrganisationUnit : false);
-
-					layout.regression = Ext.isBoolean(config.regression) ? config.regression : false;
-					layout.cumulative = Ext.isBoolean(config.cumulative) ? config.cumulative : false;
-					layout.sortOrder = Ext.isNumber(config.sortOrder) ? config.sortOrder : 0;
-					layout.topLimit = Ext.isNumber(config.topLimit) ? config.topLimit : 0;
-
-                    if (Ext.isString(config.displayProperty)) {
-                        layout.displayProperty = config.displayProperty;
-                    }
-
                     if (Ext.Array.from(config.userOrgUnit).length) {
                         layout.userOrgUnit = Ext.Array.from(config.userOrgUnit);
                     }
 
-                    // TODO program
-                    if (Ext.isObject(config.program)) {
-                        layout.program = config.program;
-                    }
-
-                    // relative period date
                     if (support.prototype.date.getYYYYMMDD(config.relativePeriodDate)) {
                         layout.relativePeriodDate = support.prototype.date.getYYYYMMDD(config.relativePeriodDate);
+                    }
+
+                    if (Ext.isArray(config.dataDimensionItems) && config.dataDimensionItems.length) {
+                        layout.dataDimensionItems = config.dataDimensionItems;
                     }
 
                     // validate
