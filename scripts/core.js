@@ -2095,22 +2095,17 @@ Ext.onReady( function() {
 			// pivot
 			web.report = {};
 
-			web.report.getHtml = function(layout) {
+			web.report.getHtml = function(layout, callbackFn) {
                 var BuildOutputReport,
                     makeTableHEADER,
                     makeTableBODY,
                     ReturnLookupValue,
                     ReturnLookup,
-                    getParameterByName,
                     GetOUlevelName,
-                    formatNumber;
+                    formatNumber,
+                    ajax = support.connection.ajax;
                     
                 BuildOutputReport = function(sDestination) {
-
-                    //var dxUID = getParameterByName('dx');
-                    //var peUID = getParameterByName('per');
-                    //var ouUID = getParameterByName('ou');
-
                     var dxItems = [],
                         peItems = [],
                         ouItems = [],
@@ -2136,409 +2131,381 @@ Ext.onReady( function() {
                     dxUID = dxItems.join(';');
                     peUID = peItems.join(';');
                     ouUID = ouItems.join(';');
-                    
-                    //var pRank = getParameterByName('rank');
+
                     var pRank = 1;
                     var ouHierarchyOffSet = 0;
                     var ArrDxUID = [];
-                    var LastNum;
-                    var LastDen;
+                    var ArrDxName = [];
+                    var ArrDxShort = [];
+                    var ArrNumFormula = [];
                     var ArrNumFormulaItems = [];
+                    var ArrNumDescription = [];
+                    var ArrDenomFormula = [];
                     var ArrDenomFormulaItems = [];
-                    var UniqueNumDenSubElements = '';
-                    var myDx = [];
+                    var ArrDenomDescription = [];
+                    var ArrTypeName = [];
+                    var ArrDxGroupName = [];
+                    var ArrDxIsIND = [];
+                    var ArrDxLegendSet = [];
+                    var lgIncr = 0;
+                    var dxUniqueID = '';
+                    var LookupSubElements = '';
+                    var Nums = '';
+                    var Denoms = '';
 
                     ArrDxUID = (dxUID).split(';');
 
-                    for (var i = 0; i < ArrDxUID.length; i++)
-                    {
-                        var dxObj = init.contextPath + '/api/indicators/' + ArrDxUID[i] + '.json?fields=id,name,displayName,displayShortName,indicatorType,indicatorGroups[name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]';
-                        var dxObjJ = $.ajax({url:dxObj, async: false}).responseText;
+                    $.ajax({
+                        url: init.contextPath + '/api/indicators.json?paging=false&filter=id:in:[' + ArrDxUID.join(',') + ']&fields=id,name,displayName,displayShortName,indicatorType,indicatorGroups[name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
+                        headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
+                    }).done(function(dxData) {
+                        var indicators = dxData.indicators;
 
-                        if (dxObjJ.indexOf('Not Found') != -1)
-                        {
-                            var dxObj = init.contextPath + '/api/dataElements/' + ArrDxUID[i] + '.json';
-                            var dxObjJ = $.ajax({url:dxObj, async: false}).responseText; 
+                        for (var i = 0, dxObjJ, dxLegendsets, numeratoritems, denominatoritems, lastNum; i < indicators.length; i++) {
+                            dxObjJ = indicators[i];
+                            dxUniqueID += (ArrDxUID[i] + ';');
+                            ArrDxIsIND[i] = 1;
+                            ArrDxName[i] = dxObjJ.displayName;
+                            ArrDxShort[i] = dxObjJ.displayShortName;
+                            ArrNumFormula[i] = dxObjJ.numerator;
+                            ArrNumDescription[i] = dxObjJ.numeratorDescription;
+                            ArrDenomFormula[i] = dxObjJ.denominator;
+                            ArrDenomDescription[i] = dxObjJ.denominatorDescription;
+                            ArrTypeName[i] = dxObjJ.indicatorType.name;
+                            ArrDxGroupName[i] = ((dxObjJ.indicatorGroups.length > 0) ? dxObjJ.indicatorGroups[0].name : '');
+                            ArrDxLegendSet[i] = [];
 
-                            if (dxObjJ.indexOf('Not Found') != -1){
-
-                            }
-                            else{
-                                dxObjJ = JSON.parse(dxObjJ);
-                                myDx.push({
-                                    indicator: 0,
-                                    dx: ArrDxUID[i],
-                                    displayName: dxObjJ.displayName,
-                                    displayShortName: dxObjJ.displayShortName,
-                                    numeratorFormula: '',
-                                    numeratorDescription: '',
-                                    numeratorItems: [],
-                                    denominatorFormula: '',
-                                    denominatorDescription: '',
-                                    denominatorItems: [],
-                                    typeName: dxObjJ.numberType,
-                                    groupName: ((dxObjJ.dataElementGroups.length > 0) ? dxObjJ.dataElementGroups[0].name : ''),
-                                    legendsets: []
-                                });
-                            }
-                        }
-                        else
-                        {
-                            dxObjJ = JSON.parse(dxObjJ);
-                            var dxLegendsets = [];
                             if (dxObjJ.legendSet != undefined){
                                 for (var p = 0; p < dxObjJ.legendSet.legends.length; p++)
                                 {
-                                    dxLegendsets.push({
-                                        name: dxObjJ.legendSet.legends[p].name,
-                                        color: dxObjJ.legendSet.legends[p].color,
-                                        startvalue: dxObjJ.legendSet.legends[p].startValue,
-                                        endvalue: dxObjJ.legendSet.legends[p].endValue
-                                    });
+                                    var sLegSet = (dxObjJ.legendSet.legends[p].name + ';' + dxObjJ.legendSet.legends[p].color + ';' + dxObjJ.legendSet.legends[p].startValue + ';' + dxObjJ.legendSet.legends[p].endValue);
+                                    ArrDxLegendSet[i][lgIncr] = sLegSet;
+                                    lgIncr += 1;
                                 }
                             }
-                            var numeratoritems = [];
-                            LastNum = dxObjJ.numerator;
-                            if (LastNum != undefined){
+
+                            if (ArrNumFormula[i] != undefined){
                                 var NumItems = '';
-                                if (LastNum.indexOf('{') != 0){
-                                    var ArrTmpOuter = LastNum.split('{');
+                                if (ArrNumFormula[i].indexOf('{') != 0){
+                                    var ArrTmpOuter = ArrNumFormula[i].split('{');
                                     for (var p = 1; p < ArrTmpOuter.length; p++) 
                                     {
                                         var ArrTmpInner = ArrTmpOuter[p].split('}');
                                         // if current UID not already listed in 'known lookup uids' 
-                                        if (UniqueNumDenSubElements.indexOf(ArrTmpInner[0] + ';') < 0) {
-                                            UniqueNumDenSubElements += (ArrTmpInner[0]+';'); 
+                                        if (LookupSubElements.indexOf(ArrTmpInner[0] + ';') < 0) {
+                                            LookupSubElements += (ArrTmpInner[0]+';'); 
                                             NumItems += (ArrTmpInner[0]+';');
                                         }
-                                        numeratoritems.push({uid: ArrTmpInner[0]});
                                     }
                                 }
                                 ArrNumFormulaItems[i] = NumItems;
                             }
-                            var denominatoritems = [];
-                            LastDen = dxObjJ.denominator;
-                            if (LastDen != undefined){
+
+                            if (ArrDenomFormula[i] != undefined){
                                 var DenomItems = '';
-                                if (LastDen.indexOf('{') != 0){
-                                    var ArrTmpOuter = LastDen.split('{');
+                                if (ArrDenomFormula[i].indexOf('{') != 0){
+                                    var ArrTmpOuter = ArrDenomFormula[i].split('{');
                                     for (var p = 1; p < ArrTmpOuter.length; p++) 
                                     {
                                         var ArrTmpInner = ArrTmpOuter[p].split('}');
                                         // if current UID not already listed in 'known lookup uids' 
                                         DenomItems += (ArrTmpInner[0]+';');
-                                        denominatoritems.push({uid: ArrTmpInner[0]});
-                                        if (UniqueNumDenSubElements.indexOf(ArrTmpInner[0] + ';') < 0) {
-                                            UniqueNumDenSubElements += (ArrTmpInner[0]+';'); 
+                                        if (LookupSubElements.indexOf(ArrTmpInner[0] + ';') < 0) {
+                                            LookupSubElements += (ArrTmpInner[0]+';'); 
                                         }
                                     }
                                 }
                                 ArrDenomFormulaItems[i] = DenomItems;
                             }
-                            myDx.push({
-                                indicator: 1,
-                                dx: ArrDxUID[i],
-                                displayName: dxObjJ.displayName,
-                                displayShortName: dxObjJ.displayShortName,
-                                numeratorFormula: dxObjJ.numerator,
-                                numeratorDescription: dxObjJ.numeratorDescription,
-                                numeratorItems: numeratoritems,
-                                denominatorFormula: dxObjJ.denominator,
-                                denominatorDescription: dxObjJ.denominatorDescription,
-                                denominatorItems: denominatoritems,
-                                typeName: dxObjJ.indicatorType.name,
-                                groupName: ((dxObjJ.indicatorGroups.length > 0) ? dxObjJ.indicatorGroups[0].name : ''),
-                                legendsets: dxLegendsets
-                            });
-
                         }
 
-                    }
+                        // analytics
 
-                    console.log(JSON.stringify(myDx));
+                        $.ajax({
+                            url: init.contextPath + '/api/analytics.json?dimension=pe:' + peUID + '&dimension=dx:' + LookupSubElements + dxUID + '&dimension=ou:' + ouUID + '&hierarchyMeta=true&displayProperty=NAME&showHierarchy=true',
+                            headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
+                        }).done(function(analyticsData) {
+                            var myData = analyticsData;
+                            var sReturn = '';
+                            var iNum = 0;
+                            var iDen = 0;
+                            var sParentPath;
+                            var ParentArr;
+                            var OUlevelJ;
+                            var iHeaders = 0;
 
-                    var sJdata = init.contextPath + '/api/analytics.json?dimension=pe:' + peUID + '&dimension=dx:' + UniqueNumDenSubElements + dxUID + '&dimension=ou:' + ouUID + '&hierarchyMeta=true&displayProperty=NAME&showHierarchy=true';
-                    //console.log(sJdata);
-                    var myDataResponse = $.ajax({url: sJdata, async: false}).responseText; 
-                    var myData = JSON.parse(myDataResponse);
-                    var sReturn = '';
-                    var iNum = 0;
-                    var iDen = 0;
-                    var sParentPath;
-                    var ParentArr;
-                    var OUlevelJ;
-                    var iHeaders = 0;
+                            var objNames = JSON.parse(JSON.stringify(myData.metaData.names));
+                            var objParentNames = JSON.parse(JSON.stringify(myData.metaData.ouNameHierarchy));
+                            var objParentUIDs = JSON.parse(JSON.stringify(myData.metaData.ouHierarchy));
 
-                    var objNames = JSON.parse(JSON.stringify(myData.metaData.names));
-                    var objParentNames = JSON.parse(JSON.stringify(myData.metaData.ouNameHierarchy));
-                    var objParentUIDs = JSON.parse(JSON.stringify(myData.metaData.ouHierarchy));
+                            var objLevels = init.organisationUnitLevels;
+                            
+                            var MyHeaders = [];
+                            var MyRows = [];
 
-                    var OUlevelLookup = init.contextPath + '/api/organisationUnitLevels.json?fields=id,name,level&paging=false';
-                    OUlevelJ = $.ajax({url:OUlevelLookup, async: false}).responseText; 
-                    var objLevels = JSON.parse(OUlevelJ);
+                            sParentPath = ReturnLookup(objParentUIDs,myData.rows[1][2]);
+                            ParentArr = sParentPath.split("/");
 
-                    var MyHeaders = [];
-                    var MyRows = [];
-
-                    sParentPath = ReturnLookup(objParentUIDs,myData.rows[1][2]);
-                    ParentArr = sParentPath.split("/");
-
-                    for (var x=1; x<ParentArr.length; x++)
-                    {
-                        ouHierarchyOffSet = x;
-                        if (ParentArr[x] == ouUID){
-                            break;
-                        }
-                    }
-                    
-                    sParentPath = ReturnLookup(objParentNames,ReturnLookup(objNames,myData.rows[1][2]));
-                    ParentArr = sParentPath.split("/");
-
-                    MyHeaders[0] = 'RESERVED_ouh'; 
-                    MyHeaders[1] = 'RESERVED_dx'; 
-                    MyHeaders[2] = 'RESERVED_pe'; 
-                    MyHeaders[3] = 'RESERVED_bgCol';
-
-                    for (var x=ouHierarchyOffSet; x<ParentArr.length; x++)
-                    {
-                        MyHeaders[4+iHeaders] = GetOUlevelName(objLevels,x);
-                        iHeaders += 1;
-                    }
-
-                    MyHeaders[4+iHeaders] = 'Group';
-                    MyHeaders[4+iHeaders+1] = ReturnLookup(objNames,myData.headers[0].name);
-                    MyHeaders[4+iHeaders+2] = 'Type';
-                    MyHeaders[4+iHeaders+3] = ReturnLookup(objNames,myData.headers[1].name);
-
-                    var peArr = (ReturnLookup(objNames,myData.rows[0][1])).split(" ");
-
-                    for (var y=0; y<peArr.length; y++){
-                        MyHeaders[(4+iHeaders + 3) + (y+1)] = ('Period_P' + (y+1));
-                    }
-
-                    MyHeaders[(4+iHeaders + 3)+peArr.length+1] = 'Numerator';
-                    MyHeaders[(4+iHeaders + 3)+peArr.length+2] = 'Denominator';
-                    MyHeaders[(4+iHeaders + 3)+peArr.length+3] = 'Value';
-
-                    var iCount = 0;
-
-                    for (var i = 0; i < myData.rows.length; i++) 
-                    {
-                        if ((dxUID + ';').indexOf(myData.rows[i][0] + ';') >= 0)
-                        {
-                            for(var z = 0; z < ArrDxUID.length; z++){
-                                if (myData.rows[i][0] == ArrDxUID[z]){
+                            for (var x=1; x<ParentArr.length; x++)
+                            {
+                                ouHierarchyOffSet = x;
+                                if (ParentArr[x] == ouUID){
                                     break;
                                 }
                             }
-
-                            sParentPath = ReturnLookup(objParentNames,ReturnLookup(objNames,myData.rows[i][2]));
+                            
+                            sParentPath = ReturnLookup(objParentNames,ReturnLookup(objNames,myData.rows[1][2]));
                             ParentArr = sParentPath.split("/");
-                            MyRows[iCount] = [];
 
-                            MyRows[iCount][0] = sParentPath;
-                            MyRows[iCount][1] = ReturnLookup(objNames,myData.rows[i][0]);
-                            MyRows[iCount][2] = myData.rows[i][1];
+                            MyHeaders[0] = 'RESERVED_ouh'; 
+                            MyHeaders[1] = 'RESERVED_dx'; 
+                            MyHeaders[2] = 'RESERVED_pe'; 
+                            MyHeaders[3] = 'RESERVED_bgCol';
 
-                            if (ArrDxLegendSet[z] != undefined){
-                                if (ArrDxLegendSet[z].length > 0){
-                                    var bFound = 0;
-                                    for(var iLg=0; iLg<ArrDxLegendSet[z].length; iLg++)
-                                    {
-                                        if ((ArrDxLegendSet[z][iLg]) != undefined){
-                                            //console.log('ArrDxLegendSet[z][iLg]: ' + ArrDxLegendSet[z][iLg]);
-                                            var LegArr = (ArrDxLegendSet[z][iLg]).split(';');
-                                            if (parseFloat((myData.rows[i][3])) >= parseFloat(LegArr[2]) && parseFloat((myData.rows[i][3])) <= parseFloat(LegArr[3])){
-                                                MyRows[iCount][3] = (LegArr[1]);
-                                                bFound = 1
+                            for (var x=ouHierarchyOffSet; x<ParentArr.length; x++)
+                            {
+                                MyHeaders[4+iHeaders] = GetOUlevelName(objLevels,x);
+                                iHeaders += 1;
+                            }
+
+                            MyHeaders[4+iHeaders] = 'Group';
+                            MyHeaders[4+iHeaders+1] = ReturnLookup(objNames,myData.headers[0].name);
+                            MyHeaders[4+iHeaders+2] = 'Type';
+                            MyHeaders[4+iHeaders+3] = ReturnLookup(objNames,myData.headers[1].name);
+
+                            var peArr = (ReturnLookup(objNames,myData.rows[0][1])).split(" ");
+
+                            for (var y=0; y<peArr.length; y++){
+                                MyHeaders[(4+iHeaders + 3) + (y+1)] = ('Period_P' + (y+1));
+                            }
+
+                            MyHeaders[(4+iHeaders + 3)+peArr.length+1] = 'Numerator';
+                            MyHeaders[(4+iHeaders + 3)+peArr.length+2] = 'Denominator';
+                            MyHeaders[(4+iHeaders + 3)+peArr.length+3] = 'Value';
+
+                            var iCount = 0;
+
+                            for (var i = 0; i < myData.rows.length; i++) 
+                            {
+                                if ((dxUID + ';').indexOf(myData.rows[i][0] + ';') >= 0)
+                                {
+                                    for(var z = 0; z < ArrDxUID.length; z++){
+                                        if (myData.rows[i][0] == ArrDxUID[z]){
+                                            break;
+                                        }
+                                    }
+
+                                    sParentPath = ReturnLookup(objParentNames,ReturnLookup(objNames,myData.rows[i][2]));
+                                    ParentArr = sParentPath.split("/");
+                                    MyRows[iCount] = [];
+
+                                    MyRows[iCount][0] = sParentPath;
+                                    MyRows[iCount][1] = ReturnLookup(objNames,myData.rows[i][0]);
+                                    MyRows[iCount][2] = myData.rows[i][1];
+
+                                    if (ArrDxLegendSet[z] != undefined){
+                                        if (ArrDxLegendSet[z].length > 0){
+                                            var bFound = 0;
+                                            for(var iLg=0; iLg<ArrDxLegendSet[z].length; iLg++)
+                                            {
+                                                if ((ArrDxLegendSet[z][iLg]) != undefined){
+                                                    //console.log('ArrDxLegendSet[z][iLg]: ' + ArrDxLegendSet[z][iLg]);
+                                                    var LegArr = (ArrDxLegendSet[z][iLg]).split(';');
+                                                    if (parseFloat((myData.rows[i][3])) >= parseFloat(LegArr[2]) && parseFloat((myData.rows[i][3])) <= parseFloat(LegArr[3])){
+                                                        MyRows[iCount][3] = (LegArr[1]);
+                                                        bFound = 1
+                                                    }
+                                                }
+                                                else{
+                                                    MyRows[iCount][3] = ('#ffffff');
+                                                }
+                                            }
+                                            if (bFound == 0){
+                                                MyRows[iCount][3] = ('#ffffff');
                                             }
                                         }
                                         else{
                                             MyRows[iCount][3] = ('#ffffff');
                                         }
                                     }
-                                    if (bFound == 0){
+                                    else{
                                         MyRows[iCount][3] = ('#ffffff');
                                     }
-                                }
-                                else{
-                                    MyRows[iCount][3] = ('#ffffff');
-                                }
-                            }
-                            else{
-                                MyRows[iCount][3] = ('#ffffff');
-                            }
 
-                            iHeaders = 0;
+                                    iHeaders = 0;
 
-                            for (var x=ouHierarchyOffSet; x<ParentArr.length; x++){
-                                MyRows[iCount][4 + iHeaders] = ParentArr[x];
-                                iHeaders += 1
-                            }
+                                    for (var x=ouHierarchyOffSet; x<ParentArr.length; x++){
+                                        MyRows[iCount][4 + iHeaders] = ParentArr[x];
+                                        iHeaders += 1
+                                    }
 
-                            MyRows[iCount][4 + iHeaders] = ArrDxGroupName[z];
-                            MyRows[iCount][4 + iHeaders+1] = MyRows[iCount][1];
-                            MyRows[iCount][4 + iHeaders+2] = ArrTypeName[z];
-                            MyRows[iCount][4 + iHeaders+3] = ReturnLookup(objNames,myData.rows[i][1]);
+                                    MyRows[iCount][4 + iHeaders] = ArrDxGroupName[z];
+                                    MyRows[iCount][4 + iHeaders+1] = MyRows[iCount][1];
+                                    MyRows[iCount][4 + iHeaders+2] = ArrTypeName[z];
+                                    MyRows[iCount][4 + iHeaders+3] = ReturnLookup(objNames,myData.rows[i][1]);
 
-                            var peArr = (ReturnLookup(objNames,myData.rows[i][1])).split(" ");
+                                    var peArr = (ReturnLookup(objNames,myData.rows[i][1])).split(" ");
 
-                            for (var y=0; y<peArr.length; y++){
-                                MyRows[iCount][(7+iHeaders) + (y+1)] = peArr[y];
-                            }
+                                    for (var y=0; y<peArr.length; y++){
+                                        MyRows[iCount][(7+iHeaders) + (y+1)] = peArr[y];
+                                    }
 
-                            if (ArrDxIsIND[z]){
+                                    if (ArrDxIsIND[z]){
 
-                                /* START OF NUM/DENOM CALCULATIONS */
-                                var ArrN = ArrNumFormulaItems[z].split(';');
-                                var ArrD = ArrDenomFormulaItems[z].split(';');
+                                        /* START OF NUM/DENOM CALCULATIONS */
+                                        var ArrN = ArrNumFormulaItems[z].split(';');
+                                        var ArrD = ArrDenomFormulaItems[z].split(';');
 
-                                if (ArrN.length > 1){
-                                    var sTempFormula = ArrNumFormula[z];
-                                    for(var p = 0; p < (ArrN.length-1); p++) {
-                                        var ArrFsub = (ArrN[p]).split(".");
-                                        var sTempLookup = ArrFsub[0];
-                                        sTempLookup = sTempLookup.replace(/{/g,'');
-                                        sTempLookup = sTempLookup.replace(/}/g,'');
-                                        sTempLookup = sTempLookup.replace(/#/g,'');
-                                        iLookup = ReturnLookupValue(myData,sTempLookup,myData.rows[i][1],myData.rows[i][2])
-                                        iLookup = ((iLookup.toString().length == 0) ? 0 : iLookup);
-                                        if (sTempFormula.indexOf(ArrFsub[0] + '.' + ArrFsub[1]) < 0){
-                                            sTempFormula = sTempFormula.replace(sTempLookup,iLookup);
+                                        if (ArrN.length > 1){
+                                            var sTempFormula = ArrNumFormula[z];
+                                            for(var p = 0; p < (ArrN.length-1); p++) {
+                                                var ArrFsub = (ArrN[p]).split(".");
+                                                var sTempLookup = ArrFsub[0];
+                                                sTempLookup = sTempLookup.replace(/{/g,'');
+                                                sTempLookup = sTempLookup.replace(/}/g,'');
+                                                sTempLookup = sTempLookup.replace(/#/g,'');
+                                                iLookup = ReturnLookupValue(myData,sTempLookup,myData.rows[i][1],myData.rows[i][2])
+                                                iLookup = ((iLookup || '').toString().length == 0 ? 0 : iLookup);
+                                                if (sTempFormula.indexOf(ArrFsub[0] + '.' + ArrFsub[1]) < 0){
+                                                    sTempFormula = sTempFormula.replace(sTempLookup,iLookup);
+                                                }
+                                                else{
+                                                    sTempFormula = sTempFormula.replace(ArrFsub[0] + '.' + ArrFsub[1],iLookup);					
+                                                }
+                                            }
+                                            sTempFormula = sTempFormula.replace(/{/g,'(');
+                                            sTempFormula = sTempFormula.replace(/}/g,')');
+                                            sTempFormula = sTempFormula.replace(/#/g,'');
+                                            iNumTotal = eval(sTempFormula);
+                                            //console.log(ArrTypeName[z] + ' NUM: ' + ArrNumFormula[z] + ' = ' + sTempFormula + ' [' + iNumTotal + ']');
                                         }
                                         else{
-                                            sTempFormula = sTempFormula.replace(ArrFsub[0] + '.' + ArrFsub[1],iLookup);					
+                                            if ((ArrNumFormula[z]).indexOf('{') >= 0){
+                                                var ArrFsub = ArrNumFormula[z].split(".")
+                                                var sTempFormula = ArrFsub[0];
+                                                sTempFormula = sTempFormula.replace(/{/g,'');
+                                                sTempFormula = sTempFormula.replace(/}/g,'');
+                                                sTempFormula = sTempFormula.replace(/#/g,'');
+                                                iNumTotal = ReturnLookupValue(myData,sTempLookup,myData.rows[i][1],myData.rows[i][2]);
+                                            }
+                                            else
+                                            {
+                                                sTempFormula = ArrNumFormula[z];
+                                                iNumTotal = eval(sTempFormula);
+                                            }
+                                            //console.log(ArrTypeName[z] + ' NUM: ' + ArrNumFormula[z] + ' = ' + sTempFormula + ' [' + iNumTotal + ']');
                                         }
-                                    }
-                                    sTempFormula = sTempFormula.replace(/{/g,'(');
-                                    sTempFormula = sTempFormula.replace(/}/g,')');
-                                    sTempFormula = sTempFormula.replace(/#/g,'');
-                                    iNumTotal = eval(sTempFormula);
-                                    //console.log(ArrTypeName[z] + ' NUM: ' + ArrNumFormula[z] + ' = ' + sTempFormula + ' [' + iNumTotal + ']');
-                                }
-                                else{
-                                    if ((ArrNumFormula[z]).indexOf('{') >= 0){
-                                        var ArrFsub = ArrNumFormula[z].split(".")
-                                        var sTempFormula = ArrFsub[0];
-                                        sTempFormula = sTempFormula.replace(/{/g,'');
-                                        sTempFormula = sTempFormula.replace(/}/g,'');
-                                        sTempFormula = sTempFormula.replace(/#/g,'');
-                                        iNumTotal = ReturnLookupValue(myData,sTempLookup,myData.rows[i][1],myData.rows[i][2]);
-                                    }
-                                    else
-                                    {
-                                        sTempFormula = ArrNumFormula[z];
-                                        iNumTotal = eval(sTempFormula);
-                                    }
-                                    //console.log(ArrTypeName[z] + ' NUM: ' + ArrNumFormula[z] + ' = ' + sTempFormula + ' [' + iNumTotal + ']');
-                                }
 
-                                if (ArrD.length > 1){
-                                    var sTempFormula = ArrDenomFormula[z];
-                                    for(var p = 0; p < (ArrD.length-1); p++) {
-                                        var ArrFsub = (ArrD[p]).split(".");
-                                        var sTempLookup = ArrFsub[0];
-                                        sTempLookup = sTempLookup.replace(/{/g,'');
-                                        sTempLookup = sTempLookup.replace(/}/g,'');
-                                        sTempLookup = sTempLookup.replace(/#/g,'');
-                                        iLookup = ReturnLookupValue(myData,sTempLookup,myData.rows[i][1],myData.rows[i][2])
-                                        iLookup = ((iLookup.toString().length == 0) ? 0 : iLookup);
-                                        if (sTempFormula.indexOf(ArrFsub[0] + '.' + ArrFsub[1]) < 0){
-                                            sTempFormula = sTempFormula.replace(sTempLookup,iLookup);
+                                        if (ArrD.length > 1){
+                                            var sTempFormula = ArrDenomFormula[z];
+                                            for(var p = 0; p < (ArrD.length-1); p++) {
+                                                var ArrFsub = (ArrD[p]).split(".");
+                                                var sTempLookup = ArrFsub[0];
+                                                sTempLookup = sTempLookup.replace(/{/g,'');
+                                                sTempLookup = sTempLookup.replace(/}/g,'');
+                                                sTempLookup = sTempLookup.replace(/#/g,'');
+                                                iLookup = ReturnLookupValue(myData,sTempLookup,myData.rows[i][1],myData.rows[i][2]);
+                                                iLookup = ((iLookup || '').toString().length == 0 ? 0 : iLookup);
+                                                if (sTempFormula.indexOf(ArrFsub[0] + '.' + ArrFsub[1]) < 0){
+                                                    sTempFormula = sTempFormula.replace(sTempLookup,iLookup);
+                                                }
+                                                else{
+                                                    sTempFormula = sTempFormula.replace(ArrFsub[0] + '.' + ArrFsub[1],iLookup);					
+                                                }
+                                            }
+                                            sTempFormula = sTempFormula.replace(/{/g,'(');
+                                            sTempFormula = sTempFormula.replace(/}/g,')');
+                                            sTempFormula = sTempFormula.replace(/#/g,'');
+                                            iDenTotal = eval(sTempFormula);
+                                            //console.log(ArrTypeName[z] + ' DEN: ' + ArrDenomFormula[z] + ' = ' + sTempFormula + ' [' + iDenTotal + ']');
                                         }
                                         else{
-                                            sTempFormula = sTempFormula.replace(ArrFsub[0] + '.' + ArrFsub[1],iLookup);					
+                                            if ((ArrDenomFormula[z]).indexOf('{') >= 0){
+                                                var ArrFsub = ArrDenomFormula[z].split(".")
+                                                var sTempFormula = ArrFsub[0];
+                                                sTempFormula = sTempFormula.replace(/{/g,'');
+                                                sTempFormula = sTempFormula.replace(/}/g,'');
+                                                sTempFormula = sTempFormula.replace(/#/g,'');
+                                                iDenTotal = ReturnLookupValue(myData,sTempLookup,myData.rows[i][1],myData.rows[i][2]);
+                                            }
+                                            else
+                                            {
+                                                sTempFormula = ArrDenomFormula[z];
+                                                iDenTotal = eval(sTempFormula);
+                                            }
+                                            //console.log(ArrTypeName[z] + ' DEN: ' + ArrDenomFormula[z] + ' = ' + sTempFormula + ' [' + iDenTotal + ']');
                                         }
                                     }
-                                    sTempFormula = sTempFormula.replace(/{/g,'(');
-                                    sTempFormula = sTempFormula.replace(/}/g,')');
-                                    sTempFormula = sTempFormula.replace(/#/g,'');
-                                    iDenTotal = eval(sTempFormula);
-                                    //console.log(ArrTypeName[z] + ' DEN: ' + ArrDenomFormula[z] + ' = ' + sTempFormula + ' [' + iDenTotal + ']');
-                                }
-                                else{
-                                    if ((ArrDenomFormula[z]).indexOf('{') >= 0){
-                                        var ArrFsub = ArrDenomFormula[z].split(".")
-                                        var sTempFormula = ArrFsub[0];
-                                        sTempFormula = sTempFormula.replace(/{/g,'');
-                                        sTempFormula = sTempFormula.replace(/}/g,'');
-                                        sTempFormula = sTempFormula.replace(/#/g,'');
-                                        iDenTotal = ReturnLookupValue(myData,sTempLookup,myData.rows[i][1],myData.rows[i][2]);
+                                    else{
+                                        iNumTotal = parseFloat((myData.rows[i][3]).replace('.0',''));
+                                        iDenTotal = 1;
                                     }
-                                    else
-                                    {
-                                        sTempFormula = ArrDenomFormula[z];
-                                        iDenTotal = eval(sTempFormula);
-                                    }
-                                    //console.log(ArrTypeName[z] + ' DEN: ' + ArrDenomFormula[z] + ' = ' + sTempFormula + ' [' + iDenTotal + ']');
+
+                                    //MyRows[iCount][7+iHeaders + (peArr.length) + 1] = ((ArrDxIsIND[z] == 0) ? '' : iNumTotal);
+                                    //MyRows[iCount][7+iHeaders + (peArr.length) + 2] = ((ArrDxIsIND[z] == 0) ? '' : iDenTotal);
+                                    MyRows[iCount][7+iHeaders + (peArr.length) + 1] = iNumTotal;
+                                    MyRows[iCount][7+iHeaders + (peArr.length) + 2] = iDenTotal;
+                                    MyRows[iCount][7+iHeaders + (peArr.length) + 3] = parseFloat((myData.rows[i][3]).replace('.0',''));
+                                    
+                                    iCount += 1;
                                 }
+                            }
+
+                            function mySortingA(a,b) {
+                                a = a[0]+a[1]+a[2];
+                                b = b[0]+b[1]+b[2];
+                                return a == b ? 0 : (a < b ? -1 : 1)
+                            }
+
+                            function mySortingAsc(a,b) {
+                                console.log(a.length + ';' + b.length);
+                                a = a[1]+a[a.length-1];
+                                b = b[1]+b[b.length-1];
+                                return a == b ? 0 : (a < b ? -1 : 1)
+                            }
+
+                            function mySortingDesc(a,b) {
+                                console.log(a.length + ';' + b.length);
+                                a = a[1]+a[a.length-1];
+                                b = b[1]+b[b.length-1];
+                                return a == b ? 0 : (a < b ? -1 : 1)
+                            }
+
+                            if (pRank == 1){
+                                MyRows.sort(mySortingAsc);
                             }
                             else{
-                                iNumTotal = parseFloat((myData.rows[i][3]).replace('.0',''));
-                                iDenTotal = 1;
+                                if (pRank == -1){
+                                    MyRows.sort(mySortingDesc);
+                                }
+                                else{
+                                    MyRows.sort(mySortingA);
+                                }
                             }
 
-                            //MyRows[iCount][7+iHeaders + (peArr.length) + 1] = ((ArrDxIsIND[z] == 0) ? '' : iNumTotal);
-                            //MyRows[iCount][7+iHeaders + (peArr.length) + 2] = ((ArrDxIsIND[z] == 0) ? '' : iDenTotal);
-                            MyRows[iCount][7+iHeaders + (peArr.length) + 1] = iNumTotal;
-                            MyRows[iCount][7+iHeaders + (peArr.length) + 2] = iDenTotal;
-                            MyRows[iCount][7+iHeaders + (peArr.length) + 3] = parseFloat((myData.rows[i][3]).replace('.0',''));
-                            
-                            iCount += 1;
-                        }
-                    }
+                            var sReturn = '<table class="listTable gridTable">';
+                            sReturn += makeTableHEADER(MyHeaders);
+                            sReturn += makeTableBODY(MyRows);
+                            sReturn += '</table>';
 
-                    function mySortingA(a,b) {
-                        a = a[0]+a[1]+a[2];
-                        b = b[0]+b[1]+b[2];
-                        return a == b ? 0 : (a < b ? -1 : 1)
-                    }
+                            if (sDestination) {
+                                $(sDestination).html(sReturn);
+                            }
 
-                    function mySortingAsc(a,b) {
-                        //console.log(a.length + ';' + b.length);
-                        a = a[1]+a[a.length-1];
-                        b = b[1]+b[b.length-1];
-                        return a == b ? 0 : (a < b ? -1 : 1)
-                    }
+                            if (callbackFn) {
+                                callbackFn(sReturn);
+                            }
+                        });                        
 
-                    function mySortingDesc(a,b) {
-                        //console.log(a.length + ';' + b.length);
-                        a = a[1]+a[a.length-1];
-                        b = b[1]+b[b.length-1];
-                        return a == b ? 0 : (a < b ? -1 : 1)
-                    }
-
-                    if (pRank == 1){
-                        MyRows.sort(mySortingAsc);
-                    }
-                    else{
-                        if (pRank == -1){
-                            MyRows.sort(mySortingDesc);
-                        }
-                        else{
-                            MyRows.sort(mySortingA);
-                        }
-                    }
-
-                    var sReturn = '<table class="listTable gridTable">';
-                    sReturn += makeTableHEADER(MyHeaders);
-                    sReturn += makeTableBODY(MyRows);
-                    sReturn += '</table>';
-
-                    //return sReturn;
-
-                    if (sDestination) {
-                        $(sDestination).html(sReturn);
-                    }
-
-                    return sReturn;
+                    // end of indicator "done"
+                    });
                 };
 
                 makeTableHEADER = function(myArray) {
                     var result = "<thead>";
                     result += "<tr>";
-                    for(var i=4; i<(myArray.length); i++){
-                        result += "<th>"+myArray[i]+"</th>";
+                    for(var i = 4; i < (myArray.length); i++) {
+                        result += "<th>" + myArray[i] + "</th>";
                     }
                     result += "</tr>";
                     result += "</thead>";
@@ -2547,10 +2514,10 @@ Ext.onReady( function() {
 
                 makeTableBODY = function(myMultiDimensionArray) {
                     var result = "<tbody>";
-                    for(var i=0; i<myMultiDimensionArray.length; i++) {
+                    for(var i = 0; i < myMultiDimensionArray.length; i++) {
                         result += "<tr>";
-                        for(var j=4; j<(myMultiDimensionArray[i].length); j++){
-                            result += "<td style='white-space: nowrap;" + ((j==(myMultiDimensionArray[i].length-1))?"background-Color:" + myMultiDimensionArray[i][3] + ";":"") + "'>"+myMultiDimensionArray[i][j]+"</td>";
+                        for (var j = 4; j < myMultiDimensionArray[i].length; j++) {
+                            result += "<td style='white-space: nowrap;" + ((j == (myMultiDimensionArray[i].length-1)) ? "background-color:" + myMultiDimensionArray[i][3] + ";" : "") + "'>" + myMultiDimensionArray[i][j] + "</td>";
                         }
                         result += "</tr>";
                     }
@@ -2558,47 +2525,24 @@ Ext.onReady( function() {
                     return result;
                 };
 
-                ReturnLookupValue = function(theData,dx,pe,ou) {
-
-                    var i;
-                    var sReturn = '';
-
-                    for(i = 0; i < theData.rows.length; i++) {
-                        if ((theData.rows[i][0] == dx) && (theData.rows[i][1] == pe) && (theData.rows[i][2] == ou)) {
-                            sReturn = theData.rows[i][3];
+                ReturnLookupValue = function(theData, dx, pe, ou) {
+                    for (var i = 0; i < theData.rows.length; i++) {
+                        if ((theData.rows[i][0] === dx) && (theData.rows[i][1] === pe) && (theData.rows[i][2] === ou)) {
+                            return theData.rows[i][3];
                         }
                     }
-                    return sReturn;
                 };
 
-                ReturnLookup = function(theData,Val) {
-                    sReturn = theData[Val];
-                    return  sReturn;
+                ReturnLookup = function(theData,val) {
+                    return theData[val];
                 };
 
-                getParameterByName = function(name) {
-                    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-                    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-                        results = regex.exec(location.search);
-                        
-                    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-                };
-
-                GetOUlevelName = function(OUlevelJ,iOU) {
-
-                    var i;
-                    var sReturn = '';
-
-                    for(i = 0; i < OUlevelJ.organisationUnitLevels.length; i++) {
-
-                        if (OUlevelJ.organisationUnitLevels[i].level == iOU){
-
-                            sReturn = OUlevelJ.organisationUnitLevels[i].name;
-                        }
-                        
+                GetOUlevelName = function(OUlevelJ, iOU) {
+                    for (i = 0; i < OUlevelJ.length; i++) {
+                        if (OUlevelJ[i].level == iOU) {
+                            return OUlevelJ[i].name;
+                        }                        
                     }
-
-                    return sReturn;
                 };
 
                 formatNumber = function(num) {

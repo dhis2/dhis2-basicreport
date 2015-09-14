@@ -2589,24 +2589,18 @@ Ext.onReady( function() {
 			};
 
 			web.report.createReport = function(layout) {
-                var html = web.report.getHtml(layout);
-                
-                // timing
-                ns.app.dateRender = new Date();
+                web.report.getHtml(layout, function(html) {
+                    ns.app.centerRegion.removeAll(true);
+                    ns.app.centerRegion.update(html);
 
-				ns.app.centerRegion.removeAll(true);
-				ns.app.centerRegion.update(html);
+                    // after render
+                    ns.app.layout = layout;
 
-                // timing
-                ns.app.dateTotal = new Date();
-
-				// after render
-				ns.app.layout = layout;
-
-                if (NS.isDebug) {
-                    console.log("RENDER", (ns.app.dateTotal - ns.app.dateRender) / 1000);
-                    console.log(ns.app.layout);
-                }
+                    if (NS.isDebug) {
+                        console.log("RENDER", (ns.app.dateTotal - ns.app.dateRender) / 1000);
+                        console.log(ns.app.layout);
+                    }
+                });
 			};
 		}());
 	};
@@ -6623,7 +6617,7 @@ Ext.onReady( function() {
 		fn = function() {
 			if (++callbacks === requests.length) {
 
-				ns.core = NS.getCore(init);
+				ns.core = NS.getCore(init, cors);
                 ns.alert = ns.core.webAlert;
                 ns.ajax = ajax;
 				extendCore(ns.core);
