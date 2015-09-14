@@ -2098,7 +2098,7 @@ Ext.onReady( function() {
 			// pivot
 			web.report = {};
 
-			web.report.getHtml = function(layout, callbackFn) {
+			web.report.getHtml = function(layout, fCallback) {
                 var buildOutputReport,
                     createTableHeader,
                     createTableBody,
@@ -2147,6 +2147,8 @@ Ext.onReady( function() {
                         sLookupSubElements = '',
                         sNums = '',
                         sDenoms = '';
+
+                    // meta data
 
                     $.ajax({
                         url: init.contextPath + '/api/indicators.json?paging=false&filter=id:in:[' + aDxReqItems.join(',') + ']&fields=id,name,displayName,displayShortName,indicatorType,indicatorGroups[name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
@@ -2218,12 +2220,9 @@ Ext.onReady( function() {
                         }).done(function(analyticsData) {
                             var oMyData = analyticsData,
                             
-                                sReturn = '',
-                                iNum = 0,
-                                iDen = 0,
                                 sParentPath,
                                 aParent,
-                                iHeaders = 0,
+                                nHeaders = 0,
 
                                 oMetaDataNames = JSON.parse(JSON.stringify(oMyData.metaData.names)),
                                 oMetaDataParentNames = JSON.parse(JSON.stringify(oMyData.metaData.ouNameHierarchy)),
@@ -2238,7 +2237,9 @@ Ext.onReady( function() {
                                 
                                 fMySortingA,
                                 fMySortingAsc,
-                                fMySortingDesc;                                
+                                fMySortingDesc,
+                                
+                                sReturn = '';
                             
                             aOuResItems = oMyData.metaData.ou;
 
@@ -2261,26 +2262,26 @@ Ext.onReady( function() {
                             aMyHeaders[3] = 'RESERVED_bgCol';
 
                             for (var x = nOuHierarchyOffSet; x < aParent.length; x++) {
-                                aMyHeaders[4 + iHeaders] = getOuLevelName(oOrganisationUnitLevels, x);
-                                iHeaders += 1;
+                                aMyHeaders[4 + nHeaders] = getOuLevelName(oOrganisationUnitLevels, x);
+                                nHeaders += 1;
                             }
 
-                            aMyHeaders[4 + iHeaders] = 'Group';
-                            aMyHeaders[4 + iHeaders+1] = returnLookup(oMetaDataNames, oMyData.headers[0].name);
-                            aMyHeaders[4 + iHeaders+2] = 'Type';
-                            aMyHeaders[4 + iHeaders+3] = returnLookup(oMetaDataNames, oMyData.headers[1].name);
+                            aMyHeaders[4 + nHeaders] = 'Group';
+                            aMyHeaders[4 + nHeaders+1] = returnLookup(oMetaDataNames, oMyData.headers[0].name);
+                            aMyHeaders[4 + nHeaders+2] = 'Type';
+                            aMyHeaders[4 + nHeaders+3] = returnLookup(oMetaDataNames, oMyData.headers[1].name);
 
                             aPeNameSplit = (returnLookup(oMetaDataNames, oMyData.rows[0][1])).split(' ');
                             
                             for (var y = 0; y < aPeNameSplit.length; y++) {
-                                aMyHeaders[(4 + iHeaders + 3) + (y + 1)] = ('Period P' + (y+1));
+                                aMyHeaders[(4 + nHeaders + 3) + (y + 1)] = ('Period P' + (y+1));
                             }
 
-                            aMyHeaders[(4 + iHeaders + 3) + aPeNameSplit.length + 1] = 'Numerator';
-                            aMyHeaders[(4 + iHeaders + 3) + aPeNameSplit.length + 2] = 'Denominator';
-                            aMyHeaders[(4 + iHeaders + 3) + aPeNameSplit.length + 3] = 'Value';
+                            aMyHeaders[(4 + nHeaders + 3) + aPeNameSplit.length + 1] = 'Numerator';
+                            aMyHeaders[(4 + nHeaders + 3) + aPeNameSplit.length + 2] = 'Denominator';
+                            aMyHeaders[(4 + nHeaders + 3) + aPeNameSplit.length + 3] = 'Value';
 
-                            var iCount = 0;
+                            var nCount = 0;
 
                             for (var i = 0; i < oMyData.rows.length; i++) {
                                 if ((aDxReqItems.join(';') + ';').indexOf(oMyData.rows[i][0] + ';') >= 0) {
@@ -2292,11 +2293,11 @@ Ext.onReady( function() {
 
                                     sParentPath = returnLookup(oMetaDataParentNames,returnLookup(oMetaDataNames,oMyData.rows[i][2]));
                                     aParent = sParentPath.split("/");
-                                    aMyRows[iCount] = [];
+                                    aMyRows[nCount] = [];
 
-                                    aMyRows[iCount][0] = sParentPath;
-                                    aMyRows[iCount][1] = returnLookup(oMetaDataNames,oMyData.rows[i][0]);
-                                    aMyRows[iCount][2] = oMyData.rows[i][1];
+                                    aMyRows[nCount][0] = sParentPath;
+                                    aMyRows[nCount][1] = returnLookup(oMetaDataNames,oMyData.rows[i][0]);
+                                    aMyRows[nCount][2] = oMyData.rows[i][1];
 
                                     if (aDxLegendSet[z] != undefined) {
                                         if (aDxLegendSet[z].length > 0) {
@@ -2306,42 +2307,42 @@ Ext.onReady( function() {
                                                     //console.log('aDxLegendSet[z][iLg]: ' + aDxLegendSet[z][iLg]);
                                                     var LegArr = (aDxLegendSet[z][iLg]).split(';');
                                                     if (parseFloat((oMyData.rows[i][3])) >= parseFloat(LegArr[2]) && parseFloat((oMyData.rows[i][3])) <= parseFloat(LegArr[3])){
-                                                        aMyRows[iCount][3] = (LegArr[1]);
+                                                        aMyRows[nCount][3] = (LegArr[1]);
                                                         bFound = 1
                                                     }
                                                 }
-                                                else{
-                                                    aMyRows[iCount][3] = ('#ffffff');
+                                                else {
+                                                    aMyRows[nCount][3] = ('#ffffff');
                                                 }
                                             }
                                             if (bFound == 0){
-                                                aMyRows[iCount][3] = ('#ffffff');
+                                                aMyRows[nCount][3] = ('#ffffff');
                                             }
                                         }
-                                        else{
-                                            aMyRows[iCount][3] = ('#ffffff');
+                                        else {
+                                            aMyRows[nCount][3] = ('#ffffff');
                                         }
                                     }
-                                    else{
-                                        aMyRows[iCount][3] = ('#ffffff');
+                                    else {
+                                        aMyRows[nCount][3] = ('#ffffff');
                                     }
 
-                                    iHeaders = 0;
+                                    nHeaders = 0;
 
                                     for (var x=nOuHierarchyOffSet; x<aParent.length; x++){
-                                        aMyRows[iCount][4 + iHeaders] = aParent[x];
-                                        iHeaders += 1
+                                        aMyRows[nCount][4 + nHeaders] = aParent[x];
+                                        nHeaders += 1
                                     }
 
-                                    aMyRows[iCount][4 + iHeaders] = aDxGroupName[z];
-                                    aMyRows[iCount][4 + iHeaders+1] = aMyRows[iCount][1];
-                                    aMyRows[iCount][4 + iHeaders+2] = aTypeName[z];
-                                    aMyRows[iCount][4 + iHeaders+3] = returnLookup(oMetaDataNames,oMyData.rows[i][1]);
+                                    aMyRows[nCount][4 + nHeaders] = aDxGroupName[z];
+                                    aMyRows[nCount][4 + nHeaders+1] = aMyRows[nCount][1];
+                                    aMyRows[nCount][4 + nHeaders+2] = aTypeName[z];
+                                    aMyRows[nCount][4 + nHeaders+3] = returnLookup(oMetaDataNames,oMyData.rows[i][1]);
 
                                     aPeNameSplit = (returnLookup(oMetaDataNames,oMyData.rows[i][1])).split(" ");
                                     
                                     for (var y = 0; y < aPeNameSplit.length; y++) {
-                                        aMyRows[iCount][(7 + iHeaders) + (y + 1)] = aPeNameSplit[y];
+                                        aMyRows[nCount][(7 + nHeaders) + (y + 1)] = aPeNameSplit[y];
                                     }
 
                                     if (aDxIsIndicator[z]) {
@@ -2413,7 +2414,6 @@ Ext.onReady( function() {
                                             sTempDenomFormula = sTempDenomFormula.replace(/}/g,')');
                                             sTempDenomFormula = sTempDenomFormula.replace(/#/g,'');
                                             nTempDenomTotal = eval(sTempDenomFormula);
-                                            //console.log(aTypeName[z] + ' DEN: ' + aDenomFormula[z] + ' = ' + sTempDenomFormula + ' [' + nTempDenomTotal + ']');
                                         }
                                         else {
                                             if ((aDenomFormula[z]).indexOf('{') >= 0) {
@@ -2426,7 +2426,6 @@ Ext.onReady( function() {
                                                 sTempDenomFormula = aDenomFormula[z];
                                                 nTempDenomTotal = eval(sTempDenomFormula);
                                             }
-                                            //console.log(aTypeName[z] + ' DEN: ' + aDenomFormula[z] + ' = ' + sTempDenomFormula + ' [' + nTempDenomTotal + ']');
                                         }
                                     }
                                     else {
@@ -2434,13 +2433,13 @@ Ext.onReady( function() {
                                         nTempDenomTotal = 1;
                                     }
                                     
-                                    //aMyRows[iCount][7+iHeaders + (aPeNameSplit.length) + 1] = ((aDxIsIndicator[z] == 0) ? '' : nTempNumTotal);
-                                    //aMyRows[iCount][7+iHeaders + (aPeNameSplit.length) + 2] = ((aDxIsIndicator[z] == 0) ? '' : nTempDenomTotal);
-                                    aMyRows[iCount][7+iHeaders + (aPeNameSplit.length) + 1] = nTempNumTotal;
-                                    aMyRows[iCount][7+iHeaders + (aPeNameSplit.length) + 2] = nTempDenomTotal;
-                                    aMyRows[iCount][7+iHeaders + (aPeNameSplit.length) + 3] = parseFloat((oMyData.rows[i][3]).replace('.0',''));
+                                    //aMyRows[nCount][7+ nHeaders + (aPeNameSplit.length) + 1] = ((aDxIsIndicator[z] == 0) ? '' : nTempNumTotal);
+                                    //aMyRows[nCount][7+ nHeaders + (aPeNameSplit.length) + 2] = ((aDxIsIndicator[z] == 0) ? '' : nTempDenomTotal);
+                                    aMyRows[nCount][7 + nHeaders + (aPeNameSplit.length) + 1] = nTempNumTotal;
+                                    aMyRows[nCount][7 + nHeaders + (aPeNameSplit.length) + 2] = nTempDenomTotal;
+                                    aMyRows[nCount][7 + nHeaders + (aPeNameSplit.length) + 3] = parseFloat((oMyData.rows[i][3]).replace('.0',''));
                                     
-                                    iCount += 1;
+                                    nCount += 1;
                                 }
                             }
 
@@ -2462,19 +2461,9 @@ Ext.onReady( function() {
                                 return a == b ? 0 : (a < b ? -1 : 1)
                             }
 
-                            if (nRank == 1){
-                                aMyRows.sort(mySortingAsc);
-                            }
-                            else{
-                                if (nRank == -1){
-                                    aMyRows.sort(mySortingDesc);
-                                }
-                                else{
-                                    aMyRows.sort(mySortingA);
-                                }
-                            }
+                            aMyRows.sort(nRank === 1 ? mySortingAsc : (nRank === -1 ? mySortingDesc : mySortingA));
 
-                            var sReturn = '<table class="pivot displaydensity-comfortable">';
+                            sReturn = '<table class="pivot displaydensity-comfortable">';
                             sReturn += createTableHeader(aMyHeaders);
                             sReturn += createTableBody(aMyRows);
                             sReturn += '</table>';
@@ -2483,8 +2472,8 @@ Ext.onReady( function() {
                                 $(sDestination).html(sReturn);
                             }
 
-                            if (callbackFn) {
-                                callbackFn(sReturn);
+                            if (fCallback) {
+                                fCallback(sReturn);
                             }
                         });                        
 
