@@ -2348,97 +2348,96 @@ Ext.onReady( function() {
 
                                         /* START OF NUM/DENOM CALCULATIONS */
                                         var aTempNum = aNumFormulaItems[z].split(';'),
-                                            aTempDenom = aDenomFormulaItems[z].split(';');
+                                            sTempNumFormula,
+                                            aTempNumFsub,
+                                            sTempNumLookup,
+                                            nTempNumLookup,
+                                            nTempNumTotal,
+                                        
+                                            aTempDenom = aDenomFormulaItems[z].split(';'),
+                                            sTempDenomFormula,
+                                            aTempDenomFsub,
+                                            sTempDenomLookup,                                            
+                                            nTempDenomLookup,
+                                            nTempDenomTotal;
 
                                         if (aTempNum.length > 1) {
-                                            var sTempFormula = aNumFormula[z];
+                                            sTempNumFormula = aNumFormula[z];
                                             for (var p = 0; p < (aTempNum.length - 1); p++) {
-                                                var ArrFsub = (aTempNum[p]).split(".");
-                                                var sTempLookup = ArrFsub[0];
-                                                sTempLookup = sTempLookup.replace(/{/g,'');
-                                                sTempLookup = sTempLookup.replace(/}/g,'');
-                                                sTempLookup = sTempLookup.replace(/#/g,'');
-                                                iLookup = returnLookupValue(oMyData,sTempLookup,oMyData.rows[i][1],oMyData.rows[i][2])
-                                                iLookup = ((iLookup || '').toString().length == 0 ? 0 : iLookup);
-                                                if (sTempFormula.indexOf(ArrFsub[0] + '.' + ArrFsub[1]) < 0){
-                                                    sTempFormula = sTempFormula.replace(sTempLookup,iLookup);
+                                                aTempNumFsub = (aTempNum[p]).split(".");
+                                                sTempNumLookup = aTempNumFsub[0].replace(/{/g,'').replace(/}/g,'').replace(/#/g,'');
+                                                nTempNumLookup = returnLookupValue(oMyData, sTempNumLookup, oMyData.rows[i][1], oMyData.rows[i][2]);
+                                                nTempNumLookup = ((nTempNumLookup || '').toString().length == 0 ? 0 : nTempNumLookup);
+                                                if (sTempNumFormula.indexOf(aTempNumFsub[0] + '.' + aTempNumFsub[1]) < 0) {
+                                                    sTempNumFormula = sTempNumFormula.replace(sTempNumLookup, nTempNumLookup);
                                                 }
-                                                else{
-                                                    sTempFormula = sTempFormula.replace(ArrFsub[0] + '.' + ArrFsub[1],iLookup);					
+                                                else {
+                                                    sTempNumFormula = sTempNumFormula.replace(aTempNumFsub[0] + '.' + aTempNumFsub[1], nTempNumLookup);					
                                                 }
                                             }
-                                            sTempFormula = sTempFormula.replace(/{/g,'(');
-                                            sTempFormula = sTempFormula.replace(/}/g,')');
-                                            sTempFormula = sTempFormula.replace(/#/g,'');
-                                            iNumTotal = eval(sTempFormula);
-                                            //console.log(aTypeName[z] + ' NUM: ' + aNumFormula[z] + ' = ' + sTempFormula + ' [' + iNumTotal + ']');
+                                            sTempNumFormula = sTempNumFormula.replace(/{/g,'(');
+                                            sTempNumFormula = sTempNumFormula.replace(/}/g,')');
+                                            sTempNumFormula = sTempNumFormula.replace(/#/g,'');
+                                            nTempNumTotal = eval(sTempNumFormula);
+                                            //console.log(aTypeName[z] + ' NUM: ' + aNumFormula[z] + ' = ' + sTempNumFormula + ' [' + nTempNumTotal + ']');
                                         }
-                                        else{
+                                        else {
                                             if ((aNumFormula[z]).indexOf('{') >= 0){
-                                                var ArrFsub = aNumFormula[z].split(".")
-                                                var sTempFormula = ArrFsub[0];
-                                                sTempFormula = sTempFormula.replace(/{/g,'');
-                                                sTempFormula = sTempFormula.replace(/}/g,'');
-                                                sTempFormula = sTempFormula.replace(/#/g,'');
-                                                iNumTotal = returnLookupValue(oMyData,sTempLookup,oMyData.rows[i][1],oMyData.rows[i][2]);
+                                                aTempNumFsub = aNumFormula[z].split(".")
+                                                sTempNumFormula = aTempNumFsub[0].replace(/{/g,'').replace(/}/g,'').replace(/#/g,'');
+                                                nTempNumTotal = returnLookupValue(oMyData, sTempNumLookup, oMyData.rows[i][1], oMyData.rows[i][2]);
                                             }
                                             else
                                             {
-                                                sTempFormula = aNumFormula[z];
-                                                iNumTotal = eval(sTempFormula);
+                                                sTempNumFormula = aNumFormula[z];
+                                                nTempNumTotal = eval(sTempNumFormula);
                                             }
-                                            //console.log(aTypeName[z] + ' NUM: ' + aNumFormula[z] + ' = ' + sTempFormula + ' [' + iNumTotal + ']');
+                                            //console.log(aTypeName[z] + ' NUM: ' + aNumFormula[z] + ' = ' + sTempNumFormula + ' [' + nTempNumTotal + ']');
                                         }
 
-                                        if (aTempDenom.length > 1){
-                                            var sTempFormula = aDenomFormula[z];
-                                            for(var p = 0; p < (aTempDenom.length-1); p++) {
-                                                var ArrFsub = (aTempDenom[p]).split(".");
-                                                var sTempLookup = ArrFsub[0];
-                                                sTempLookup = sTempLookup.replace(/{/g,'');
-                                                sTempLookup = sTempLookup.replace(/}/g,'');
-                                                sTempLookup = sTempLookup.replace(/#/g,'');
-                                                iLookup = returnLookupValue(oMyData,sTempLookup,oMyData.rows[i][1],oMyData.rows[i][2]);
-                                                iLookup = ((iLookup || '').toString().length == 0 ? 0 : iLookup);
-                                                if (sTempFormula.indexOf(ArrFsub[0] + '.' + ArrFsub[1]) < 0){
-                                                    sTempFormula = sTempFormula.replace(sTempLookup,iLookup);
+                                        if (aTempDenom.length > 1) {
+                                            sTempDenomFormula = aDenomFormula[z];
+                                            for (var p = 0; p < (aTempDenom.length - 1); p++) {
+                                                aTempDenomFsub = (aTempDenom[p]).split(".");
+                                                sTempDenomLookup = aTempDenomFsub[0].replace(/{/g,'').replace(/}/g,'').replace(/#/g,'');
+                                                nTempDenomLookup = returnLookupValue(oMyData, sTempDenomLookup, oMyData.rows[i][1], oMyData.rows[i][2]);
+                                                nTempDenomLookup = ((nTempDenomLookup || '').toString().length == 0 ? 0 : nTempDenomLookup);
+                                                if (sTempDenomFormula.indexOf(aTempDenomFsub[0] + '.' + aTempDenomFsub[1]) < 0) {
+                                                    sTempDenomFormula = sTempDenomFormula.replace(sTempDenomLookup, nTempDenomLookup);
                                                 }
                                                 else{
-                                                    sTempFormula = sTempFormula.replace(ArrFsub[0] + '.' + ArrFsub[1],iLookup);					
+                                                    sTempDenomFormula = sTempDenomFormula.replace(aTempDenomFsub[0] + '.' + aTempDenomFsub[1],nTempDenomLookup);					
                                                 }
                                             }
-                                            sTempFormula = sTempFormula.replace(/{/g,'(');
-                                            sTempFormula = sTempFormula.replace(/}/g,')');
-                                            sTempFormula = sTempFormula.replace(/#/g,'');
-                                            iDenTotal = eval(sTempFormula);
-                                            //console.log(aTypeName[z] + ' DEN: ' + aDenomFormula[z] + ' = ' + sTempFormula + ' [' + iDenTotal + ']');
+                                            sTempDenomFormula = sTempDenomFormula.replace(/{/g,'(');
+                                            sTempDenomFormula = sTempDenomFormula.replace(/}/g,')');
+                                            sTempDenomFormula = sTempDenomFormula.replace(/#/g,'');
+                                            nTempDenomTotal = eval(sTempDenomFormula);
+                                            //console.log(aTypeName[z] + ' DEN: ' + aDenomFormula[z] + ' = ' + sTempDenomFormula + ' [' + nTempDenomTotal + ']');
                                         }
-                                        else{
-                                            if ((aDenomFormula[z]).indexOf('{') >= 0){
-                                                var ArrFsub = aDenomFormula[z].split(".")
-                                                var sTempFormula = ArrFsub[0];
-                                                sTempFormula = sTempFormula.replace(/{/g,'');
-                                                sTempFormula = sTempFormula.replace(/}/g,'');
-                                                sTempFormula = sTempFormula.replace(/#/g,'');
-                                                iDenTotal = returnLookupValue(oMyData,sTempLookup,oMyData.rows[i][1],oMyData.rows[i][2]);
+                                        else {
+                                            if ((aDenomFormula[z]).indexOf('{') >= 0) {
+                                                aTempDenomFsub = aDenomFormula[z].split(".")
+                                                sTempDenomFormula = aTempDenomFsub[0].replace(/{/g,'').replace(/}/g,'').replace(/#/g,'');
+                                                nTempDenomTotal = returnLookupValue(oMyData, sTempDenomLookup, oMyData.rows[i][1], oMyData.rows[i][2]);
                                             }
                                             else
                                             {
-                                                sTempFormula = aDenomFormula[z];
-                                                iDenTotal = eval(sTempFormula);
+                                                sTempDenomFormula = aDenomFormula[z];
+                                                nTempDenomTotal = eval(sTempDenomFormula);
                                             }
-                                            //console.log(aTypeName[z] + ' DEN: ' + aDenomFormula[z] + ' = ' + sTempFormula + ' [' + iDenTotal + ']');
+                                            //console.log(aTypeName[z] + ' DEN: ' + aDenomFormula[z] + ' = ' + sTempDenomFormula + ' [' + nTempDenomTotal + ']');
                                         }
                                     }
                                     else {
-                                        iNumTotal = parseFloat((oMyData.rows[i][3]).replace('.0',''));
-                                        iDenTotal = 1;
+                                        nTempNumTotal = parseFloat((oMyData.rows[i][3]).replace('.0',''));
+                                        nTempDenomTotal = 1;
                                     }
                                     
-                                    //aMyRows[iCount][7+iHeaders + (aPeNameSplit.length) + 1] = ((aDxIsIndicator[z] == 0) ? '' : iNumTotal);
-                                    //aMyRows[iCount][7+iHeaders + (aPeNameSplit.length) + 2] = ((aDxIsIndicator[z] == 0) ? '' : iDenTotal);
-                                    aMyRows[iCount][7+iHeaders + (aPeNameSplit.length) + 1] = iNumTotal;
-                                    aMyRows[iCount][7+iHeaders + (aPeNameSplit.length) + 2] = iDenTotal;
+                                    //aMyRows[iCount][7+iHeaders + (aPeNameSplit.length) + 1] = ((aDxIsIndicator[z] == 0) ? '' : nTempNumTotal);
+                                    //aMyRows[iCount][7+iHeaders + (aPeNameSplit.length) + 2] = ((aDxIsIndicator[z] == 0) ? '' : nTempDenomTotal);
+                                    aMyRows[iCount][7+iHeaders + (aPeNameSplit.length) + 1] = nTempNumTotal;
+                                    aMyRows[iCount][7+iHeaders + (aPeNameSplit.length) + 2] = nTempDenomTotal;
                                     aMyRows[iCount][7+iHeaders + (aPeNameSplit.length) + 3] = parseFloat((oMyData.rows[i][3]).replace('.0',''));
                                     
                                     iCount += 1;
