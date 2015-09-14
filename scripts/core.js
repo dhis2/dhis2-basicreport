@@ -2106,17 +2106,15 @@ Ext.onReady( function() {
                     ajax = support.connection.ajax;
                     
                 BuildOutputReport = function(sDestination) {
-                    var dxItems = [],
-                        peItems = [],
-                        ouItems = [],
-                        dimensionNameItemArrayMap = {},
-                        dxUID,
-                        peUID,
-                        ouUID;
+                    var dxReqItems = [],
+                        peReqItems = [],
+                        ouReqItems = [],
+                        dimNameReqItemArrayMap = {},
+                        ouResItems = [];
 
-                    dimensionNameItemArrayMap[dimConf.data.dimensionName] = dxItems;
-                    dimensionNameItemArrayMap[dimConf.period.dimensionName] = peItems;
-                    dimensionNameItemArrayMap[dimConf.organisationUnit.dimensionName] = ouItems;
+                    dimNameReqItemArrayMap[dimConf.data.dimensionName] = dxReqItems;
+                    dimNameReqItemArrayMap[dimConf.period.dimensionName] = peReqItems;
+                    dimNameReqItemArrayMap[dimConf.organisationUnit.dimensionName] = ouReqItems;
 
                     for (var i = 0, dim; i < layout.columns.length; i++) {
                         dim = layout.columns[i];
@@ -2124,17 +2122,12 @@ Ext.onReady( function() {
                         for (var j = 0, item; j < dim.items.length; j++) {
                             item = dim.items[j];
 
-                            dimensionNameItemArrayMap[dim.dimension].push(item.id);
+                            dimNameReqItemArrayMap[dim.dimension].push(item.id);
                         }
                     }
 
-                    dxUID = dxItems.join(';');
-                    peUID = peItems.join(';');
-                    ouUID = ouItems.join(';');
-
                     var pRank = 1;
                     var ouHierarchyOffSet = 0;
-                    var ArrDxUID = [];
                     var ArrDxName = [];
                     var ArrDxShort = [];
                     var ArrNumFormula = [];
@@ -2153,17 +2146,15 @@ Ext.onReady( function() {
                     var Nums = '';
                     var Denoms = '';
 
-                    ArrDxUID = (dxUID).split(';');
-
                     $.ajax({
-                        url: init.contextPath + '/api/indicators.json?paging=false&filter=id:in:[' + ArrDxUID.join(',') + ']&fields=id,name,displayName,displayShortName,indicatorType,indicatorGroups[name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
+                        url: init.contextPath + '/api/indicators.json?paging=false&filter=id:in:[' + dxReqItems.join(',') + ']&fields=id,name,displayName,displayShortName,indicatorType,indicatorGroups[name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
                         headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
                     }).done(function(dxData) {
                         var indicators = dxData.indicators;
 
                         for (var i = 0, dxObjJ, dxLegendsets, numeratoritems, denominatoritems, lastNum; i < indicators.length; i++) {
                             dxObjJ = indicators[i];
-                            dxUniqueID += (ArrDxUID[i] + ';');
+                            dxUniqueID += (dxReqItems[i] + ';');
                             ArrDxIsIND[i] = 1;
                             ArrDxName[i] = dxObjJ.displayName;
                             ArrDxShort[i] = dxObjJ.displayShortName;
@@ -2222,10 +2213,12 @@ Ext.onReady( function() {
                         // analytics
 
                         $.ajax({
-                            url: init.contextPath + '/api/analytics.json?dimension=pe:' + peUID + '&dimension=dx:' + LookupSubElements + dxUID + '&dimension=ou:' + ouUID + '&hierarchyMeta=true&displayProperty=NAME&showHierarchy=true',
+                            url: init.contextPath + '/api/analytics.json?dimension=pe:' + peReqItems.join(';') + '&dimension=dx:' + LookupSubElements + dxReqItems.join(';') + '&dimension=ou:' + ouReqItems.join(';') + '&hierarchyMeta=true&displayProperty=NAME&showHierarchy=true',
                             headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
                         }).done(function(analyticsData) {
                             var myData = analyticsData;
+                            ouResItems = myData.metaData.ou;
+                            
                             var sReturn = '';
                             var iNum = 0;
                             var iDen = 0;
@@ -2249,7 +2242,7 @@ Ext.onReady( function() {
                             for (var x=1; x<ParentArr.length; x++)
                             {
                                 ouHierarchyOffSet = x;
-                                if (ParentArr[x] == ouUID){
+                                if (ParentArr[x] == ouResItems){
                                     break;
                                 }
                             }
@@ -2276,7 +2269,7 @@ Ext.onReady( function() {
                             var peArr = (ReturnLookup(objNames,myData.rows[0][1])).split(" ");
 
                             for (var y=0; y<peArr.length; y++){
-                                MyHeaders[(4+iHeaders + 3) + (y+1)] = ('Period_P' + (y+1));
+                                MyHeaders[(4+iHeaders + 3) + (y+1)] = ('Period P' + (y+1));
                             }
 
                             MyHeaders[(4+iHeaders + 3)+peArr.length+1] = 'Numerator';
@@ -2287,10 +2280,10 @@ Ext.onReady( function() {
 
                             for (var i = 0; i < myData.rows.length; i++) 
                             {
-                                if ((dxUID + ';').indexOf(myData.rows[i][0] + ';') >= 0)
+                                if ((dxReqItems.join(';') + ';').indexOf(myData.rows[i][0] + ';') >= 0)
                                 {
-                                    for(var z = 0; z < ArrDxUID.length; z++){
-                                        if (myData.rows[i][0] == ArrDxUID[z]){
+                                    for(var z = 0; z < dxReqItems.length; z++){
+                                        if (myData.rows[i][0] == dxReqItems[z]){
                                             break;
                                         }
                                     }
@@ -2458,14 +2451,12 @@ Ext.onReady( function() {
                             }
 
                             function mySortingAsc(a,b) {
-                                console.log(a.length + ';' + b.length);
                                 a = a[1]+a[a.length-1];
                                 b = b[1]+b[b.length-1];
                                 return a == b ? 0 : (a < b ? -1 : 1)
                             }
 
                             function mySortingDesc(a,b) {
-                                console.log(a.length + ';' + b.length);
                                 a = a[1]+a[a.length-1];
                                 b = b[1]+b[b.length-1];
                                 return a == b ? 0 : (a < b ? -1 : 1)
@@ -2483,7 +2474,7 @@ Ext.onReady( function() {
                                 }
                             }
 
-                            var sReturn = '<table class="listTable gridTable">';
+                            var sReturn = '<table class="pivot displaydensity-comfortable">';
                             sReturn += makeTableHEADER(MyHeaders);
                             sReturn += makeTableBODY(MyRows);
                             sReturn += '</table>';
@@ -2505,7 +2496,7 @@ Ext.onReady( function() {
                     var result = "<thead>";
                     result += "<tr>";
                     for(var i = 4; i < (myArray.length); i++) {
-                        result += "<th>" + myArray[i] + "</th>";
+                        result += "<th class='pivot-dim-label'>" + myArray[i] + "</th>";
                     }
                     result += "</tr>";
                     result += "</thead>";
@@ -2517,7 +2508,7 @@ Ext.onReady( function() {
                     for(var i = 0; i < myMultiDimensionArray.length; i++) {
                         result += "<tr>";
                         for (var j = 4; j < myMultiDimensionArray[i].length; j++) {
-                            result += "<td style='white-space: nowrap;" + ((j == (myMultiDimensionArray[i].length-1)) ? "background-color:" + myMultiDimensionArray[i][3] + ";" : "") + "'>" + myMultiDimensionArray[i][j] + "</td>";
+                            result += "<td style='white-space: normal;" + ((j == (myMultiDimensionArray[i].length-1)) ? "background-color:" + myMultiDimensionArray[i][3] + ";" : "") + "'>" + myMultiDimensionArray[i][j] + "</td>";
                         }
                         result += "</tr>";
                     }

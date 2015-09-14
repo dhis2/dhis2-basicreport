@@ -190,20 +190,25 @@ table.pivot {
 	user-select: all;
 }
 
+table.pivot.displaydensity-comfortable th,
 table.pivot.displaydensity-comfortable td {
 	padding: 7px;
 }
+table.pivot.displaydensity-compact th,
 table.pivot.displaydensity-compact td {
 	padding: 3px;
 }
 
+table.pivot.fontsize-large th,
 table.pivot.fontsize-large td {
 	font-size: 13px;
 }
+table.pivot.fontsize-small th,
 table.pivot.fontsize-small td {
 	font-size: 10px;
 }
 
+.pivot th,
 .pivot td {
 	padding: 5px;
 	border: 1px solid #b2b2b2;
