@@ -2232,7 +2232,13 @@ Ext.onReady( function() {
                                 oOrganisationUnitLevels = init.organisationUnitLevels,
                             
                                 aMyHeaders = [],
-                                aMyRows = [];
+                                aMyRows = [],
+
+                                aPeNameSplit,
+                                
+                                fMySortingA,
+                                fMySortingAsc,
+                                fMySortingDesc;                                
                             
                             aOuResItems = oMyData.metaData.ou;
 
@@ -2264,15 +2270,15 @@ Ext.onReady( function() {
                             aMyHeaders[4 + iHeaders+2] = 'Type';
                             aMyHeaders[4 + iHeaders+3] = returnLookup(oMetaDataNames, oMyData.headers[1].name);
 
-                            var peArr = (returnLookup(oMetaDataNames, oMyData.rows[0][1])).split(' ');
-console.log("peArr", peArr);
-                            for (var y = 0; y < peArr.length; y++) {
+                            aPeNameSplit = (returnLookup(oMetaDataNames, oMyData.rows[0][1])).split(' ');
+                            
+                            for (var y = 0; y < aPeNameSplit.length; y++) {
                                 aMyHeaders[(4 + iHeaders + 3) + (y + 1)] = ('Period P' + (y+1));
                             }
 
-                            aMyHeaders[(4 + iHeaders + 3)+peArr.length + 1] = 'Numerator';
-                            aMyHeaders[(4 + iHeaders + 3)+peArr.length + 2] = 'Denominator';
-                            aMyHeaders[(4 + iHeaders + 3)+peArr.length + 3] = 'Value';
+                            aMyHeaders[(4 + iHeaders + 3) + aPeNameSplit.length + 1] = 'Numerator';
+                            aMyHeaders[(4 + iHeaders + 3) + aPeNameSplit.length + 2] = 'Denominator';
+                            aMyHeaders[(4 + iHeaders + 3) + aPeNameSplit.length + 3] = 'Value';
 
                             var iCount = 0;
 
@@ -2332,22 +2338,22 @@ console.log("peArr", peArr);
                                     aMyRows[iCount][4 + iHeaders+2] = aTypeName[z];
                                     aMyRows[iCount][4 + iHeaders+3] = returnLookup(oMetaDataNames,oMyData.rows[i][1]);
 
-                                    peArr = (returnLookup(oMetaDataNames,oMyData.rows[i][1])).split(" ");
-
-                                    for (var y = 0; y < peArr.length; y++) {
-                                        aMyRows[iCount][(7 + iHeaders) + (y + 1)] = peArr[y];
+                                    aPeNameSplit = (returnLookup(oMetaDataNames,oMyData.rows[i][1])).split(" ");
+                                    
+                                    for (var y = 0; y < aPeNameSplit.length; y++) {
+                                        aMyRows[iCount][(7 + iHeaders) + (y + 1)] = aPeNameSplit[y];
                                     }
 
                                     if (aDxIsIndicator[z]) {
 
                                         /* START OF NUM/DENOM CALCULATIONS */
-                                        var ArrN = aNumFormulaItems[z].split(';');
-                                        var ArrD = aDenomFormulaItems[z].split(';');
+                                        var aTempNum = aNumFormulaItems[z].split(';'),
+                                            aTempDenom = aDenomFormulaItems[z].split(';');
 
-                                        if (ArrN.length > 1){
+                                        if (aTempNum.length > 1) {
                                             var sTempFormula = aNumFormula[z];
-                                            for(var p = 0; p < (ArrN.length-1); p++) {
-                                                var ArrFsub = (ArrN[p]).split(".");
+                                            for (var p = 0; p < (aTempNum.length - 1); p++) {
+                                                var ArrFsub = (aTempNum[p]).split(".");
                                                 var sTempLookup = ArrFsub[0];
                                                 sTempLookup = sTempLookup.replace(/{/g,'');
                                                 sTempLookup = sTempLookup.replace(/}/g,'');
@@ -2384,10 +2390,10 @@ console.log("peArr", peArr);
                                             //console.log(aTypeName[z] + ' NUM: ' + aNumFormula[z] + ' = ' + sTempFormula + ' [' + iNumTotal + ']');
                                         }
 
-                                        if (ArrD.length > 1){
+                                        if (aTempDenom.length > 1){
                                             var sTempFormula = aDenomFormula[z];
-                                            for(var p = 0; p < (ArrD.length-1); p++) {
-                                                var ArrFsub = (ArrD[p]).split(".");
+                                            for(var p = 0; p < (aTempDenom.length-1); p++) {
+                                                var ArrFsub = (aTempDenom[p]).split(".");
                                                 var sTempLookup = ArrFsub[0];
                                                 sTempLookup = sTempLookup.replace(/{/g,'');
                                                 sTempLookup = sTempLookup.replace(/}/g,'');
@@ -2428,30 +2434,30 @@ console.log("peArr", peArr);
                                         iNumTotal = parseFloat((oMyData.rows[i][3]).replace('.0',''));
                                         iDenTotal = 1;
                                     }
-
-                                    //aMyRows[iCount][7+iHeaders + (peArr.length) + 1] = ((aDxIsIndicator[z] == 0) ? '' : iNumTotal);
-                                    //aMyRows[iCount][7+iHeaders + (peArr.length) + 2] = ((aDxIsIndicator[z] == 0) ? '' : iDenTotal);
-                                    aMyRows[iCount][7+iHeaders + (peArr.length) + 1] = iNumTotal;
-                                    aMyRows[iCount][7+iHeaders + (peArr.length) + 2] = iDenTotal;
-                                    aMyRows[iCount][7+iHeaders + (peArr.length) + 3] = parseFloat((oMyData.rows[i][3]).replace('.0',''));
+                                    
+                                    //aMyRows[iCount][7+iHeaders + (aPeNameSplit.length) + 1] = ((aDxIsIndicator[z] == 0) ? '' : iNumTotal);
+                                    //aMyRows[iCount][7+iHeaders + (aPeNameSplit.length) + 2] = ((aDxIsIndicator[z] == 0) ? '' : iDenTotal);
+                                    aMyRows[iCount][7+iHeaders + (aPeNameSplit.length) + 1] = iNumTotal;
+                                    aMyRows[iCount][7+iHeaders + (aPeNameSplit.length) + 2] = iDenTotal;
+                                    aMyRows[iCount][7+iHeaders + (aPeNameSplit.length) + 3] = parseFloat((oMyData.rows[i][3]).replace('.0',''));
                                     
                                     iCount += 1;
                                 }
                             }
 
-                            function mySortingA(a,b) {
+                            mySortingA = function(a,b) {
                                 a = a[0]+a[1]+a[2];
                                 b = b[0]+b[1]+b[2];
                                 return a == b ? 0 : (a < b ? -1 : 1)
-                            }
+                            };
 
-                            function mySortingAsc(a,b) {
+                            mySortingAsc = function(a,b) {
                                 a = a[1]+a[a.length-1];
                                 b = b[1]+b[b.length-1];
                                 return a == b ? 0 : (a < b ? -1 : 1)
                             }
 
-                            function mySortingDesc(a,b) {
+                            mySortingDesc = function(a,b) {
                                 a = a[1]+a[a.length-1];
                                 b = b[1]+b[b.length-1];
                                 return a == b ? 0 : (a < b ? -1 : 1)
