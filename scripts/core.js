@@ -2093,873 +2093,521 @@ Ext.onReady( function() {
 			};
 
 			// pivot
-			web.pivot = {};
+			web.report = {};
 
-			web.pivot.sort = function(xLayout, xResponse, xColAxis) {
-				var xResponse = Ext.clone(xResponse),
-					id = xLayout.sorting.id,
-					dim = xLayout.rows[0],
-					valueMap = xResponse.idValueMap,
-					direction = xLayout.sorting ? xLayout.sorting.direction : 'DESC',
-					layout;
+			web.report.getHtml = function(layout) {
+                var BuildOutputReport,
+                    makeTableHEADER,
+                    makeTableBODY,
+                    ReturnLookupValue,
+                    ReturnLookup,
+                    getParameterByName,
+                    GetOUlevelName,
+                    formatNumber;
+                    
+                BuildOutputReport = function(sDestination) {
 
-				dim.ids = [];
+                    //var dxUID = getParameterByName('dx');
+                    //var peUID = getParameterByName('per');
+                    //var ouUID = getParameterByName('ou');
 
-				// relative id?
-				if (Ext.isString(id)) {
-					id = id.toLowerCase() === 'total' ? 'total_' : id;
-				}
-				else if (Ext.isNumber(id)) {
-					if (id === 0) {
-						id = 'total_';
-					}
-					else {
-						id = xColAxis.ids[parseInt(id) - 1];
-					}
-				}
-				else {
-					return xLayout;
-				}
+                    var dxItems = [],
+                        peItems = [],
+                        ouItems = [],
+                        dimensionNameItemArrayMap = {},
+                        dxUID,
+                        peUID,
+                        ouUID;
 
-				// collect values
-				for (var i = 0, item, key, value; i < dim.items.length; i++) {
-					item = dim.items[i];
-					key = id + item.id;
-					value = parseFloat(valueMap[key]);
+                    dimensionNameItemArrayMap[dimConf.data.dimensionName] = dxItems;
+                    dimensionNameItemArrayMap[dimConf.period.dimensionName] = peItems;
+                    dimensionNameItemArrayMap[dimConf.organisationUnit.dimensionName] = ouItems;
 
-					item.value = Ext.isNumber(value) ? value : (Number.MAX_VALUE * -1);
-				}
+                    for (var i = 0, dim; i < layout.columns.length; i++) {
+                        dim = layout.columns[i];
 
-				// sort
-				support.prototype.array.sort(dim.items, direction, 'value');
+                        for (var j = 0, item; j < dim.items.length; j++) {
+                            item = dim.items[j];
 
-				// new id order
-				for (var i = 0; i < dim.items.length; i++) {
-					dim.ids.push(dim.items[i].id);
-				}
-
-				// update id
-				if (id !== xLayout.sorting.id) {
-					xLayout.sorting.id = id;
-				}
-
-				return xLayout;
-			};
-
-			web.pivot.getHtml = function(xLayout, xResponse, xColAxis, xRowAxis) {
-				var getRoundedHtmlValue,
-					getTdHtml,
-					doSubTotals,
-					doRowTotals,
-                    doColTotals,
-                    doSortableColumnHeaders,
-					getColAxisHtmlArray,
-					getRowHtmlArray,
-					rowAxisHtmlArray,
-					getColTotalHtmlArray,
-					getGrandTotalHtmlArray,
-					getTotalHtmlArray,
-					getHtml,
-					getUniqueFactor = function(xAxis) {
-                        var unique;
-
-						if (!xAxis) {
-							return null;
-						}
-
-						unique = xAxis.xItems.unique;
-
-						if (unique) {
-							return unique.length < 2 ? 1 : (xAxis.size / unique[0].length);
-						}
-
-						return null;
-					},
-					colUniqueFactor = getUniqueFactor(xColAxis),
-					rowUniqueFactor = getUniqueFactor(xRowAxis),
-					valueItems = [],
-					valueObjects = [],
-					totalColObjects = [],
-					uuidDimUuidsMap = {},
-					isLegendSet = Ext.isObject(xLayout.legendSet) && Ext.isArray(xLayout.legendSet.legends) && xLayout.legendSet.legends.length,
-                    tdCount = 0,
-                    htmlArray;
-
-				xResponse.sortableIdObjects = [];
-
-				getRoundedHtmlValue = function(value, dec) {
-					dec = dec || 2;
-					return parseFloat(support.prototype.number.roundIf(value, 2)).toString();
-				};
-
-				getTdHtml = function(config, metaDataId) {
-					var bgColor,
-						legends,
-						colSpan,
-						rowSpan,
-						htmlValue,
-						displayDensity,
-						fontSize,
-						isNumeric = Ext.isObject(config) && Ext.isString(config.type) && config.type.substr(0,5) === 'value' && !config.empty,
-						isValue = isNumeric && config.type === 'value',
-						cls = '',
-						html = '',
-                        getHtmlValue;
-
-                    getHtmlValue = function(config) {
-                        var str = config.htmlValue,
-                            n = parseFloat(config.htmlValue);
-
-                        if (config.collapsed) {
-                            return '';
+                            dimensionNameItemArrayMap[dim.dimension].push(item.id);
                         }
-
-                        if (isValue) {
-                            if (Ext.isBoolean(str)) {
-                                return str;
-                            }
-
-                            //if (!Ext.isNumber(n) || n != str || new Date(str).toString() !== 'Invalid Date') {
-                            if (!Ext.isNumber(n) || n != str) {
-                                return str;
-                            }
-
-                            return n;
-                        }
-
-                        return str || '';
                     }
 
-					if (!Ext.isObject(config)) {
-						return '';
-					}
+                    dxUID = dxItems.join(';');
+                    peUID = peItems.join(';');
+                    ouUID = ouItems.join(';');
+                    
+                    //var pRank = getParameterByName('rank');
+                    var pRank = 1;
+                    var ouHierarchyOffSet = 0;
+                    var ArrDxUID = [];
+                    var LastNum;
+                    var LastDen;
+                    var ArrNumFormulaItems = [];
+                    var ArrDenomFormulaItems = [];
+                    var UniqueNumDenSubElements = '';
+                    var myDx = [];
 
-                    if (config.hidden || config.collapsed) {
-                        return '';
+                    ArrDxUID = (dxUID).split(';');
+
+                    for (var i = 0; i < ArrDxUID.length; i++)
+                    {
+                        var dxObj = init.contextPath + '/api/indicators/' + ArrDxUID[i] + '.json?fields=id,name,displayName,displayShortName,indicatorType,indicatorGroups[name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]';
+                        var dxObjJ = $.ajax({url:dxObj, async: false}).responseText;
+
+                        if (dxObjJ.indexOf('Not Found') != -1)
+                        {
+                            var dxObj = init.contextPath + '/api/dataElements/' + ArrDxUID[i] + '.json';
+                            var dxObjJ = $.ajax({url:dxObj, async: false}).responseText; 
+
+                            if (dxObjJ.indexOf('Not Found') != -1){
+
+                            }
+                            else{
+                                dxObjJ = JSON.parse(dxObjJ);
+                                myDx.push({
+                                    indicator: 0,
+                                    dx: ArrDxUID[i],
+                                    displayName: dxObjJ.displayName,
+                                    displayShortName: dxObjJ.displayShortName,
+                                    numeratorFormula: '',
+                                    numeratorDescription: '',
+                                    numeratorItems: [],
+                                    denominatorFormula: '',
+                                    denominatorDescription: '',
+                                    denominatorItems: [],
+                                    typeName: dxObjJ.numberType,
+                                    groupName: ((dxObjJ.dataElementGroups.length > 0) ? dxObjJ.dataElementGroups[0].name : ''),
+                                    legendsets: []
+                                });
+                            }
+                        }
+                        else
+                        {
+                            dxObjJ = JSON.parse(dxObjJ);
+                            var dxLegendsets = [];
+                            if (dxObjJ.legendSet != undefined){
+                                for (var p = 0; p < dxObjJ.legendSet.legends.length; p++)
+                                {
+                                    dxLegendsets.push({
+                                        name: dxObjJ.legendSet.legends[p].name,
+                                        color: dxObjJ.legendSet.legends[p].color,
+                                        startvalue: dxObjJ.legendSet.legends[p].startValue,
+                                        endvalue: dxObjJ.legendSet.legends[p].endValue
+                                    });
+                                }
+                            }
+                            var numeratoritems = [];
+                            LastNum = dxObjJ.numerator;
+                            if (LastNum != undefined){
+                                var NumItems = '';
+                                if (LastNum.indexOf('{') != 0){
+                                    var ArrTmpOuter = LastNum.split('{');
+                                    for (var p = 1; p < ArrTmpOuter.length; p++) 
+                                    {
+                                        var ArrTmpInner = ArrTmpOuter[p].split('}');
+                                        // if current UID not already listed in 'known lookup uids' 
+                                        if (UniqueNumDenSubElements.indexOf(ArrTmpInner[0] + ';') < 0) {
+                                            UniqueNumDenSubElements += (ArrTmpInner[0]+';'); 
+                                            NumItems += (ArrTmpInner[0]+';');
+                                        }
+                                        numeratoritems.push({uid: ArrTmpInner[0]});
+                                    }
+                                }
+                                ArrNumFormulaItems[i] = NumItems;
+                            }
+                            var denominatoritems = [];
+                            LastDen = dxObjJ.denominator;
+                            if (LastDen != undefined){
+                                var DenomItems = '';
+                                if (LastDen.indexOf('{') != 0){
+                                    var ArrTmpOuter = LastDen.split('{');
+                                    for (var p = 1; p < ArrTmpOuter.length; p++) 
+                                    {
+                                        var ArrTmpInner = ArrTmpOuter[p].split('}');
+                                        // if current UID not already listed in 'known lookup uids' 
+                                        DenomItems += (ArrTmpInner[0]+';');
+                                        denominatoritems.push({uid: ArrTmpInner[0]});
+                                        if (UniqueNumDenSubElements.indexOf(ArrTmpInner[0] + ';') < 0) {
+                                            UniqueNumDenSubElements += (ArrTmpInner[0]+';'); 
+                                        }
+                                    }
+                                }
+                                ArrDenomFormulaItems[i] = DenomItems;
+                            }
+                            myDx.push({
+                                indicator: 1,
+                                dx: ArrDxUID[i],
+                                displayName: dxObjJ.displayName,
+                                displayShortName: dxObjJ.displayShortName,
+                                numeratorFormula: dxObjJ.numerator,
+                                numeratorDescription: dxObjJ.numeratorDescription,
+                                numeratorItems: numeratoritems,
+                                denominatorFormula: dxObjJ.denominator,
+                                denominatorDescription: dxObjJ.denominatorDescription,
+                                denominatorItems: denominatoritems,
+                                typeName: dxObjJ.indicatorType.name,
+                                groupName: ((dxObjJ.indicatorGroups.length > 0) ? dxObjJ.indicatorGroups[0].name : ''),
+                                legendsets: dxLegendsets
+                            });
+
+                        }
+
                     }
 
-                    // number of cells
-                    tdCount = tdCount + 1;
+                    console.log(JSON.stringify(myDx));
 
-					// background color from legend set
-					if (isValue && xLayout.legendSet) {
-						var value = parseFloat(config.value);
-						legends = xLayout.legendSet.legends;
+                    var sJdata = init.contextPath + '/api/analytics.json?dimension=pe:' + peUID + '&dimension=dx:' + UniqueNumDenSubElements + dxUID + '&dimension=ou:' + ouUID + '&hierarchyMeta=true&displayProperty=NAME&showHierarchy=true';
+                    //console.log(sJdata);
+                    var myDataResponse = $.ajax({url: sJdata, async: false}).responseText; 
+                    var myData = JSON.parse(myDataResponse);
+                    var sReturn = '';
+                    var iNum = 0;
+                    var iDen = 0;
+                    var sParentPath;
+                    var ParentArr;
+                    var OUlevelJ;
+                    var iHeaders = 0;
 
-						for (var i = 0; i < legends.length; i++) {
-							if (Ext.Number.constrain(value, legends[i].startValue, legends[i].endValue) === value) {
-								bgColor = legends[i].color;
-							}
-						}
-					}
+                    var objNames = JSON.parse(JSON.stringify(myData.metaData.names));
+                    var objParentNames = JSON.parse(JSON.stringify(myData.metaData.ouNameHierarchy));
+                    var objParentUIDs = JSON.parse(JSON.stringify(myData.metaData.ouHierarchy));
 
-					colSpan = config.colSpan ? 'colspan="' + config.colSpan + '" ' : '';
-					rowSpan = config.rowSpan ? 'rowspan="' + config.rowSpan + '" ' : '';
-                    htmlValue = getHtmlValue(config);
-					htmlValue = config.type !== 'dimension' ? support.prototype.number.prettyPrint(htmlValue, xLayout.digitGroupSeparator) : htmlValue;
+                    var OUlevelLookup = init.contextPath + '/api/organisationUnitLevels.json?fields=id,name,level&paging=false';
+                    OUlevelJ = $.ajax({url:OUlevelLookup, async: false}).responseText; 
+                    var objLevels = JSON.parse(OUlevelJ);
 
-					cls += config.hidden ? ' td-hidden' : '';
-					cls += config.collapsed ? ' td-collapsed' : '';
-					cls += isValue ? ' pointer' : '';
-					//cls += bgColor ? ' legend' : (config.cls ? ' ' + config.cls : '');
-                    cls += config.cls ? ' ' + config.cls : '';
+                    var MyHeaders = [];
+                    var MyRows = [];
 
-					// if sorting
-					if (Ext.isString(metaDataId)) {
-						cls += ' td-sortable';
+                    sParentPath = ReturnLookup(objParentUIDs,myData.rows[1][2]);
+                    ParentArr = sParentPath.split("/");
 
-						xResponse.sortableIdObjects.push({
-							id: metaDataId,
-							uuid: config.uuid
-						});
-					}
+                    for (var x=1; x<ParentArr.length; x++)
+                    {
+                        ouHierarchyOffSet = x;
+                        if (ParentArr[x] == ouUID){
+                            break;
+                        }
+                    }
+                    
+                    sParentPath = ReturnLookup(objParentNames,ReturnLookup(objNames,myData.rows[1][2]));
+                    ParentArr = sParentPath.split("/");
 
-					html += '<td ' + (config.uuid ? ('id="' + config.uuid + '" ') : '');
-					html += ' class="' + cls + '" ' + colSpan + rowSpan;
+                    MyHeaders[0] = 'RESERVED_ouh'; 
+                    MyHeaders[1] = 'RESERVED_dx'; 
+                    MyHeaders[2] = 'RESERVED_pe'; 
+                    MyHeaders[3] = 'RESERVED_bgCol';
 
-					//if (bgColor && isValue) {
-                        //html += 'style="color:' + bgColor + ';padding:' + displayDensity + '; font-size:' + fontSize + ';"' + '>' + htmlValue + '</td>';
-						//html += '>';
-						//html += '<div class="legendCt">';
-						//html += '<div class="number ' + config.cls + '" style="padding:' + displayDensity + '; padding-right:3px; font-size:' + fontSize + '">' + htmlValue + '</div>';
-						//html += '<div class="arrowCt ' + config.cls + '">';
-						//html += '<div class="arrow" style="border-bottom:8px solid transparent; border-right:8px solid ' + bgColor + '">&nbsp;</div>';
-						//html += '</div></div></div></td>';
-					//}
-					//else {
-						html += 'style="' + (bgColor && isValue ? 'color:' + bgColor + '; ' : '') + '">' + htmlValue + '</td>';
-					//}
+                    for (var x=ouHierarchyOffSet; x<ParentArr.length; x++)
+                    {
+                        MyHeaders[4+iHeaders] = GetOUlevelName(objLevels,x);
+                        iHeaders += 1;
+                    }
 
-					return html;
-				};
+                    MyHeaders[4+iHeaders] = 'Group';
+                    MyHeaders[4+iHeaders+1] = ReturnLookup(objNames,myData.headers[0].name);
+                    MyHeaders[4+iHeaders+2] = 'Type';
+                    MyHeaders[4+iHeaders+3] = ReturnLookup(objNames,myData.headers[1].name);
 
-                doColTotals = function() {
-					return !!xLayout.showColTotals;
-				};
+                    var peArr = (ReturnLookup(objNames,myData.rows[0][1])).split(" ");
 
-				doRowTotals = function() {
-					return !!xLayout.showRowTotals;
-				};
+                    for (var y=0; y<peArr.length; y++){
+                        MyHeaders[(4+iHeaders + 3) + (y+1)] = ('Period_P' + (y+1));
+                    }
 
-				doColSubTotals = function() {
-					return !!xLayout.showColSubTotals && xRowAxis && xRowAxis.dims > 1;
-				};
+                    MyHeaders[(4+iHeaders + 3)+peArr.length+1] = 'Numerator';
+                    MyHeaders[(4+iHeaders + 3)+peArr.length+2] = 'Denominator';
+                    MyHeaders[(4+iHeaders + 3)+peArr.length+3] = 'Value';
 
-				doRowSubTotals = function() {
-					return !!xLayout.showRowSubTotals && xColAxis && xColAxis.dims > 1;
-				};
+                    var iCount = 0;
 
-				doSortableColumnHeaders = function() {
-					return (xRowAxis && xRowAxis.dims === 1);
-				};
-
-				getColAxisHtmlArray = function() {
-					var a = [],
-						getEmptyHtmlArray;
-
-                    getEmptyNameTdConfig = function(config) {
-                        config = config || {};
-
-                        return getTdHtml({
-                            cls: config.cls ? ' ' + config.cls : 'pivot-empty',
-                            colSpan: config.colSpan ? config.colSpan : 1,
-                            rowSpan: config.rowSpan ? config.rowSpan : 1,
-                            htmlValue: config.htmlValue ? config.htmlValue : '&nbsp;'
-                        });
-                    };
-
-                    getEmptyHtmlArray = function(i) {
-                        var a = [];
-
-                        // if not the intersection cell
-                        if (i < xColAxis.dims - 1) {
-                            if (xRowAxis && xRowAxis.dims) {
-                                for (var j = 0; j < xRowAxis.dims - 1; j++) {
-                                    a.push(getEmptyNameTdConfig({
-                                        cls: 'pivot-dim-label'
-                                    }));
+                    for (var i = 0; i < myData.rows.length; i++) 
+                    {
+                        if ((dxUID + ';').indexOf(myData.rows[i][0] + ';') >= 0)
+                        {
+                            for(var z = 0; z < ArrDxUID.length; z++){
+                                if (myData.rows[i][0] == ArrDxUID[z]){
+                                    break;
                                 }
                             }
 
-                            a.push(getEmptyNameTdConfig({
-                                cls: 'pivot-dim-label',
-                                htmlValue: dimConf.objectNameMap[xLayout.columnObjectNames[i]].name
-                            }));
-                        }
-                        else {
-                            if (xRowAxis && xRowAxis.dims) {
-                                for (var j = 0; j < xRowAxis.dims - 1; j++) {
-                                    a.push(getEmptyNameTdConfig({
-                                        cls: 'pivot-dim-label',
-                                        htmlValue: dimConf.objectNameMap[xLayout.rowObjectNames[j]].name
-                                    }));
+                            sParentPath = ReturnLookup(objParentNames,ReturnLookup(objNames,myData.rows[i][2]));
+                            ParentArr = sParentPath.split("/");
+                            MyRows[iCount] = [];
+
+                            MyRows[iCount][0] = sParentPath;
+                            MyRows[iCount][1] = ReturnLookup(objNames,myData.rows[i][0]);
+                            MyRows[iCount][2] = myData.rows[i][1];
+
+                            if (ArrDxLegendSet[z] != undefined){
+                                if (ArrDxLegendSet[z].length > 0){
+                                    var bFound = 0;
+                                    for(var iLg=0; iLg<ArrDxLegendSet[z].length; iLg++)
+                                    {
+                                        if ((ArrDxLegendSet[z][iLg]) != undefined){
+                                            //console.log('ArrDxLegendSet[z][iLg]: ' + ArrDxLegendSet[z][iLg]);
+                                            var LegArr = (ArrDxLegendSet[z][iLg]).split(';');
+                                            if (parseFloat((myData.rows[i][3])) >= parseFloat(LegArr[2]) && parseFloat((myData.rows[i][3])) <= parseFloat(LegArr[3])){
+                                                MyRows[iCount][3] = (LegArr[1]);
+                                                bFound = 1
+                                            }
+                                        }
+                                        else{
+                                            MyRows[iCount][3] = ('#ffffff');
+                                        }
+                                    }
+                                    if (bFound == 0){
+                                        MyRows[iCount][3] = ('#ffffff');
+                                    }
+                                }
+                                else{
+                                    MyRows[iCount][3] = ('#ffffff');
                                 }
                             }
-
-                            a.push(getEmptyNameTdConfig({
-                                cls: 'pivot-dim-label',
-                                htmlValue: (xRowAxis ? dimConf.objectNameMap[xLayout.rowObjectNames[j]].name : '') + (xColAxis && xRowAxis ? '&nbsp;/&nbsp;' : '') + (xColAxis ? dimConf.objectNameMap[xLayout.columnObjectNames[i]].name : '')
-                            }));
-                        }
-
-                        return a;
-                    };
-
-					if (!xColAxis) {
-
-                        // show row dimension labels
-                        if (xRowAxis && xLayout.showDimensionLabels) {
-                            var dimLabelHtml = [];
-
-                            // labels from row object names
-                            for (var i = 0; i < xLayout.rowObjectNames.length; i++) {
-                                dimLabelHtml.push(getEmptyNameTdConfig({
-                                    cls: 'pivot-dim-label',
-                                    htmlValue: dimConf.objectNameMap[xLayout.rowObjectNames[i]].name
-                                }));
+                            else{
+                                MyRows[iCount][3] = ('#ffffff');
                             }
 
-                            // pivot-transparent-column unnecessary
+                            iHeaders = 0;
 
-                            a.push(dimLabelHtml);
-                        }
+                            for (var x=ouHierarchyOffSet; x<ParentArr.length; x++){
+                                MyRows[iCount][4 + iHeaders] = ParentArr[x];
+                                iHeaders += 1
+                            }
 
-						return a;
-					}
+                            MyRows[iCount][4 + iHeaders] = ArrDxGroupName[z];
+                            MyRows[iCount][4 + iHeaders+1] = MyRows[iCount][1];
+                            MyRows[iCount][4 + iHeaders+2] = ArrTypeName[z];
+                            MyRows[iCount][4 + iHeaders+3] = ReturnLookup(objNames,myData.rows[i][1]);
 
-					// for each col dimension
-					for (var i = 0, dimHtml; i < xColAxis.dims; i++) {
-						dimHtml = [];
+                            var peArr = (ReturnLookup(objNames,myData.rows[i][1])).split(" ");
 
-                        if (xLayout.showDimensionLabels) {
-                            dimHtml = dimHtml.concat(getEmptyHtmlArray(i));
-                        }
-                        else if (i === 0) {
-							dimHtml.push(xColAxis && xRowAxis ? getEmptyNameTdConfig({
-                                colSpan: xRowAxis.dims,
-                                rowSpan: xColAxis.dims
-                            }) : '');
-						}
+                            for (var y=0; y<peArr.length; y++){
+                                MyRows[iCount][(7+iHeaders) + (y+1)] = peArr[y];
+                            }
 
-						for (var j = 0, obj, spanCount = 0, condoId, totalId; j < xColAxis.size; j++) {
-							spanCount++;
-							condoId = null;
-							totalId = null;
+                            if (ArrDxIsIND[z]){
 
-							obj = xColAxis.objects.all[i][j];
-							obj.type = 'dimension';
-							obj.cls = 'pivot-dim';
-							obj.noBreak = false;
-							obj.hidden = !(obj.rowSpan || obj.colSpan);
-							obj.htmlValue = service.layout.getItemName(xLayout, xResponse, obj.id, true);
+                                /* START OF NUM/DENOM CALCULATIONS */
+                                var ArrN = ArrNumFormulaItems[z].split(';');
+                                var ArrD = ArrDenomFormulaItems[z].split(';');
 
-							// sortable column headers. last dim only.
-							if (i === xColAxis.dims - 1 && doSortableColumnHeaders()) {
+                                if (ArrN.length > 1){
+                                    var sTempFormula = ArrNumFormula[z];
+                                    for(var p = 0; p < (ArrN.length-1); p++) {
+                                        var ArrFsub = (ArrN[p]).split(".");
+                                        var sTempLookup = ArrFsub[0];
+                                        sTempLookup = sTempLookup.replace(/{/g,'');
+                                        sTempLookup = sTempLookup.replace(/}/g,'');
+                                        sTempLookup = sTempLookup.replace(/#/g,'');
+                                        iLookup = ReturnLookupValue(myData,sTempLookup,myData.rows[i][1],myData.rows[i][2])
+                                        iLookup = ((iLookup.toString().length == 0) ? 0 : iLookup);
+                                        if (sTempFormula.indexOf(ArrFsub[0] + '.' + ArrFsub[1]) < 0){
+                                            sTempFormula = sTempFormula.replace(sTempLookup,iLookup);
+                                        }
+                                        else{
+                                            sTempFormula = sTempFormula.replace(ArrFsub[0] + '.' + ArrFsub[1],iLookup);					
+                                        }
+                                    }
+                                    sTempFormula = sTempFormula.replace(/{/g,'(');
+                                    sTempFormula = sTempFormula.replace(/}/g,')');
+                                    sTempFormula = sTempFormula.replace(/#/g,'');
+                                    iNumTotal = eval(sTempFormula);
+                                    //console.log(ArrTypeName[z] + ' NUM: ' + ArrNumFormula[z] + ' = ' + sTempFormula + ' [' + iNumTotal + ']');
+                                }
+                                else{
+                                    if ((ArrNumFormula[z]).indexOf('{') >= 0){
+                                        var ArrFsub = ArrNumFormula[z].split(".")
+                                        var sTempFormula = ArrFsub[0];
+                                        sTempFormula = sTempFormula.replace(/{/g,'');
+                                        sTempFormula = sTempFormula.replace(/}/g,'');
+                                        sTempFormula = sTempFormula.replace(/#/g,'');
+                                        iNumTotal = ReturnLookupValue(myData,sTempLookup,myData.rows[i][1],myData.rows[i][2]);
+                                    }
+                                    else
+                                    {
+                                        sTempFormula = ArrNumFormula[z];
+                                        iNumTotal = eval(sTempFormula);
+                                    }
+                                    //console.log(ArrTypeName[z] + ' NUM: ' + ArrNumFormula[z] + ' = ' + sTempFormula + ' [' + iNumTotal + ']');
+                                }
 
-								//condoId = xColAxis.ids[j].split('-').join('');
-								condoId = xColAxis.ids[j];
-							}
+                                if (ArrD.length > 1){
+                                    var sTempFormula = ArrDenomFormula[z];
+                                    for(var p = 0; p < (ArrD.length-1); p++) {
+                                        var ArrFsub = (ArrD[p]).split(".");
+                                        var sTempLookup = ArrFsub[0];
+                                        sTempLookup = sTempLookup.replace(/{/g,'');
+                                        sTempLookup = sTempLookup.replace(/}/g,'');
+                                        sTempLookup = sTempLookup.replace(/#/g,'');
+                                        iLookup = ReturnLookupValue(myData,sTempLookup,myData.rows[i][1],myData.rows[i][2])
+                                        iLookup = ((iLookup.toString().length == 0) ? 0 : iLookup);
+                                        if (sTempFormula.indexOf(ArrFsub[0] + '.' + ArrFsub[1]) < 0){
+                                            sTempFormula = sTempFormula.replace(sTempLookup,iLookup);
+                                        }
+                                        else{
+                                            sTempFormula = sTempFormula.replace(ArrFsub[0] + '.' + ArrFsub[1],iLookup);					
+                                        }
+                                    }
+                                    sTempFormula = sTempFormula.replace(/{/g,'(');
+                                    sTempFormula = sTempFormula.replace(/}/g,')');
+                                    sTempFormula = sTempFormula.replace(/#/g,'');
+                                    iDenTotal = eval(sTempFormula);
+                                    //console.log(ArrTypeName[z] + ' DEN: ' + ArrDenomFormula[z] + ' = ' + sTempFormula + ' [' + iDenTotal + ']');
+                                }
+                                else{
+                                    if ((ArrDenomFormula[z]).indexOf('{') >= 0){
+                                        var ArrFsub = ArrDenomFormula[z].split(".")
+                                        var sTempFormula = ArrFsub[0];
+                                        sTempFormula = sTempFormula.replace(/{/g,'');
+                                        sTempFormula = sTempFormula.replace(/}/g,'');
+                                        sTempFormula = sTempFormula.replace(/#/g,'');
+                                        iDenTotal = ReturnLookupValue(myData,sTempLookup,myData.rows[i][1],myData.rows[i][2]);
+                                    }
+                                    else
+                                    {
+                                        sTempFormula = ArrDenomFormula[z];
+                                        iDenTotal = eval(sTempFormula);
+                                    }
+                                    //console.log(ArrTypeName[z] + ' DEN: ' + ArrDenomFormula[z] + ' = ' + sTempFormula + ' [' + iDenTotal + ']');
+                                }
+                            }
+                            else{
+                                iNumTotal = parseFloat((myData.rows[i][3]).replace('.0',''));
+                                iDenTotal = 1;
+                            }
 
-							dimHtml.push(getTdHtml(obj, condoId));
-
-							if (i === 0 && spanCount === xColAxis.span[i] && doRowSubTotals() ) {
-								dimHtml.push(getTdHtml({
-									type: 'dimensionSubtotal',
-									cls: 'pivot-dim-subtotal cursor-default',
-									rowSpan: xColAxis.dims,
-									htmlValue: '&nbsp;'
-								}));
-
-								spanCount = 0;
-							}
-
-							if (i === 0 && (j === xColAxis.size - 1) && doRowTotals()) {
-								totalId = doSortableColumnHeaders() ? 'total_' : null;
-
-								dimHtml.push(getTdHtml({
-									uuid: Ext.data.IdGenerator.get('uuid').generate(),
-									type: 'dimensionTotal',
-									cls: 'pivot-dim-total',
-									rowSpan: xColAxis.dims,
-									htmlValue: 'Total'
-								}, totalId));
-							}
-						}
-
-						a.push(dimHtml);
-					}
-
-					return a;
-				};
-
-				getRowHtmlArray = function() {
-					var a = [],
-						axisAllObjects = [],
-						xValueObjects,
-						totalValueObjects = [],
-						mergedObjects = [],
-						valueItemsCopy,
-						colAxisSize = xColAxis ? xColAxis.size : 1,
-						rowAxisSize = xRowAxis ? xRowAxis.size : 1,
-						recursiveReduce;
-
-					recursiveReduce = function(obj) {
-						if (!obj.children) {
-							obj.collapsed = true;
-
-							if (obj.parent) {
-								obj.parent.oldestSibling.children--;
-							}
-						}
-
-						if (obj.parent) {
-							recursiveReduce(obj.parent.oldestSibling);
-						}
-					};
-
-					// dimension
-					if (xRowAxis) {
-						for (var i = 0, row; i < xRowAxis.size; i++) {
-							row = [];
-
-							for (var j = 0, obj, newObj; j < xRowAxis.dims; j++) {
-								obj = xRowAxis.objects.all[j][i];
-								obj.type = 'dimension';
-								obj.cls = 'pivot-dim td-nobreak' + (service.layout.isHierarchy(xLayout, xResponse, obj.id) ? ' align-left' : '');
-								obj.noBreak = true;
-								obj.hidden = !(obj.rowSpan || obj.colSpan);
-								obj.htmlValue = service.layout.getItemName(xLayout, xResponse, obj.id, true);
-
-								row.push(obj);
-							}
-
-							axisAllObjects.push(row);
-						}
-					}
-                    else {
-                        if (xLayout.showDimensionLabels) {
-                            axisAllObjects.push([{
-                                type: 'transparent',
-                                cls: 'pivot-transparent-row'
-                            }]);
+                            //MyRows[iCount][7+iHeaders + (peArr.length) + 1] = ((ArrDxIsIND[z] == 0) ? '' : iNumTotal);
+                            //MyRows[iCount][7+iHeaders + (peArr.length) + 2] = ((ArrDxIsIND[z] == 0) ? '' : iDenTotal);
+                            MyRows[iCount][7+iHeaders + (peArr.length) + 1] = iNumTotal;
+                            MyRows[iCount][7+iHeaders + (peArr.length) + 2] = iDenTotal;
+                            MyRows[iCount][7+iHeaders + (peArr.length) + 3] = parseFloat((myData.rows[i][3]).replace('.0',''));
+                            
+                            iCount += 1;
                         }
                     }
 
+                    function mySortingA(a,b) {
+                        a = a[0]+a[1]+a[2];
+                        b = b[0]+b[1]+b[2];
+                        return a == b ? 0 : (a < b ? -1 : 1)
+                    }
+
+                    function mySortingAsc(a,b) {
+                        //console.log(a.length + ';' + b.length);
+                        a = a[1]+a[a.length-1];
+                        b = b[1]+b[b.length-1];
+                        return a == b ? 0 : (a < b ? -1 : 1)
+                    }
+
+                    function mySortingDesc(a,b) {
+                        //console.log(a.length + ';' + b.length);
+                        a = a[1]+a[a.length-1];
+                        b = b[1]+b[b.length-1];
+                        return a == b ? 0 : (a < b ? -1 : 1)
+                    }
+
+                    if (pRank == 1){
+                        MyRows.sort(mySortingAsc);
+                    }
+                    else{
+                        if (pRank == -1){
+                            MyRows.sort(mySortingDesc);
+                        }
+                        else{
+                            MyRows.sort(mySortingA);
+                        }
+                    }
+
+                    var sReturn = '<table class="listTable gridTable">';
+                    sReturn += makeTableHEADER(MyHeaders);
+                    sReturn += makeTableBODY(MyRows);
+                    sReturn += '</table>';
+
+                    //return sReturn;
+
+                    if (sDestination) {
+                        $(sDestination).html(sReturn);
+                    }
+
+                    return sReturn;
+                };
+
+                makeTableHEADER = function(myArray) {
+                    var result = "<thead>";
+                    result += "<tr>";
+                    for(var i=4; i<(myArray.length); i++){
+                        result += "<th>"+myArray[i]+"</th>";
+                    }
+                    result += "</tr>";
+                    result += "</thead>";
+                    return result;
+                };
+
+                makeTableBODY = function(myMultiDimensionArray) {
+                    var result = "<tbody>";
+                    for(var i=0; i<myMultiDimensionArray.length; i++) {
+                        result += "<tr>";
+                        for(var j=4; j<(myMultiDimensionArray[i].length); j++){
+                            result += "<td style='white-space: nowrap;" + ((j==(myMultiDimensionArray[i].length-1))?"background-Color:" + myMultiDimensionArray[i][3] + ";":"") + "'>"+myMultiDimensionArray[i][j]+"</td>";
+                        }
+                        result += "</tr>";
+                    }
+                    result += "</tbody>";
+                    return result;
+                };
+
+                ReturnLookupValue = function(theData,dx,pe,ou) {
+
+                    var i;
+                    var sReturn = '';
+
+                    for(i = 0; i < theData.rows.length; i++) {
+                        if ((theData.rows[i][0] == dx) && (theData.rows[i][1] == pe) && (theData.rows[i][2] == ou)) {
+                            sReturn = theData.rows[i][3];
+                        }
+                    }
+                    return sReturn;
+                };
+
+                ReturnLookup = function(theData,Val) {
+                    sReturn = theData[Val];
+                    return  sReturn;
+                };
+
+                getParameterByName = function(name) {
+                    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+                    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+                        results = regex.exec(location.search);
+                        
+                    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+                };
+
+                GetOUlevelName = function(OUlevelJ,iOU) {
+
+                    var i;
+                    var sReturn = '';
+
+                    for(i = 0; i < OUlevelJ.organisationUnitLevels.length; i++) {
 
-	//axisAllObjects = [ [ dim, dim ]
-	//				     [ dim, dim ]
-	//				     [ dim, dim ]
-	//				     [ dim, dim ] ];
-
-					// value
-					for (var i = 0, valueItemsRow, valueObjectsRow, idValueMap = xResponse.idValueMap; i < rowAxisSize; i++) {
-						valueItemsRow = [];
-						valueObjectsRow = [];
-
-						for (var j = 0, id, value, responseValue, htmlValue, empty, uuid, uuids; j < colAxisSize; j++) {
-							empty = false;
-							uuids = [];
-
-							// meta data uid
-							id = ((xColAxis ? xColAxis.ids[j] : '') + (xRowAxis ? xRowAxis.ids[i] : ''));
-
-                            // value html element id
-							uuid = Ext.data.IdGenerator.get('uuid').generate();
-
-							// get uuids array from colaxis/rowaxis leaf
-							if (xColAxis) {
-								uuids = uuids.concat(xColAxis.objects.all[xColAxis.dims - 1][j].uuids);
-							}
-							if (xRowAxis) {
-								uuids = uuids.concat(xRowAxis.objects.all[xRowAxis.dims - 1][i].uuids);
-							}
-
-                            // value, htmlValue
-                            responseValue = idValueMap[id];
-
-							if (Ext.isDefined(responseValue)) {
-                                value = service.response.getValue(responseValue);
-                                htmlValue = responseValue;
-							}
-							else {
-								value = 0;
-								htmlValue = '&nbsp;';
-								empty = true;
-							}
-
-							valueItemsRow.push(value);
-							valueObjectsRow.push({
-								uuid: uuid,
-								type: 'value',
-								cls: 'pivot-value' + (empty ? ' cursor-default' : ''),
-								value: value,
-								htmlValue: htmlValue,
-								empty: empty,
-								uuids: uuids
-							});
-
-							// map element id to dim element ids
-							uuidDimUuidsMap[uuid] = uuids;
-						}
-
-						valueItems.push(valueItemsRow);
-						valueObjects.push(valueObjectsRow);
-					}
-
-					// totals
-					if (xColAxis && doRowTotals()) {
-						for (var i = 0, empty = [], total = 0; i < valueObjects.length; i++) {
-							for (j = 0, obj; j < valueObjects[i].length; j++) {
-								obj = valueObjects[i][j];
-
-								empty.push(obj.empty);
-								total += obj.value;
-							}
-
-							// row totals
-							totalValueObjects.push({
-								type: 'valueTotal',
-								cls: 'pivot-value-total',
-								value: total,
-								htmlValue: Ext.Array.contains(empty, false) ? getRoundedHtmlValue(total) : '',
-								empty: !Ext.Array.contains(empty, false)
-							});
-
-							// add row totals to idValueMap to make sorting on totals possible
-							if (doSortableColumnHeaders()) {
-								var totalId = 'total_' + xRowAxis.ids[i],
-									isEmpty = !Ext.Array.contains(empty, false);
-
-								xResponse.idValueMap[totalId] = isEmpty ? null : total;
-							}
-
-							empty = [];
-							total = 0;
-						}
-					}
-
-					// hide empty rows (dims/values/totals)
-					if (xColAxis && xRowAxis) {
-						if (xLayout.hideEmptyRows) {
-							for (var i = 0, valueRow, isValueRowEmpty, dimLeaf; i < valueObjects.length; i++) {
-								valueRow = valueObjects[i];
-								isValueRowEmpty = !Ext.Array.contains(Ext.Array.pluck(valueRow, 'empty'), false);
-
-								// if value row is empty
-								if (isValueRowEmpty) {
-
-									// hide values by adding collapsed = true to all items
-									for (var j = 0; j < valueRow.length; j++) {
-										valueRow[j].collapsed = true;
-									}
-
-									// hide totals by adding collapsed = true to all items
-									if (doRowTotals()) {
-										totalValueObjects[i].collapsed = true;
-									}
-
-									// hide/reduce parent dim span
-									dimLeaf = axisAllObjects[i][xRowAxis.dims-1];
-									recursiveReduce(dimLeaf);
-								}
-							}
-						}
-					}
-
-                    xValueObjects = valueObjects;
-
-					// col subtotals
-					if (doRowSubTotals()) {
-						var tmpValueObjects = [];
-
-						for (var i = 0, row, rowSubTotal, colCount; i < xValueObjects.length; i++) {
-							row = [];
-							rowSubTotal = 0;
-							colCount = 0;
-
-							for (var j = 0, item, collapsed = [], empty = []; j < xValueObjects[i].length; j++) {
-								item = xValueObjects[i][j];
-								rowSubTotal += item.value;
-								empty.push(!!item.empty);
-								collapsed.push(!!item.collapsed);
-								colCount++;
-
-								row.push(item);
-
-								if (colCount === colUniqueFactor) {
-									var isEmpty = !Ext.Array.contains(empty, false);
-									row.push({
-										type: 'valueSubtotal',
-										cls: 'pivot-value-subtotal' + (isEmpty ? ' cursor-default' : ''),
-										value: rowSubTotal,
-										htmlValue: isEmpty ? '&nbsp;' : getRoundedHtmlValue(rowSubTotal),
-										empty: isEmpty,
-										collapsed: !Ext.Array.contains(collapsed, false)
-									});
-
-									colCount = 0;
-									rowSubTotal = 0;
-									empty = [];
-									collapsed = [];
-								}
-							}
-
-							tmpValueObjects.push(row);
-						}
-
-						xValueObjects = tmpValueObjects;
-					}
-
-					// row subtotals
-					if (doColSubTotals()) {
-						var tmpAxisAllObjects = [],
-							tmpValueObjects = [],
-							tmpTotalValueObjects = [],
-							getAxisSubTotalRow;
-
-						getAxisSubTotalRow = function(collapsed) {
-							var row = [];
-
-							for (var i = 0, obj; i < xRowAxis.dims; i++) {
-								obj = {};
-								obj.type = 'dimensionSubtotal';
-								obj.cls = 'pivot-dim-subtotal cursor-default';
-								obj.collapsed = Ext.Array.contains(collapsed, true);
-
-								if (i === 0) {
-									obj.htmlValue = '&nbsp;';
-									obj.colSpan = xRowAxis.dims;
-								}
-								else {
-									obj.hidden = true;
-								}
-
-								row.push(obj);
-							}
-
-							return row;
-						};
-
-						// tmpAxisAllObjects
-						for (var i = 0, row, collapsed = []; i < axisAllObjects.length; i++) {
-							tmpAxisAllObjects.push(axisAllObjects[i]);
-							collapsed.push(!!axisAllObjects[i][0].collapsed);
-
-							// insert subtotal after last objects
-							if (!Ext.isArray(axisAllObjects[i+1]) || !!axisAllObjects[i+1][0].root) {
-								tmpAxisAllObjects.push(getAxisSubTotalRow(collapsed));
-
-								collapsed = [];
-							}
-						}
-
-						// tmpValueObjects
-						for (var i = 0; i < tmpAxisAllObjects.length; i++) {
-							tmpValueObjects.push([]);
-						}
-
-						for (var i = 0; i < xValueObjects[0].length; i++) {
-							for (var j = 0, rowCount = 0, tmpCount = 0, subTotal = 0, empty = [], collapsed, item; j < xValueObjects.length; j++) {
-								item = xValueObjects[j][i];
-								tmpValueObjects[tmpCount++].push(item);
-								subTotal += item.value;
-								empty.push(!!item.empty);
-								rowCount++;
-
-								if (axisAllObjects[j][0].root) {
-									collapsed = !!axisAllObjects[j][0].collapsed;
-								}
-
-								if (!Ext.isArray(axisAllObjects[j+1]) || axisAllObjects[j+1][0].root) {
-									var isEmpty = !Ext.Array.contains(empty, false);
-
-									tmpValueObjects[tmpCount++].push({
-										type: item.type === 'value' ? 'valueSubtotal' : 'valueSubtotalTotal',
-										value: subTotal,
-										htmlValue: isEmpty ? '&nbsp;' : getRoundedHtmlValue(subTotal),
-										collapsed: collapsed,
-										cls: (item.type === 'value' ? 'pivot-value-subtotal' : 'pivot-value-subtotal-total') + (isEmpty ? ' cursor-default' : '')
-									});
-									rowCount = 0;
-									subTotal = 0;
-									empty = [];
-								}
-							}
-						}
-
-						// tmpTotalValueObjects
-						for (var i = 0, obj, collapsed = [], empty = [], subTotal = 0, count = 0; i < totalValueObjects.length; i++) {
-							obj = totalValueObjects[i];
-							tmpTotalValueObjects.push(obj);
-
-							collapsed.push(!!obj.collapsed);
-							empty.push(!!obj.empty);
-							subTotal += obj.value;
-							count++;
-
-							if (count === xRowAxis.span[0]) {
-								var isEmpty = !Ext.Array.contains(empty, false);
-
-								tmpTotalValueObjects.push({
-									type: 'valueTotalSubgrandtotal',
-									cls: 'pivot-value-total-subgrandtotal' + (isEmpty ? ' cursor-default' : ''),
-									value: subTotal,
-									htmlValue: isEmpty ? '&nbsp;' : getRoundedHtmlValue(subTotal),
-									empty: isEmpty,
-									collapsed: !Ext.Array.contains(collapsed, false)
-								});
-
-								collapsed = [];
-								empty = [];
-								subTotal = 0;
-								count = 0;
-							}
-						}
-
-						axisAllObjects = tmpAxisAllObjects;
-						xValueObjects = tmpValueObjects;
-						totalValueObjects = tmpTotalValueObjects;
-					}
-
-					// merge dim, value, total
-					for (var i = 0, row; i < xValueObjects.length; i++) {
-						row = [];
-
-						//if (xRowAxis) {
-							row = row.concat(axisAllObjects[i]);
-						//}
-
-						row = row.concat(xValueObjects[i]);
-
-						if (xColAxis) {
-							row = row.concat(totalValueObjects[i]);
-						}
-
-						mergedObjects.push(row);
-					}
-
-					// create html items
-					for (var i = 0, row; i < mergedObjects.length; i++) {
-						row = [];
-
-						for (var j = 0; j < mergedObjects[i].length; j++) {
-							row.push(getTdHtml(mergedObjects[i][j]));
-						}
-
-						a.push(row);
-					}
-
-					return a;
-				};
-
-				getColTotalHtmlArray = function() {
-					var a = [];
-
-					if (xRowAxis && doColTotals()) {
-						var xTotalColObjects;
-
-						// total col items
-						for (var i = 0, total = 0, empty = []; i < valueObjects[0].length; i++) {
-							for (var j = 0, obj; j < valueObjects.length; j++) {
-								obj = valueObjects[j][i];
-
-								total += obj.value;
-								empty.push(!!obj.empty);
-							}
-
-							// col total
-							totalColObjects.push({
-								type: 'valueTotal',
-								value: total,
-								htmlValue: Ext.Array.contains(empty, false) ? getRoundedHtmlValue(total) : '',
-								empty: !Ext.Array.contains(empty, false),
-								cls: 'pivot-value-total'
-							});
-
-							total = 0;
-							empty = [];
-						}
-
-						xTotalColObjects = totalColObjects;
-
-						if (xColAxis && doRowSubTotals()) {
-							var tmp = [];
-
-							for (var i = 0, item, subTotal = 0, empty = [], colCount = 0; i < xTotalColObjects.length; i++) {
-								item = xTotalColObjects[i];
-								tmp.push(item);
-								subTotal += item.value;
-								empty.push(!!item.empty);
-								colCount++;
-
-								if (colCount === colUniqueFactor) {
-									tmp.push({
-										type: 'valueTotalSubgrandtotal',
-										value: subTotal,
-										htmlValue: Ext.Array.contains(empty, false) ? getRoundedHtmlValue(subTotal) : '',
-										empty: !Ext.Array.contains(empty, false),
-										cls: 'pivot-value-total-subgrandtotal'
-									});
-
-									subTotal = 0;
-									colCount = 0;
-								}
-							}
-
-							xTotalColObjects = tmp;
-						}
-
-						// total col html items
-						for (var i = 0; i < xTotalColObjects.length; i++) {
-							a.push(getTdHtml(xTotalColObjects[i]));
-						}
-					}
-
-					return a;
-				};
-
-				getGrandTotalHtmlArray = function() {
-					var total = 0,
-						empty = [],
-						a = [];
-
-					if (doRowTotals() && doColTotals()) {
-						for (var i = 0, obj; i < totalColObjects.length; i++) {
-							obj = totalColObjects[i];
-
-							total += obj.value;
-							empty.push(obj.empty);
-						}
-
-						if (xColAxis && xRowAxis) {
-							a.push(getTdHtml({
-								type: 'valueGrandTotal',
-								cls: 'pivot-value-grandtotal',
-								value: total,
-								htmlValue: Ext.Array.contains(empty, false) ? getRoundedHtmlValue(total) : '',
-								empty: !Ext.Array.contains(empty, false)
-							}));
-						}
-					}
-
-					return a;
-				};
-
-				getTotalHtmlArray = function() {
-					var dimTotalArray,
-						colTotal = getColTotalHtmlArray(),
-						grandTotal = getGrandTotalHtmlArray(),
-						row,
-						a = [];
-
-					if (doColTotals()) {
-						if (xRowAxis) {
-							dimTotalArray = [getTdHtml({
-								type: 'dimensionSubtotal',
-								cls: 'pivot-dim-total',
-								colSpan: xRowAxis.dims,
-								htmlValue: 'Total'
-							})];
-						}
-
-						row = [].concat(dimTotalArray || [], colTotal || [], grandTotal || []);
-
-						a.push(row);
-					}
-
-					return a;
-				};
-
-				getHtml = function() {
-                    var cls = 'pivot',
-                        table;
-
-                    cls += xLayout.displayDensity && xLayout.displayDensity !== 'normal' ? ' displaydensity-' + xLayout.displayDensity : '';
-                    cls += xLayout.fontSize && xLayout.fontSize !== 'normal' ? ' fontsize-' + xLayout.fontSize : '';
-
-					table = '<table id="' + xLayout.tableUuid + '" class="' + cls + '">';
-
-					for (var i = 0; i < htmlArray.length; i++) {
-						table += '<tr>' + htmlArray[i].join('') + '</tr>';
-					}
-
-					return table += '</table>';
-				};
-
-				// get html
-				return function() {
-					htmlArray = Ext.Array.clean([].concat(getColAxisHtmlArray() || [], getRowHtmlArray() || [], getTotalHtmlArray() || []));
-
-					return {
-						html: getHtml(htmlArray),
-						uuidDimUuidsMap: uuidDimUuidsMap,
-						xColAxis: xColAxis,
-						xRowAxis: xRowAxis,
-                        tdCount: tdCount
-					};
-				}();
-			};
-		}());
+                        if (OUlevelJ.organisationUnitLevels[i].level == iOU){
+
+                            sReturn = OUlevelJ.organisationUnitLevels[i].name;
+                        }
+                        
+                    }
+
+                    return sReturn;
+                };
+
+                formatNumber = function(num) {
+                    return ("" + num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, function($1) { return $1 + "," });
+                };
+
+                BuildOutputReport();
+            };
+        }());
 
 		// extend init
 		(function() {
