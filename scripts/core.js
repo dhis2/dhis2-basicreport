@@ -2099,25 +2099,24 @@ Ext.onReady( function() {
 			web.report = {};
 
 			web.report.getHtml = function(layout, callbackFn) {
-                var BuildOutputReport,
-                    makeTableHEADER,
-                    makeTableBODY,
-                    ReturnLookupValue,
-                    ReturnLookup,
-                    GetOUlevelName,
-                    formatNumber,
-                    ajax = support.connection.ajax;
+                var buildOutputReport,
+                    createTableHeader,
+                    createTableBody,
+                    returnLookupValue,
+                    returnLookup,
+                    getOuLevelName,
+                    formatNumber;
                     
-                BuildOutputReport = function(sDestination) {
-                    var dxReqItems = [],
-                        peReqItems = [],
-                        ouReqItems = [],
-                        dimNameReqItemArrayMap = {},
-                        ouResItems = [];
+                buildOutputReport = function(sDestination) {
+                    var aDxReqItems = [],
+                        aPeReqItems = [],
+                        aOuReqItems = [],
+                        oDimNameReqItemArrayMap = {},
+                        aOuResItems = [];
 
-                    dimNameReqItemArrayMap[dimConf.data.dimensionName] = dxReqItems;
-                    dimNameReqItemArrayMap[dimConf.period.dimensionName] = peReqItems;
-                    dimNameReqItemArrayMap[dimConf.organisationUnit.dimensionName] = ouReqItems;
+                    oDimNameReqItemArrayMap[dimConf.data.dimensionName] = aDxReqItems;
+                    oDimNameReqItemArrayMap[dimConf.period.dimensionName] = aPeReqItems;
+                    oDimNameReqItemArrayMap[dimConf.organisationUnit.dimensionName] = aOuReqItems;
 
                     for (var i = 0, dim; i < layout.columns.length; i++) {
                         dim = layout.columns[i];
@@ -2125,242 +2124,235 @@ Ext.onReady( function() {
                         for (var j = 0, item; j < dim.items.length; j++) {
                             item = dim.items[j];
 
-                            dimNameReqItemArrayMap[dim.dimension].push(item.id);
+                            oDimNameReqItemArrayMap[dim.dimension].push(item.id);
                         }
                     }
 
-                    var pRank = 1;
-                    var ouHierarchyOffSet = 0;
-                    var ArrDxName = [];
-                    var ArrDxShort = [];
-                    var ArrNumFormula = [];
-                    var ArrNumFormulaItems = [];
-                    var ArrNumDescription = [];
-                    var ArrDenomFormula = [];
-                    var ArrDenomFormulaItems = [];
-                    var ArrDenomDescription = [];
-                    var ArrTypeName = [];
-                    var ArrDxGroupName = [];
-                    var ArrDxIsIND = [];
-                    var ArrDxLegendSet = [];
-                    var lgIncr = 0;
-                    var dxUniqueID = '';
-                    var LookupSubElements = '';
-                    var Nums = '';
-                    var Denoms = '';
+                    var nRank = 1,
+                        nOuHierarchyOffSet = 0,
+                        aDxName = [],
+                        aDxShort = [],
+                        aNumFormula = [],
+                        aNumFormulaItems = [],
+                        aNumDescription = [],
+                        aDenomFormula = [],
+                        aDenomFormulaItems = [],
+                        aDenomDescription = [],
+                        aTypeName = [],
+                        aDxGroupName = [],
+                        aDxIsIndicator = [],
+                        aDxLegendSet = [],
+                        nLgIncr = 0,
+                        sDxUniqueId = '',
+                        sLookupSubElements = '',
+                        sNums = '',
+                        sDenoms = '';
 
                     $.ajax({
-                        url: init.contextPath + '/api/indicators.json?paging=false&filter=id:in:[' + dxReqItems.join(',') + ']&fields=id,name,displayName,displayShortName,indicatorType,indicatorGroups[name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
+                        url: init.contextPath + '/api/indicators.json?paging=false&filter=id:in:[' + aDxReqItems.join(',') + ']&fields=id,name,displayName,displayShortName,indicatorType,indicatorGroups[name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
                         headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
                     }).done(function(dxData) {
-                        var indicators = dxData.indicators;
+                        var aIndicators = dxData.indicators;
 
-                        for (var i = 0, dxObjJ, dxLegendsets, numeratoritems, denominatoritems, lastNum; i < indicators.length; i++) {
-                            dxObjJ = indicators[i];
-                            dxUniqueID += (dxReqItems[i] + ';');
-                            ArrDxIsIND[i] = 1;
-                            ArrDxName[i] = dxObjJ.displayName;
-                            ArrDxShort[i] = dxObjJ.displayShortName;
-                            ArrNumFormula[i] = dxObjJ.numerator;
-                            ArrNumDescription[i] = dxObjJ.numeratorDescription;
-                            ArrDenomFormula[i] = dxObjJ.denominator;
-                            ArrDenomDescription[i] = dxObjJ.denominatorDescription;
-                            ArrTypeName[i] = dxObjJ.indicatorType.name;
-                            ArrDxGroupName[i] = ((dxObjJ.indicatorGroups.length > 0) ? dxObjJ.indicatorGroups[0].name : '');
-                            ArrDxLegendSet[i] = [];
+                        for (var i = 0, oIndicator; i < aIndicators.length; i++) {
+                            oIndicator = aIndicators[i];
+                            sDxUniqueId += (aDxReqItems[i] + ';');
+                            aDxIsIndicator[i] = 1;
+                            aDxName[i] = oIndicator.displayName;
+                            aDxShort[i] = oIndicator.displayShortName;
+                            aNumFormula[i] = oIndicator.numerator;
+                            aNumDescription[i] = oIndicator.numeratorDescription;
+                            aDenomFormula[i] = oIndicator.denominator;
+                            aDenomDescription[i] = oIndicator.denominatorDescription;
+                            aTypeName[i] = oIndicator.indicatorType.name;
+                            aDxGroupName[i] = ((oIndicator.indicatorGroups.length > 0) ? oIndicator.indicatorGroups[0].name : '');
+                            aDxLegendSet[i] = [];
 
-                            if (dxObjJ.legendSet != undefined){
-                                for (var p = 0; p < dxObjJ.legendSet.legends.length; p++)
-                                {
-                                    var sLegSet = (dxObjJ.legendSet.legends[p].name + ';' + dxObjJ.legendSet.legends[p].color + ';' + dxObjJ.legendSet.legends[p].startValue + ';' + dxObjJ.legendSet.legends[p].endValue);
-                                    ArrDxLegendSet[i][lgIncr] = sLegSet;
-                                    lgIncr += 1;
+                            if (oIndicator.legendSet) {
+                                for (var p = 0; p < oIndicator.legendSet.legends.length; p++) {
+                                    var sLegendSet = (oIndicator.legendSet.legends[p].name + ';' + oIndicator.legendSet.legends[p].color + ';' + oIndicator.legendSet.legends[p].startValue + ';' + oIndicator.legendSet.legends[p].endValue);
+                                    aDxLegendSet[i][nLgIncr] = sLegendSet;
+                                    nLgIncr += 1;
                                 }
                             }
 
-                            if (ArrNumFormula[i] != undefined){
-                                var NumItems = '';
-                                if (ArrNumFormula[i].indexOf('{') != 0){
-                                    var ArrTmpOuter = ArrNumFormula[i].split('{');
-                                    for (var p = 1; p < ArrTmpOuter.length; p++) 
+                            if (aNumFormula[i]) {
+                                var sNumItems = '';
+                                if (aNumFormula[i].indexOf('{') != 0) {
+                                    var aNumTmpOuter = aNumFormula[i].split('{');
+                                    for (var p = 1; p < aNumTmpOuter.length; p++) 
                                     {
-                                        var ArrTmpInner = ArrTmpOuter[p].split('}');
+                                        var aNumTmpInner = aNumTmpOuter[p].split('}');
                                         // if current UID not already listed in 'known lookup uids' 
-                                        if (LookupSubElements.indexOf(ArrTmpInner[0] + ';') < 0) {
-                                            LookupSubElements += (ArrTmpInner[0]+';'); 
-                                            NumItems += (ArrTmpInner[0]+';');
+                                        if (sLookupSubElements.indexOf(aNumTmpInner[0] + ';') < 0) {
+                                            sLookupSubElements += (aNumTmpInner[0]+';'); 
+                                            sNumItems += (aNumTmpInner[0]+';');
                                         }
                                     }
                                 }
-                                ArrNumFormulaItems[i] = NumItems;
+                                aNumFormulaItems[i] = sNumItems;
                             }
 
-                            if (ArrDenomFormula[i] != undefined){
-                                var DenomItems = '';
-                                if (ArrDenomFormula[i].indexOf('{') != 0){
-                                    var ArrTmpOuter = ArrDenomFormula[i].split('{');
-                                    for (var p = 1; p < ArrTmpOuter.length; p++) 
-                                    {
-                                        var ArrTmpInner = ArrTmpOuter[p].split('}');
+                            if (aDenomFormula[i]){
+                                var sDenomItems = '';
+                                if (aDenomFormula[i].indexOf('{') != 0){
+                                    var aDenomTmpOuter = aDenomFormula[i].split('{');
+                                    for (var p = 1; p < aDenomTmpOuter.length; p++) {
+                                        var aDenomTmpInner = aDenomTmpOuter[p].split('}');
                                         // if current UID not already listed in 'known lookup uids' 
-                                        DenomItems += (ArrTmpInner[0]+';');
-                                        if (LookupSubElements.indexOf(ArrTmpInner[0] + ';') < 0) {
-                                            LookupSubElements += (ArrTmpInner[0]+';'); 
+                                        sDenomItems += (aDenomTmpInner[0] + ';');
+                                        if (sLookupSubElements.indexOf(aDenomTmpInner[0] + ';') < 0) {
+                                            sLookupSubElements += (aDenomTmpInner[0] + ';'); 
                                         }
                                     }
                                 }
-                                ArrDenomFormulaItems[i] = DenomItems;
+                                aDenomFormulaItems[i] = sDenomItems;
                             }
                         }
 
                         // analytics
 
                         $.ajax({
-                            url: init.contextPath + '/api/analytics.json?dimension=pe:' + peReqItems.join(';') + '&dimension=dx:' + LookupSubElements + dxReqItems.join(';') + '&dimension=ou:' + ouReqItems.join(';') + '&hierarchyMeta=true&displayProperty=NAME&showHierarchy=true',
+                            url: init.contextPath + '/api/analytics.json?dimension=pe:' + aPeReqItems.join(';') + '&dimension=dx:' + sLookupSubElements + aDxReqItems.join(';') + '&dimension=ou:' + aOuReqItems.join(';') + '&hierarchyMeta=true&displayProperty=NAME&showHierarchy=true',
                             headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
                         }).done(function(analyticsData) {
-                            var myData = analyticsData;
-                            ouResItems = myData.metaData.ou;
+                            var oMyData = analyticsData,
                             
-                            var sReturn = '';
-                            var iNum = 0;
-                            var iDen = 0;
-                            var sParentPath;
-                            var ParentArr;
-                            var OUlevelJ;
-                            var iHeaders = 0;
+                                sReturn = '',
+                                iNum = 0,
+                                iDen = 0,
+                                sParentPath,
+                                aParent,
+                                iHeaders = 0,
 
-                            var objNames = JSON.parse(JSON.stringify(myData.metaData.names));
-                            var objParentNames = JSON.parse(JSON.stringify(myData.metaData.ouNameHierarchy));
-                            var objParentUIDs = JSON.parse(JSON.stringify(myData.metaData.ouHierarchy));
+                                oMetaDataNames = JSON.parse(JSON.stringify(oMyData.metaData.names)),
+                                oMetaDataParentNames = JSON.parse(JSON.stringify(oMyData.metaData.ouNameHierarchy)),
+                                oMetaDataParentUids = JSON.parse(JSON.stringify(oMyData.metaData.ouHierarchy)),
 
-                            var objLevels = init.organisationUnitLevels;
+                                oOrganisationUnitLevels = init.organisationUnitLevels,
                             
-                            var MyHeaders = [];
-                            var MyRows = [];
+                                aMyHeaders = [],
+                                aMyRows = [];
+                            
+                            aOuResItems = oMyData.metaData.ou;
 
-                            sParentPath = ReturnLookup(objParentUIDs,myData.rows[1][2]);
-                            ParentArr = sParentPath.split("/");
+                            sParentPath = returnLookup(oMetaDataParentUids,oMyData.rows[1][2]);
+                            aParent = sParentPath.split('/');
 
-                            for (var x=1; x<ParentArr.length; x++)
-                            {
-                                ouHierarchyOffSet = x;
-                                if (ParentArr[x] == ouResItems){
+                            for (var x = 1; x < aParent.length; x++) {
+                                nOuHierarchyOffSet = x;
+                                if (aParent[x] === aOuResItems) {
                                     break;
                                 }
                             }
                             
-                            sParentPath = ReturnLookup(objParentNames,ReturnLookup(objNames,myData.rows[1][2]));
-                            ParentArr = sParentPath.split("/");
+                            sParentPath = returnLookup(oMetaDataParentNames, returnLookup(oMetaDataNames, oMyData.rows[1][2]));
+                            aParent = sParentPath.split('/');
 
-                            MyHeaders[0] = 'RESERVED_ouh'; 
-                            MyHeaders[1] = 'RESERVED_dx'; 
-                            MyHeaders[2] = 'RESERVED_pe'; 
-                            MyHeaders[3] = 'RESERVED_bgCol';
+                            aMyHeaders[0] = 'RESERVED_ouh'; 
+                            aMyHeaders[1] = 'RESERVED_dx'; 
+                            aMyHeaders[2] = 'RESERVED_pe'; 
+                            aMyHeaders[3] = 'RESERVED_bgCol';
 
-                            for (var x=ouHierarchyOffSet; x<ParentArr.length; x++)
-                            {
-                                MyHeaders[4+iHeaders] = GetOUlevelName(objLevels,x);
+                            for (var x = nOuHierarchyOffSet; x < aParent.length; x++) {
+                                aMyHeaders[4 + iHeaders] = getOuLevelName(oOrganisationUnitLevels, x);
                                 iHeaders += 1;
                             }
 
-                            MyHeaders[4+iHeaders] = 'Group';
-                            MyHeaders[4+iHeaders+1] = ReturnLookup(objNames,myData.headers[0].name);
-                            MyHeaders[4+iHeaders+2] = 'Type';
-                            MyHeaders[4+iHeaders+3] = ReturnLookup(objNames,myData.headers[1].name);
+                            aMyHeaders[4 + iHeaders] = 'Group';
+                            aMyHeaders[4 + iHeaders+1] = returnLookup(oMetaDataNames, oMyData.headers[0].name);
+                            aMyHeaders[4 + iHeaders+2] = 'Type';
+                            aMyHeaders[4 + iHeaders+3] = returnLookup(oMetaDataNames, oMyData.headers[1].name);
 
-                            var peArr = (ReturnLookup(objNames,myData.rows[0][1])).split(" ");
-
-                            for (var y=0; y<peArr.length; y++){
-                                MyHeaders[(4+iHeaders + 3) + (y+1)] = ('Period P' + (y+1));
+                            var peArr = (returnLookup(oMetaDataNames, oMyData.rows[0][1])).split(' ');
+console.log("peArr", peArr);
+                            for (var y = 0; y < peArr.length; y++) {
+                                aMyHeaders[(4 + iHeaders + 3) + (y + 1)] = ('Period P' + (y+1));
                             }
 
-                            MyHeaders[(4+iHeaders + 3)+peArr.length+1] = 'Numerator';
-                            MyHeaders[(4+iHeaders + 3)+peArr.length+2] = 'Denominator';
-                            MyHeaders[(4+iHeaders + 3)+peArr.length+3] = 'Value';
+                            aMyHeaders[(4 + iHeaders + 3)+peArr.length + 1] = 'Numerator';
+                            aMyHeaders[(4 + iHeaders + 3)+peArr.length + 2] = 'Denominator';
+                            aMyHeaders[(4 + iHeaders + 3)+peArr.length + 3] = 'Value';
 
                             var iCount = 0;
 
-                            for (var i = 0; i < myData.rows.length; i++) 
-                            {
-                                if ((dxReqItems.join(';') + ';').indexOf(myData.rows[i][0] + ';') >= 0)
-                                {
-                                    for(var z = 0; z < dxReqItems.length; z++){
-                                        if (myData.rows[i][0] == dxReqItems[z]){
+                            for (var i = 0; i < oMyData.rows.length; i++) {
+                                if ((aDxReqItems.join(';') + ';').indexOf(oMyData.rows[i][0] + ';') >= 0) {
+                                    for (var z = 0; z < aDxReqItems.length; z++) {
+                                        if (oMyData.rows[i][0] == aDxReqItems[z]) {
                                             break;
                                         }
                                     }
 
-                                    sParentPath = ReturnLookup(objParentNames,ReturnLookup(objNames,myData.rows[i][2]));
-                                    ParentArr = sParentPath.split("/");
-                                    MyRows[iCount] = [];
+                                    sParentPath = returnLookup(oMetaDataParentNames,returnLookup(oMetaDataNames,oMyData.rows[i][2]));
+                                    aParent = sParentPath.split("/");
+                                    aMyRows[iCount] = [];
 
-                                    MyRows[iCount][0] = sParentPath;
-                                    MyRows[iCount][1] = ReturnLookup(objNames,myData.rows[i][0]);
-                                    MyRows[iCount][2] = myData.rows[i][1];
+                                    aMyRows[iCount][0] = sParentPath;
+                                    aMyRows[iCount][1] = returnLookup(oMetaDataNames,oMyData.rows[i][0]);
+                                    aMyRows[iCount][2] = oMyData.rows[i][1];
 
-                                    if (ArrDxLegendSet[z] != undefined){
-                                        if (ArrDxLegendSet[z].length > 0){
+                                    if (aDxLegendSet[z] != undefined) {
+                                        if (aDxLegendSet[z].length > 0) {
                                             var bFound = 0;
-                                            for(var iLg=0; iLg<ArrDxLegendSet[z].length; iLg++)
-                                            {
-                                                if ((ArrDxLegendSet[z][iLg]) != undefined){
-                                                    //console.log('ArrDxLegendSet[z][iLg]: ' + ArrDxLegendSet[z][iLg]);
-                                                    var LegArr = (ArrDxLegendSet[z][iLg]).split(';');
-                                                    if (parseFloat((myData.rows[i][3])) >= parseFloat(LegArr[2]) && parseFloat((myData.rows[i][3])) <= parseFloat(LegArr[3])){
-                                                        MyRows[iCount][3] = (LegArr[1]);
+                                            for (var iLg = 0; iLg < aDxLegendSet[z].length; iLg++) {
+                                                if ((aDxLegendSet[z][iLg]) != undefined) {
+                                                    //console.log('aDxLegendSet[z][iLg]: ' + aDxLegendSet[z][iLg]);
+                                                    var LegArr = (aDxLegendSet[z][iLg]).split(';');
+                                                    if (parseFloat((oMyData.rows[i][3])) >= parseFloat(LegArr[2]) && parseFloat((oMyData.rows[i][3])) <= parseFloat(LegArr[3])){
+                                                        aMyRows[iCount][3] = (LegArr[1]);
                                                         bFound = 1
                                                     }
                                                 }
                                                 else{
-                                                    MyRows[iCount][3] = ('#ffffff');
+                                                    aMyRows[iCount][3] = ('#ffffff');
                                                 }
                                             }
                                             if (bFound == 0){
-                                                MyRows[iCount][3] = ('#ffffff');
+                                                aMyRows[iCount][3] = ('#ffffff');
                                             }
                                         }
                                         else{
-                                            MyRows[iCount][3] = ('#ffffff');
+                                            aMyRows[iCount][3] = ('#ffffff');
                                         }
                                     }
                                     else{
-                                        MyRows[iCount][3] = ('#ffffff');
+                                        aMyRows[iCount][3] = ('#ffffff');
                                     }
 
                                     iHeaders = 0;
 
-                                    for (var x=ouHierarchyOffSet; x<ParentArr.length; x++){
-                                        MyRows[iCount][4 + iHeaders] = ParentArr[x];
+                                    for (var x=nOuHierarchyOffSet; x<aParent.length; x++){
+                                        aMyRows[iCount][4 + iHeaders] = aParent[x];
                                         iHeaders += 1
                                     }
 
-                                    MyRows[iCount][4 + iHeaders] = ArrDxGroupName[z];
-                                    MyRows[iCount][4 + iHeaders+1] = MyRows[iCount][1];
-                                    MyRows[iCount][4 + iHeaders+2] = ArrTypeName[z];
-                                    MyRows[iCount][4 + iHeaders+3] = ReturnLookup(objNames,myData.rows[i][1]);
+                                    aMyRows[iCount][4 + iHeaders] = aDxGroupName[z];
+                                    aMyRows[iCount][4 + iHeaders+1] = aMyRows[iCount][1];
+                                    aMyRows[iCount][4 + iHeaders+2] = aTypeName[z];
+                                    aMyRows[iCount][4 + iHeaders+3] = returnLookup(oMetaDataNames,oMyData.rows[i][1]);
 
-                                    var peArr = (ReturnLookup(objNames,myData.rows[i][1])).split(" ");
+                                    peArr = (returnLookup(oMetaDataNames,oMyData.rows[i][1])).split(" ");
 
-                                    for (var y=0; y<peArr.length; y++){
-                                        MyRows[iCount][(7+iHeaders) + (y+1)] = peArr[y];
+                                    for (var y = 0; y < peArr.length; y++) {
+                                        aMyRows[iCount][(7 + iHeaders) + (y + 1)] = peArr[y];
                                     }
 
-                                    if (ArrDxIsIND[z]){
+                                    if (aDxIsIndicator[z]) {
 
                                         /* START OF NUM/DENOM CALCULATIONS */
-                                        var ArrN = ArrNumFormulaItems[z].split(';');
-                                        var ArrD = ArrDenomFormulaItems[z].split(';');
+                                        var ArrN = aNumFormulaItems[z].split(';');
+                                        var ArrD = aDenomFormulaItems[z].split(';');
 
                                         if (ArrN.length > 1){
-                                            var sTempFormula = ArrNumFormula[z];
+                                            var sTempFormula = aNumFormula[z];
                                             for(var p = 0; p < (ArrN.length-1); p++) {
                                                 var ArrFsub = (ArrN[p]).split(".");
                                                 var sTempLookup = ArrFsub[0];
                                                 sTempLookup = sTempLookup.replace(/{/g,'');
                                                 sTempLookup = sTempLookup.replace(/}/g,'');
                                                 sTempLookup = sTempLookup.replace(/#/g,'');
-                                                iLookup = ReturnLookupValue(myData,sTempLookup,myData.rows[i][1],myData.rows[i][2])
+                                                iLookup = returnLookupValue(oMyData,sTempLookup,oMyData.rows[i][1],oMyData.rows[i][2])
                                                 iLookup = ((iLookup || '').toString().length == 0 ? 0 : iLookup);
                                                 if (sTempFormula.indexOf(ArrFsub[0] + '.' + ArrFsub[1]) < 0){
                                                     sTempFormula = sTempFormula.replace(sTempLookup,iLookup);
@@ -2373,34 +2365,34 @@ Ext.onReady( function() {
                                             sTempFormula = sTempFormula.replace(/}/g,')');
                                             sTempFormula = sTempFormula.replace(/#/g,'');
                                             iNumTotal = eval(sTempFormula);
-                                            //console.log(ArrTypeName[z] + ' NUM: ' + ArrNumFormula[z] + ' = ' + sTempFormula + ' [' + iNumTotal + ']');
+                                            //console.log(aTypeName[z] + ' NUM: ' + aNumFormula[z] + ' = ' + sTempFormula + ' [' + iNumTotal + ']');
                                         }
                                         else{
-                                            if ((ArrNumFormula[z]).indexOf('{') >= 0){
-                                                var ArrFsub = ArrNumFormula[z].split(".")
+                                            if ((aNumFormula[z]).indexOf('{') >= 0){
+                                                var ArrFsub = aNumFormula[z].split(".")
                                                 var sTempFormula = ArrFsub[0];
                                                 sTempFormula = sTempFormula.replace(/{/g,'');
                                                 sTempFormula = sTempFormula.replace(/}/g,'');
                                                 sTempFormula = sTempFormula.replace(/#/g,'');
-                                                iNumTotal = ReturnLookupValue(myData,sTempLookup,myData.rows[i][1],myData.rows[i][2]);
+                                                iNumTotal = returnLookupValue(oMyData,sTempLookup,oMyData.rows[i][1],oMyData.rows[i][2]);
                                             }
                                             else
                                             {
-                                                sTempFormula = ArrNumFormula[z];
+                                                sTempFormula = aNumFormula[z];
                                                 iNumTotal = eval(sTempFormula);
                                             }
-                                            //console.log(ArrTypeName[z] + ' NUM: ' + ArrNumFormula[z] + ' = ' + sTempFormula + ' [' + iNumTotal + ']');
+                                            //console.log(aTypeName[z] + ' NUM: ' + aNumFormula[z] + ' = ' + sTempFormula + ' [' + iNumTotal + ']');
                                         }
 
                                         if (ArrD.length > 1){
-                                            var sTempFormula = ArrDenomFormula[z];
+                                            var sTempFormula = aDenomFormula[z];
                                             for(var p = 0; p < (ArrD.length-1); p++) {
                                                 var ArrFsub = (ArrD[p]).split(".");
                                                 var sTempLookup = ArrFsub[0];
                                                 sTempLookup = sTempLookup.replace(/{/g,'');
                                                 sTempLookup = sTempLookup.replace(/}/g,'');
                                                 sTempLookup = sTempLookup.replace(/#/g,'');
-                                                iLookup = ReturnLookupValue(myData,sTempLookup,myData.rows[i][1],myData.rows[i][2]);
+                                                iLookup = returnLookupValue(oMyData,sTempLookup,oMyData.rows[i][1],oMyData.rows[i][2]);
                                                 iLookup = ((iLookup || '').toString().length == 0 ? 0 : iLookup);
                                                 if (sTempFormula.indexOf(ArrFsub[0] + '.' + ArrFsub[1]) < 0){
                                                     sTempFormula = sTempFormula.replace(sTempLookup,iLookup);
@@ -2413,35 +2405,35 @@ Ext.onReady( function() {
                                             sTempFormula = sTempFormula.replace(/}/g,')');
                                             sTempFormula = sTempFormula.replace(/#/g,'');
                                             iDenTotal = eval(sTempFormula);
-                                            //console.log(ArrTypeName[z] + ' DEN: ' + ArrDenomFormula[z] + ' = ' + sTempFormula + ' [' + iDenTotal + ']');
+                                            //console.log(aTypeName[z] + ' DEN: ' + aDenomFormula[z] + ' = ' + sTempFormula + ' [' + iDenTotal + ']');
                                         }
                                         else{
-                                            if ((ArrDenomFormula[z]).indexOf('{') >= 0){
-                                                var ArrFsub = ArrDenomFormula[z].split(".")
+                                            if ((aDenomFormula[z]).indexOf('{') >= 0){
+                                                var ArrFsub = aDenomFormula[z].split(".")
                                                 var sTempFormula = ArrFsub[0];
                                                 sTempFormula = sTempFormula.replace(/{/g,'');
                                                 sTempFormula = sTempFormula.replace(/}/g,'');
                                                 sTempFormula = sTempFormula.replace(/#/g,'');
-                                                iDenTotal = ReturnLookupValue(myData,sTempLookup,myData.rows[i][1],myData.rows[i][2]);
+                                                iDenTotal = returnLookupValue(oMyData,sTempLookup,oMyData.rows[i][1],oMyData.rows[i][2]);
                                             }
                                             else
                                             {
-                                                sTempFormula = ArrDenomFormula[z];
+                                                sTempFormula = aDenomFormula[z];
                                                 iDenTotal = eval(sTempFormula);
                                             }
-                                            //console.log(ArrTypeName[z] + ' DEN: ' + ArrDenomFormula[z] + ' = ' + sTempFormula + ' [' + iDenTotal + ']');
+                                            //console.log(aTypeName[z] + ' DEN: ' + aDenomFormula[z] + ' = ' + sTempFormula + ' [' + iDenTotal + ']');
                                         }
                                     }
-                                    else{
-                                        iNumTotal = parseFloat((myData.rows[i][3]).replace('.0',''));
+                                    else {
+                                        iNumTotal = parseFloat((oMyData.rows[i][3]).replace('.0',''));
                                         iDenTotal = 1;
                                     }
 
-                                    //MyRows[iCount][7+iHeaders + (peArr.length) + 1] = ((ArrDxIsIND[z] == 0) ? '' : iNumTotal);
-                                    //MyRows[iCount][7+iHeaders + (peArr.length) + 2] = ((ArrDxIsIND[z] == 0) ? '' : iDenTotal);
-                                    MyRows[iCount][7+iHeaders + (peArr.length) + 1] = iNumTotal;
-                                    MyRows[iCount][7+iHeaders + (peArr.length) + 2] = iDenTotal;
-                                    MyRows[iCount][7+iHeaders + (peArr.length) + 3] = parseFloat((myData.rows[i][3]).replace('.0',''));
+                                    //aMyRows[iCount][7+iHeaders + (peArr.length) + 1] = ((aDxIsIndicator[z] == 0) ? '' : iNumTotal);
+                                    //aMyRows[iCount][7+iHeaders + (peArr.length) + 2] = ((aDxIsIndicator[z] == 0) ? '' : iDenTotal);
+                                    aMyRows[iCount][7+iHeaders + (peArr.length) + 1] = iNumTotal;
+                                    aMyRows[iCount][7+iHeaders + (peArr.length) + 2] = iDenTotal;
+                                    aMyRows[iCount][7+iHeaders + (peArr.length) + 3] = parseFloat((oMyData.rows[i][3]).replace('.0',''));
                                     
                                     iCount += 1;
                                 }
@@ -2465,21 +2457,21 @@ Ext.onReady( function() {
                                 return a == b ? 0 : (a < b ? -1 : 1)
                             }
 
-                            if (pRank == 1){
-                                MyRows.sort(mySortingAsc);
+                            if (nRank == 1){
+                                aMyRows.sort(mySortingAsc);
                             }
                             else{
-                                if (pRank == -1){
-                                    MyRows.sort(mySortingDesc);
+                                if (nRank == -1){
+                                    aMyRows.sort(mySortingDesc);
                                 }
                                 else{
-                                    MyRows.sort(mySortingA);
+                                    aMyRows.sort(mySortingA);
                                 }
                             }
 
                             var sReturn = '<table class="pivot displaydensity-comfortable">';
-                            sReturn += makeTableHEADER(MyHeaders);
-                            sReturn += makeTableBODY(MyRows);
+                            sReturn += createTableHeader(aMyHeaders);
+                            sReturn += createTableBody(aMyRows);
                             sReturn += '</table>';
 
                             if (sDestination) {
@@ -2495,7 +2487,7 @@ Ext.onReady( function() {
                     });
                 };
 
-                makeTableHEADER = function(myArray) {
+                createTableHeader = function(myArray) {
                     var result = "<thead>";
                     result += "<tr>";
                     for(var i = 4; i < (myArray.length); i++) {
@@ -2506,7 +2498,7 @@ Ext.onReady( function() {
                     return result;
                 };
 
-                makeTableBODY = function(myMultiDimensionArray) {
+                createTableBody = function(myMultiDimensionArray) {
                     var result = "<tbody>";
                     for(var i = 0; i < myMultiDimensionArray.length; i++) {
                         result += "<tr>";
@@ -2519,7 +2511,7 @@ Ext.onReady( function() {
                     return result;
                 };
 
-                ReturnLookupValue = function(theData, dx, pe, ou) {
+                returnLookupValue = function(theData, dx, pe, ou) {
                     for (var i = 0; i < theData.rows.length; i++) {
                         if ((theData.rows[i][0] === dx) && (theData.rows[i][1] === pe) && (theData.rows[i][2] === ou)) {
                             return theData.rows[i][3];
@@ -2527,11 +2519,11 @@ Ext.onReady( function() {
                     }
                 };
 
-                ReturnLookup = function(theData,val) {
+                returnLookup = function(theData,val) {
                     return theData[val];
                 };
 
-                GetOUlevelName = function(OUlevelJ, iOU) {
+                getOuLevelName = function(OUlevelJ, iOU) {
                     for (i = 0; i < OUlevelJ.length; i++) {
                         if (OUlevelJ[i].level == iOU) {
                             return OUlevelJ[i].name;
@@ -2543,7 +2535,7 @@ Ext.onReady( function() {
                     return ("" + num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, function($1) { return $1 + "," });
                 };
 
-                BuildOutputReport();
+                buildOutputReport();
             };
         }());
 
