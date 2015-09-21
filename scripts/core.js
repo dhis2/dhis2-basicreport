@@ -237,22 +237,22 @@ Ext.onReady( function() {
 
 			conf.report = {
 				digitGroupSeparator: {
-					'comma': ',',
-					'space': '&nbsp;'
+					'COMMA': ',',
+					'SPACE': '&nbsp;'
 				},
 				displayDensity: {
-                    'xcompact': '2px',
-					'compact': '4px',
-					'normal': '6px',
-					'comfortable': '8px',
-                    'xcomfortable': '10px'
+                    'XCOMPACT': '2px',
+					'COMPACT': '4px',
+					'NORMAL': '6px',
+					'COMFORTABLE': '8px',
+                    'XCOMFORTABLE': '10px'
 				},
 				fontSize: {
-					'xsmall': '9px',
-					'small': '10px',
-					'normal': '11px',
-					'large': '12px',
-					'xlarge': '14px'
+					'XSMALL': '9px',
+					'SMALL': '10px',
+					'NORMAL': '11px',
+					'LARGE': '12px',
+					'XLARGE': '14px'
 				}
 			};
 
@@ -375,11 +375,11 @@ Ext.onReady( function() {
 
                 // showHierarchy: boolean (false)
 
-				// displayDensity: string ('normal') - 'compact', 'normal', 'comfortable'
+				// displayDensity: string ('NORMAL') - 'COMPACT', 'NORMAL', 'COMFORTABLE'
 
-				// fontSize: string ('normal') - 'small', 'normal', 'large'
+				// fontSize: string ('NORMAL') - 'SMALL', 'NORMAL', 'LARGE'
 
-				// digitGroupSeparator: string ('space') - 'none', 'comma', 'space'
+				// digitGroupSeparator: string ('SPACE') - 'NONE', 'COMMA', 'SPACE'
 
 				// legendSet: object
 
@@ -466,6 +466,7 @@ Ext.onReady( function() {
 					}
 
                     config.columns = getValidatedDimensionArray(config.columns);
+                    config.rows = getValidatedDimensionArray(config.rows);
 
 					// at least one dimension specified as column or row
 					if (!config.columns) {
@@ -499,6 +500,7 @@ Ext.onReady( function() {
 
 					// layout
 					layout.columns = config.columns;
+                    layout.rows = config.rows;
                     
 					layout.showHierarchy = Ext.isBoolean(config.showHierarchy) ? config.showHierarchy : false;
 
@@ -2108,26 +2110,95 @@ Ext.onReady( function() {
                     formatNumber;
                     
                 buildOutputReport = function(sDestination) {
-                    var aDxReqItems = [],
-                        aPeReqItems = [],
-                        aOuReqItems = [],
+                    var aInReqIds = [],
+                        aInReqItems = [],
+                        aDeReqIds = [],
+                        aDeReqItems = [],
+                        aDsReqIds = [],
+                        aDsReqItems = [],
+                        aPeReqIds = [],
+                        aOuReqIds = [],
                         oDimNameReqItemArrayMap = {},
-                        aOuResItems = [];
+                        aOuResItems = [],
+                        sInName = 'indicator',
+                        sDeName = 'dataElement',
+                        sDsName = 'dataSet';
 
-                    oDimNameReqItemArrayMap[dimConf.data.dimensionName] = aDxReqItems;
-                    oDimNameReqItemArrayMap[dimConf.period.dimensionName] = aPeReqItems;
-                    oDimNameReqItemArrayMap[dimConf.organisationUnit.dimensionName] = aOuReqItems;
+                    oDimNameReqItemArrayMap[dimConf.period.dimensionName] = aPeReqIds;
+                    oDimNameReqItemArrayMap[dimConf.organisationUnit.dimensionName] = aOuReqIds;
 
-                    for (var i = 0, dim; i < layout.columns.length; i++) {
-                        dim = layout.columns[i];
+                    // columns (data)
+                    (function() {
+                        var ddi = layout.dataDimensionItems,
+                            dimMap = {};
 
-                        for (var j = 0, item; j < dim.items.length; j++) {
-                            item = dim.items[j];
+                        dimMap[sInName] = aInReqIds;
+                        dimMap[sDeName] = aDeReqIds;
+                        dimMap[sDsName] = aDsReqIds;
 
-                            oDimNameReqItemArrayMap[dim.dimension].push(item.id);
+                        // add objects to corresponding array
+                        if (Ext.isArray(ddi) && ddi.length) {
+                            for (var i = 0, obj; i < ddi.length; i++) {
+                                obj = ddi[i];
+
+                                for (var j = 0, names = [sInName, sDeName, sDsName]; j < names.length; j++) {
+                                    name = names[j];
+
+                                    if (obj.hasOwnProperty(name) && Ext.isObject(obj[name])) {
+                                        dimMap[name].push(obj[name].id);
+                                    }
+                                }
+                            }
+                        }
+                    })();
+                    
+                    // rows
+                    if (Ext.isArray(layout.rows)) {
+                        for (var i = 0, dim; i < layout.rows.length; i++) {
+                            dim = layout.rows[i];
+
+                            for (var j = 0, item; j < dim.items.length; j++) {
+                                item = dim.items[j];
+
+                                oDimNameReqItemArrayMap[dim.dimension].push(item.id);
+                            }
                         }
                     }
+                                                        
+                    ////tmp
+                    //columns: [
+                        //{
+                            //dimension: 'dx',
+                            //items: [
+                                //{
+                                    //id: sdfgfdsg,
+                                    //name: sffg
+                                //},
+                                //{
+                                    //id: sdfgfdsg,
+                                    //name: sffg
+                                //}
+                            //]
+                        //}
+                    //];
 
+                    ////tmp
+                    //dataDimensionItems: [
+                        //{
+                            //indicator:  {
+                                //id: sdfsdf,
+                                //name: eerert
+                            //}
+                        //},
+                        //{
+                            //dataElement: {
+                                //id: rfgfdg,
+                                //name: gdfgd
+                            //}
+                        //}
+                    //];
+
+                    // meta data
                     var nRank = 1,
                         nOuHierarchyOffSet = 0,
                         aDxName = [],
@@ -2146,33 +2217,81 @@ Ext.onReady( function() {
                         sDxUniqueId = '',
                         sLookupSubElements = '',
                         sNums = '',
-                        sDenoms = '';
+                        sDenoms = '',
+                        getIndicators,
+                        getDataElements,
+                        getDataSets,
+                        getData;
 
-                    // meta data
+                    getIndicators = function() {
+                        if (!aInReqIds.length) {
+                            getDataElements();
+                            return;
+                        }
 
-                    $.ajax({
-                        url: init.contextPath + '/api/indicators.json?paging=false&filter=id:in:[' + aDxReqItems.join(',') + ']&fields=id,name,displayName,displayShortName,indicatorType,indicatorGroups[name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
-                        headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
-                    }).done(function(dxData) {
-                        var aIndicators = dxData.indicators;
+                        $.ajax({
+                            url: init.contextPath + '/api/indicators.json?paging=false&filter=id:in:[' + aInReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,indicatorType,indicatorGroups[name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
+                            headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
+                        }).done(function(r) {                          
+                            aInReqItems = r.indicators;
+                            support.prototype.array.addObjectProperty(aInReqItems, 'type', sInName);
+                            getDataElements();
+                        });
+                    };
 
-                        for (var i = 0, oIndicator; i < aIndicators.length; i++) {
-                            oIndicator = aIndicators[i];
-                            sDxUniqueId += (aDxReqItems[i] + ';');
-                            aDxIsIndicator[i] = 1;
-                            aDxName[i] = oIndicator.displayName;
-                            aDxShort[i] = oIndicator.displayShortName;
-                            aNumFormula[i] = oIndicator.numerator;
-                            aNumDescription[i] = oIndicator.numeratorDescription;
-                            aDenomFormula[i] = oIndicator.denominator;
-                            aDenomDescription[i] = oIndicator.denominatorDescription;
-                            aTypeName[i] = oIndicator.indicatorType.name;
-                            aDxGroupName[i] = ((oIndicator.indicatorGroups.length > 0) ? oIndicator.indicatorGroups[0].name : '');
+                    getDataElements = function() {
+                        if (!aDeReqIds.length) {
+                            getDataSets();
+                            return;
+                        }
+
+                        $.ajax({
+                            url: init.contextPath + '/api/dataElements.json?paging=false&filter=id:in:[' + aDeReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,valueType,dataElementGroups[name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
+                            headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
+                        }).done(function(r) {
+                            aDeReqItems = r.dataElements;
+                            support.prototype.array.addObjectProperty(aDeReqItems, 'type', sDeName);
+                            getDataSets();
+                        });
+                    };
+
+                    getDataSets = function() {
+                        if (!aDsReqIds.length) {
+                            getData();
+                            return;
+                        }
+
+                        $.ajax({
+                            url: init.contextPath + '/api/dataSets.json?paging=false&filter=id:in:[' + aDsReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,valueType,dataSetGroups[name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
+                            headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
+                        }).done(function(r) {
+                            aDsReqItems = r.dataSets;
+                            support.prototype.array.addObjectProperty(aDsReqItems, 'type', sDsName);
+                            getData();
+                        });
+                    };
+
+                    getData = function() {
+                        aDxReqIds = [].concat(aInReqIds || [], aDeReqIds || [], aDsReqIds || []);
+                        aDxReqItems = [].concat(aInReqItems || [], aDeReqItems || [], aDsReqItems || []);
+                        
+                        for (var i = 0, oDxItem; i < aDxReqItems.length; i++) {
+                            oDxItem = aDxReqItems[i];
+                            sDxUniqueId += (oDxItem.id + ';');
+                            aDxIsIndicator[i] = oDxItem.type === sInName ? 1 : 0;
+                            aDxName[i] = oDxItem.displayName;
+                            aDxShort[i] = oDxItem.displayShortName;
+                            aNumFormula[i] = oDxItem.numerator;
+                            aNumDescription[i] = oDxItem.numeratorDescription;
+                            aDenomFormula[i] = oDxItem.denominator;
+                            aDenomDescription[i] = oDxItem.denominatorDescription;
+                            aTypeName[i] = oDxItem.indicatorType ? oDxItem.indicatorType.name : ''; //todo
+                            aDxGroupName[i] = (oDxItem.indicatorGroups && oDxItem.indicatorGroups.length) ? oDxItem.indicatorGroups[0].name : ''; //todo
                             aDxLegendSet[i] = [];
 
-                            if (oIndicator.legendSet) {
-                                for (var p = 0; p < oIndicator.legendSet.legends.length; p++) {
-                                    var sLegendSet = (oIndicator.legendSet.legends[p].name + ';' + oIndicator.legendSet.legends[p].color + ';' + oIndicator.legendSet.legends[p].startValue + ';' + oIndicator.legendSet.legends[p].endValue);
+                            if (oDxItem.legendSet) {
+                                for (var p = 0; p < oDxItem.legendSet.legends.length; p++) {
+                                    var sLegendSet = (oDxItem.legendSet.legends[p].name + ';' + oDxItem.legendSet.legends[p].color + ';' + oDxItem.legendSet.legends[p].startValue + ';' + oDxItem.legendSet.legends[p].endValue);
                                     aDxLegendSet[i][nLgIncr] = sLegendSet;
                                     nLgIncr += 1;
                                 }
@@ -2213,9 +2332,9 @@ Ext.onReady( function() {
                         }
 
                         // analytics
-
+                    
                         $.ajax({
-                            url: init.contextPath + '/api/analytics.json?dimension=pe:' + aPeReqItems.join(';') + '&dimension=dx:' + sLookupSubElements + aDxReqItems.join(';') + '&dimension=ou:' + aOuReqItems.join(';') + '&hierarchyMeta=true&displayProperty=NAME&showHierarchy=true',
+                            url: init.contextPath + '/api/analytics.json?dimension=pe:' + aPeReqIds.join(';') + '&dimension=dx:' + sLookupSubElements + aDxReqIds.join(';') + '&dimension=ou:' + aOuReqIds.join(';') + '&hierarchyMeta=true&displayProperty=NAME&showHierarchy=true',
                             headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
                         }).done(function(analyticsData) {
                             var oMyData = analyticsData,
@@ -2228,7 +2347,7 @@ Ext.onReady( function() {
                                 oMetaDataParentNames = JSON.parse(JSON.stringify(oMyData.metaData.ouNameHierarchy)),
                                 oMetaDataParentUids = JSON.parse(JSON.stringify(oMyData.metaData.ouHierarchy)),
 
-                                oOrganisationUnitLevels = init.organisationUnitLevels,
+                                aOrganisationUnitLevels = init.organisationUnitLevels,
                             
                                 aMyHeaders = [],
                                 aMyRows = [],
@@ -2262,7 +2381,7 @@ Ext.onReady( function() {
                             aMyHeaders[3] = 'RESERVED_bgCol';
 
                             for (var x = nOuHierarchyOffSet; x < aParent.length; x++) {
-                                aMyHeaders[4 + nHeaders] = getOuLevelName(oOrganisationUnitLevels, x);
+                                aMyHeaders[4 + nHeaders] = getOuLevelName(aOrganisationUnitLevels, x);
                                 nHeaders += 1;
                             }
 
@@ -2283,21 +2402,23 @@ Ext.onReady( function() {
 
                             var nCount = 0;
 
-                            for (var i = 0; i < oMyData.rows.length; i++) {
-                                if ((aDxReqItems.join(';') + ';').indexOf(oMyData.rows[i][0] + ';') >= 0) {
-                                    for (var z = 0; z < aDxReqItems.length; z++) {
-                                        if (oMyData.rows[i][0] == aDxReqItems[z]) {
+                            for (var i = 0, row; i < oMyData.rows.length; i++) {
+                                row = oMyData.rows[i];
+                                
+                                if ((aDxReqIds.join(';') + ';').indexOf(row[0] + ';') >= 0) {
+                                    for (var z = 0; z < aDxReqIds.length; z++) {
+                                        if (row[0] == aDxReqIds[z]) {
                                             break;
                                         }
                                     }
 
-                                    sParentPath = returnLookup(oMetaDataParentNames,returnLookup(oMetaDataNames,oMyData.rows[i][2]));
-                                    aParent = sParentPath.split("/");
+                                    sParentPath = returnLookup(oMetaDataParentNames, returnLookup(oMetaDataNames, row[2]));
+                                    aParent = sParentPath.split('/');
                                     aMyRows[nCount] = [];
 
                                     aMyRows[nCount][0] = sParentPath;
-                                    aMyRows[nCount][1] = returnLookup(oMetaDataNames,oMyData.rows[i][0]);
-                                    aMyRows[nCount][2] = oMyData.rows[i][1];
+                                    aMyRows[nCount][1] = returnLookup(oMetaDataNames, row[0]);
+                                    aMyRows[nCount][2] = row[1];
 
                                     if (aDxLegendSet[z] != undefined) {
                                         if (aDxLegendSet[z].length > 0) {
@@ -2306,7 +2427,7 @@ Ext.onReady( function() {
                                                 if ((aDxLegendSet[z][iLg]) != undefined) {
                                                     //console.log('aDxLegendSet[z][iLg]: ' + aDxLegendSet[z][iLg]);
                                                     var LegArr = (aDxLegendSet[z][iLg]).split(';');
-                                                    if (parseFloat((oMyData.rows[i][3])) >= parseFloat(LegArr[2]) && parseFloat((oMyData.rows[i][3])) <= parseFloat(LegArr[3])){
+                                                    if (parseFloat((row[3])) >= parseFloat(LegArr[2]) && parseFloat((row[3])) <= parseFloat(LegArr[3])){
                                                         aMyRows[nCount][3] = (LegArr[1]);
                                                         bFound = 1
                                                     }
@@ -2337,9 +2458,9 @@ Ext.onReady( function() {
                                     aMyRows[nCount][4 + nHeaders] = aDxGroupName[z];
                                     aMyRows[nCount][4 + nHeaders+1] = aMyRows[nCount][1];
                                     aMyRows[nCount][4 + nHeaders+2] = aTypeName[z];
-                                    aMyRows[nCount][4 + nHeaders+3] = returnLookup(oMetaDataNames,oMyData.rows[i][1]);
+                                    aMyRows[nCount][4 + nHeaders+3] = returnLookup(oMetaDataNames,row[1]);
 
-                                    aPeNameSplit = (returnLookup(oMetaDataNames,oMyData.rows[i][1])).split(" ");
+                                    aPeNameSplit = (returnLookup(oMetaDataNames,row[1])).split(" ");
                                     
                                     for (var y = 0; y < aPeNameSplit.length; y++) {
                                         aMyRows[nCount][(7 + nHeaders) + (y + 1)] = aPeNameSplit[y];
@@ -2367,7 +2488,7 @@ Ext.onReady( function() {
                                             for (var p = 0; p < (aTempNum.length - 1); p++) {
                                                 aTempNumFsub = (aTempNum[p]).split(".");
                                                 sTempNumLookup = aTempNumFsub[0].replace(/{/g,'').replace(/}/g,'').replace(/#/g,'');
-                                                nTempNumLookup = returnLookupValue(oMyData, sTempNumLookup, oMyData.rows[i][1], oMyData.rows[i][2]);
+                                                nTempNumLookup = returnLookupValue(oMyData, sTempNumLookup, row[1], row[2]);
                                                 nTempNumLookup = ((nTempNumLookup || '').toString().length == 0 ? 0 : nTempNumLookup);
                                                 if (sTempNumFormula.indexOf(aTempNumFsub[0] + '.' + aTempNumFsub[1]) < 0) {
                                                     sTempNumFormula = sTempNumFormula.replace(sTempNumLookup, nTempNumLookup);
@@ -2386,7 +2507,7 @@ Ext.onReady( function() {
                                             if ((aNumFormula[z]).indexOf('{') >= 0){
                                                 aTempNumFsub = aNumFormula[z].split(".")
                                                 sTempNumFormula = aTempNumFsub[0].replace(/{/g,'').replace(/}/g,'').replace(/#/g,'');
-                                                nTempNumTotal = returnLookupValue(oMyData, sTempNumLookup, oMyData.rows[i][1], oMyData.rows[i][2]);
+                                                nTempNumTotal = returnLookupValue(oMyData, sTempNumLookup, row[1], row[2]);
                                             }
                                             else
                                             {
@@ -2401,7 +2522,7 @@ Ext.onReady( function() {
                                             for (var p = 0; p < (aTempDenom.length - 1); p++) {
                                                 aTempDenomFsub = (aTempDenom[p]).split(".");
                                                 sTempDenomLookup = aTempDenomFsub[0].replace(/{/g,'').replace(/}/g,'').replace(/#/g,'');
-                                                nTempDenomLookup = returnLookupValue(oMyData, sTempDenomLookup, oMyData.rows[i][1], oMyData.rows[i][2]);
+                                                nTempDenomLookup = returnLookupValue(oMyData, sTempDenomLookup, row[1], row[2]);
                                                 nTempDenomLookup = ((nTempDenomLookup || '').toString().length == 0 ? 0 : nTempDenomLookup);
                                                 if (sTempDenomFormula.indexOf(aTempDenomFsub[0] + '.' + aTempDenomFsub[1]) < 0) {
                                                     sTempDenomFormula = sTempDenomFormula.replace(sTempDenomLookup, nTempDenomLookup);
@@ -2419,7 +2540,7 @@ Ext.onReady( function() {
                                             if ((aDenomFormula[z]).indexOf('{') >= 0) {
                                                 aTempDenomFsub = aDenomFormula[z].split(".")
                                                 sTempDenomFormula = aTempDenomFsub[0].replace(/{/g,'').replace(/}/g,'').replace(/#/g,'');
-                                                nTempDenomTotal = returnLookupValue(oMyData, sTempDenomLookup, oMyData.rows[i][1], oMyData.rows[i][2]);
+                                                nTempDenomTotal = returnLookupValue(oMyData, sTempDenomLookup, row[1], row[2]);
                                             }
                                             else
                                             {
@@ -2429,7 +2550,7 @@ Ext.onReady( function() {
                                         }
                                     }
                                     else {
-                                        nTempNumTotal = parseFloat((oMyData.rows[i][3]).replace('.0',''));
+                                        nTempNumTotal = parseFloat((row[3]).replace('.0',''));
                                         nTempDenomTotal = 1;
                                     }
                                     
@@ -2437,7 +2558,7 @@ Ext.onReady( function() {
                                     //aMyRows[nCount][7+ nHeaders + (aPeNameSplit.length) + 2] = ((aDxIsIndicator[z] == 0) ? '' : nTempDenomTotal);
                                     aMyRows[nCount][7 + nHeaders + (aPeNameSplit.length) + 1] = nTempNumTotal;
                                     aMyRows[nCount][7 + nHeaders + (aPeNameSplit.length) + 2] = nTempDenomTotal;
-                                    aMyRows[nCount][7 + nHeaders + (aPeNameSplit.length) + 3] = parseFloat((oMyData.rows[i][3]).replace('.0',''));
+                                    aMyRows[nCount][7 + nHeaders + (aPeNameSplit.length) + 3] = parseFloat((row[3]).replace('.0',''));
                                     
                                     nCount += 1;
                                 }
@@ -2475,10 +2596,12 @@ Ext.onReady( function() {
                             if (fCallback) {
                                 fCallback(sReturn);
                             }
-                        });                        
+                        });
 
                     // end of indicator "done"
-                    });
+                    };
+
+                    getIndicators();
                 };
 
                 createTableHeader = function(myArray) {
@@ -2517,10 +2640,10 @@ Ext.onReady( function() {
                     return theData[val];
                 };
 
-                getOuLevelName = function(OUlevelJ, iOU) {
-                    for (i = 0; i < OUlevelJ.length; i++) {
-                        if (OUlevelJ[i].level == iOU) {
-                            return OUlevelJ[i].name;
+                getOuLevelName = function(oLevel, nLevel) {
+                    for (i = 0; i < oLevel.length; i++) {
+                        if (oLevel[i].level === nLevel) {
+                            return oLevel[i].name;
                         }                        
                     }
                 };

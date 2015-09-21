@@ -134,9 +134,9 @@ Ext.onReady( function() {
 			store: Ext.create('Ext.data.Store', {
 				fields: ['id', 'text'],
 				data: [
-					{id: 'comfortable', text: NS.i18n.comfortable},
-					{id: 'normal', text: NS.i18n.normal},
-					{id: 'compact', text: NS.i18n.compact}
+					{id: 'COMPACT', text: NS.i18n.compact},
+					{id: 'NORMAL', text: NS.i18n.normal},
+					{id: 'COMFORTABLE', text: NS.i18n.comfortable}
 				]
 			})
 		});
@@ -155,9 +155,9 @@ Ext.onReady( function() {
 			store: Ext.create('Ext.data.Store', {
 				fields: ['id', 'text'],
 				data: [
-					{id: 'large', text: NS.i18n.large},
-					{id: 'normal', text: NS.i18n.normal},
-					{id: 'small', text: NS.i18n.small_}
+					{id: 'LARGE', text: NS.i18n.large},
+					{id: 'NORMAL', text: NS.i18n.normal},
+					{id: 'SMALL', text: NS.i18n.small_}
 				]
 			})
 		});
@@ -176,9 +176,9 @@ Ext.onReady( function() {
 			store: Ext.create('Ext.data.Store', {
 				fields: ['id', 'text'],
 				data: [
-					{id: 'comma', text: 'Comma'},
-					{id: 'space', text: 'Space'},
-					{id: 'none', text: 'None'}
+					{id: 'COMMA', text: 'Comma'},
+					{id: 'SPACE', text: 'Space'},
+					{id: 'NONE', text: 'None'}
 				]
 			})
 		});
@@ -796,6 +796,7 @@ Ext.onReady( function() {
                     map = dimConf.objectNameMap;
 
 				config.columns = [];
+                config.rows = [];
                 config.dataDimensionItems = [];
 
 				// panel data
@@ -803,9 +804,12 @@ Ext.onReady( function() {
 					dim = panels[i].getDimension();
                     
 					if (dim) {
-                        config.columns.push(dim);
-
                         if (dim.dimension === dx) {
+
+                            // columns
+                            config.columns.push(dim);
+
+                            // dataDimensionItems
                             for (var j = 0, item, ddi; j < dim.items.length; j++) {
                                 ddi = {};
                                 item = dim.items[j];
@@ -814,7 +818,12 @@ Ext.onReady( function() {
 
                                 config.dataDimensionItems.push(ddi);
                             }
-                        }                                    
+                        }
+                        else {
+
+                            // rows
+                            config.rows.push(dim);
+                        }
 					}
 				}
                 
@@ -4071,7 +4080,7 @@ Ext.onReady( function() {
 
 					// left gui
 					var viewportHeight = westRegion.getHeight(),
-						numberOfTabs = ns.core.init.dimensions.length + 3,
+						numberOfTabs = (ns.core.init.dimensions ? ns.core.init.dimensions.length : 0) + 3,
 						tabHeight = 28,
 						minPeriodHeight = 380;
 
@@ -4382,13 +4391,13 @@ Ext.onReady( function() {
                                                 });
 
                                                 // dimensions
-                                                requests.push({
-                                                    url: contextPath + '/api/dimensions.json?fields=id,name&paging=false',
-                                                    success: function(r) {
-                                                        init.dimensions = Ext.decode(r.responseText).dimensions || [];
-                                                        fn();
-                                                    }
-                                                });
+                                                //requests.push({
+                                                    //url: contextPath + '/api/dimensions.json?fields=id,name&paging=false',
+                                                    //success: function(r) {
+                                                        //init.dimensions = Ext.decode(r.responseText).dimensions || [];
+                                                        //fn();
+                                                    //}
+                                                //});
 
                                                 // approval levels
                                                 requests.push({
