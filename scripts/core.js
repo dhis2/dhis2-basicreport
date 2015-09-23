@@ -296,6 +296,9 @@ Ext.onReady( function() {
 
 		// api
 		(function() {
+
+            // layout
+
 			api.layout = {};
 
 			api.layout.Record = function(config) {
@@ -534,11 +537,13 @@ Ext.onReady( function() {
 				}();
 			};
 
-			api.response = {};
+            // data
+
+			api.data = {};
 
             // Response
             (function() {
-                var R = api.response.Response = function(config) {
+                var R = api.data.Response = function(config) {
                     var r = this;
 
                     r.headers = config.headers;
@@ -550,6 +555,7 @@ Ext.onReady( function() {
 
                     // uninitialized transient properties
                     r.idValueMap = {};
+                    r.idCombinations = [];
 
                     // header index
                     (function() {
@@ -584,6 +590,19 @@ Ext.onReady( function() {
                     return Ext.Array.clean((this.metaData.ouHierarchy[id] || '').split('/') || []).length + 1;
                 };
 
+                R.prototype.getMaxLevel = function() {
+                    var ouh = this.metaData.ouHierarchy,
+                        anLevels = [];
+
+                    for (var i in ouh) {
+                        if (ouh.hasOwnProperty(i)) {
+                            anLevels.push(this.getLevelById(i));
+                        }
+                    }
+
+                    return Ext.Array.max(anLevels);
+                };
+
                 R.prototype.getAncestorIdArray = function(id) {
                     return Ext.Array.clean((this.metaData.ouHierarchy[id] || '').split('/') || []);
                 };
@@ -597,19 +616,6 @@ Ext.onReady( function() {
                     }
 
                     return anchestorNameArray;
-                };
-
-                R.prototype.getMaxLevel = function() {
-                    var ouh = this.metaData.ouHierarchy,
-                        anLevels = [];
-
-                    for (var i in ouh) {
-                        if (ouh.hasOwnProperty(i)) {
-                            anLevels.push(this.getLevelById(i));
-                        }
-                    }
-
-                    return Ext.Array.max(anLevels);
                 };
 
                 R.prototype.createIdValueMap = function() {
@@ -633,9 +639,25 @@ Ext.onReady( function() {
                 R.prototype.getValueByIdParams = function(dxId, peId, ouId) {
                     return this.idValueMap[dxId + '-' + peId + '-' + ouId];
                 };
-			})();
 
-            api.data = {};
+                R.prototype.createIdCombinationArray = function() {
+                    for (var i = 0, dx; i < aDxResIds.length; i++) {
+                        dx = aDxResIds[i];
+
+                        for (var j = 0, pe; j < aPeResIds.length; j++) {
+                            pe = aPeResIds[j];
+
+                            for (var k = 0, ou; k < aOuResIds.length; k++) {
+                                ou = aOuResIds[k];
+
+                                this.idCombinations.push(dx + '-' + pe + '-' + ou);
+                            }
+                        }
+                    }
+
+                    return this.idCombinations;
+                };
+			})();
 
             // Data object
             (function() {
@@ -693,6 +715,18 @@ Ext.onReady( function() {
                     }
 
                     return this.defaultBgColor;
+                };
+            })();
+
+            // Table header
+            (function() {
+                var H = api.data.TableHeader = function(config) {
+                    var h = this;
+
+                    h.elementId = config.id;
+                    h.name = config.name;
+
+                    h.cls = 'pivot-dim td-sortable';
                 };
             })();
         }());
@@ -2212,7 +2246,6 @@ Ext.onReady( function() {
                         aPeReqIds = [],
                         aOuReqIds = [],
                         oDimNameReqItemArrayMap = {},
-                        aOuResIds,
                         sInName = 'indicator',
                         sDeName = 'dataElement',
                         sDsName = 'dataSet';
@@ -2439,9 +2472,108 @@ console.log(aDxReqItems);
                             url: init.contextPath + '/api/analytics.json?dimension=pe:' + aPeReqIds.join(';') + '&dimension=dx:' + sLookupSubElements + aDxReqIds.join(';') + '&dimension=ou:' + aOuReqIds.join(';') + '&hierarchyMeta=true&displayProperty=NAME&showHierarchy=true',
                             headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
                         }).done(function(analyticsData) {
-                            var response = new api.response.Response(analyticsData),
+                            var response = new api.data.Response(analyticsData),
+                                idCombinations = response.createIdCombinations(),
+                                aDxResIds = response.metaData.dx,
+                                aPeResIds = response.metaData.pe,
+                                aOuResIds = response.metaData.ou,
+                                tableHeaders = [],
+                                nOuHeaders;
 
-                                sParentPath,
+                            // table headers
+
+                            (function() {
+
+                                // ou headers
+                                (function() {
+                                    var maxLevel = response.getMaxLevel(),
+                                        i = maxLevel > 1 ? 1 : 0;
+
+                                    nOuHeaders = (maxLevel === 1) ? 1 : (maxLevel - 1);
+
+                                    for (; i < maxLevel; i++) {
+                                        tableHeaders.push(new api.data.TableHeader(init.organisationUnitLevels[i]));
+                                    }
+                                })();
+
+                                // pe headers
+                                tableHeaders.push(new api.data.TableHeader({
+                                    id: 'pe',
+                                    name: 'Period'
+                                });
+
+                                // dx headers
+                                tableHeaders.push(new api.data.TableHeader({
+                                    id: 'dx-group',
+                                    name: 'Data group'
+                                }));
+
+                                tableHeaders.push(new api.data.TableHeader({
+                                    id: 'dx',
+                                    name: 'Data'
+                                });
+
+                                tableHeaders.push(new api.data.TableHeader({
+                                    id: 'dx-type',
+                                    name: 'Type'
+                                });
+
+                                tableHeaders.push(new api.data.TableHeader({
+                                    id: 'dx-numerator',
+                                    name: 'Numerator'
+                                });
+
+                                tableHeaders.push(new api.data.TableHeader({
+                                    id: 'dx-denominator',
+                                    name: 'Denominator'
+                                });
+
+                                tableHeaders.push(new api.data.TableHeader({
+                                    id: 'dx-value',
+                                    name: 'Value'
+                                });
+                            })();
+
+                            // table rows
+
+                            (function() {
+                                for (var i = 0; i < idCombinations.length; i++) {
+
+
+                                    //todo
+                                }
+                            })();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                            var sParentPath,
                                 aParent,
                                 nHeaders = 0,
 
