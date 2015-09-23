@@ -2108,7 +2108,8 @@ Ext.onReady( function() {
                     returnLookup,
                     getOuLevelName,
                     formatNumber;
-                    
+
+var count = 0;
                 buildOutputReport = function(sDestination) {
                     var aInReqIds = [],
                         aInReqItems = [],
@@ -2119,7 +2120,7 @@ Ext.onReady( function() {
                         aPeReqIds = [],
                         aOuReqIds = [],
                         oDimNameReqItemArrayMap = {},
-                        aOuResItems = [],
+                        aOuResIds,
                         sInName = 'indicator',
                         sDeName = 'dataElement',
                         sDsName = 'dataSet';
@@ -2314,7 +2315,7 @@ Ext.onReady( function() {
                                 aNumFormulaItems[i] = sNumItems;
                             }
 
-                            if (aDenomFormula[i]){
+                            if (aDenomFormula[i]) {
                                 var sDenomItems = '';
                                 if (aDenomFormula[i].indexOf('{') != 0){
                                     var aDenomTmpOuter = aDenomFormula[i].split('{');
@@ -2337,16 +2338,16 @@ Ext.onReady( function() {
                             url: init.contextPath + '/api/analytics.json?dimension=pe:' + aPeReqIds.join(';') + '&dimension=dx:' + sLookupSubElements + aDxReqIds.join(';') + '&dimension=ou:' + aOuReqIds.join(';') + '&hierarchyMeta=true&displayProperty=NAME&showHierarchy=true',
                             headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
                         }).done(function(analyticsData) {
-                            var oMyData = analyticsData,
+                            var aMyData = analyticsData,
                             
                                 sParentPath,
                                 aParent,
                                 nHeaders = 0,
 
-                                oMetaDataNames = JSON.parse(JSON.stringify(oMyData.metaData.names)),
-                                oMetaDataParentNames = JSON.parse(JSON.stringify(oMyData.metaData.ouNameHierarchy)),
-                                oMetaDataParentUids = JSON.parse(JSON.stringify(oMyData.metaData.ouHierarchy)),
-
+                                oMetaDataNames = aMyData.metaData.names,
+                                oMetaDataParentNames = aMyData.metaData.ouNameHierarchy,
+                                oMetaDataParentUids = aMyData.metaData.ouHierarchy,
+                                
                                 aOrganisationUnitLevels = init.organisationUnitLevels,
                             
                                 aMyHeaders = [],
@@ -2360,19 +2361,19 @@ Ext.onReady( function() {
                                 
                                 sReturn = '';
                             
-                            aOuResItems = oMyData.metaData.ou;
+                            aOuResIds = aMyData.metaData.ou;
 
-                            sParentPath = returnLookup(oMetaDataParentUids,oMyData.rows[1][2]);
-                            aParent = sParentPath.split('/');
+                            sParentPath = returnLookup(oMetaDataParentUids, aMyData.rows[1][2]);
+                            aParent = Ext.Array.clean(sParentPath.split('/'));
 
-                            for (var x = 1; x < aParent.length; x++) {
+                            for (var x = 0; x < aParent.length; x++) {
                                 nOuHierarchyOffSet = x;
-                                if (aParent[x] === aOuResItems) {
+                                if (Ext.Array.contains(aOuResIds, aParent[x])) {
                                     break;
                                 }
                             }
                             
-                            sParentPath = returnLookup(oMetaDataParentNames, returnLookup(oMetaDataNames, oMyData.rows[1][2]));
+                            sParentPath = returnLookup(oMetaDataParentNames, returnLookup(oMetaDataNames, aMyData.rows[1][2]));
                             aParent = sParentPath.split('/');
 
                             aMyHeaders[0] = 'RESERVED_ouh'; 
@@ -2386,11 +2387,11 @@ Ext.onReady( function() {
                             }
 
                             aMyHeaders[4 + nHeaders] = 'Group';
-                            aMyHeaders[4 + nHeaders+1] = returnLookup(oMetaDataNames, oMyData.headers[0].name);
+                            aMyHeaders[4 + nHeaders+1] = returnLookup(oMetaDataNames, aMyData.headers[0].name);
                             aMyHeaders[4 + nHeaders+2] = 'Type';
-                            aMyHeaders[4 + nHeaders+3] = returnLookup(oMetaDataNames, oMyData.headers[1].name);
+                            aMyHeaders[4 + nHeaders+3] = returnLookup(oMetaDataNames, aMyData.headers[1].name);
 
-                            aPeNameSplit = (returnLookup(oMetaDataNames, oMyData.rows[0][1])).split(' ');
+                            aPeNameSplit = (returnLookup(oMetaDataNames, aMyData.rows[0][1])).split(' ');
                             
                             for (var y = 0; y < aPeNameSplit.length; y++) {
                                 aMyHeaders[(4 + nHeaders + 3) + (y + 1)] = ('Period P' + (y+1));
@@ -2402,8 +2403,8 @@ Ext.onReady( function() {
 
                             var nCount = 0;
 
-                            for (var i = 0, row; i < oMyData.rows.length; i++) {
-                                row = oMyData.rows[i];
+                            for (var i = 0, row; i < aMyData.rows.length; i++) {
+                                row = aMyData.rows[i];
                                 
                                 if ((aDxReqIds.join(';') + ';').indexOf(row[0] + ';') >= 0) {
                                     for (var z = 0; z < aDxReqIds.length; z++) {
@@ -2420,27 +2421,22 @@ Ext.onReady( function() {
                                     aMyRows[nCount][1] = returnLookup(oMetaDataNames, row[0]);
                                     aMyRows[nCount][2] = row[1];
 
-                                    if (aDxLegendSet[z] != undefined) {
-                                        if (aDxLegendSet[z].length > 0) {
-                                            var bFound = 0;
-                                            for (var iLg = 0; iLg < aDxLegendSet[z].length; iLg++) {
-                                                if ((aDxLegendSet[z][iLg]) != undefined) {
-                                                    //console.log('aDxLegendSet[z][iLg]: ' + aDxLegendSet[z][iLg]);
-                                                    var LegArr = (aDxLegendSet[z][iLg]).split(';');
-                                                    if (parseFloat((row[3])) >= parseFloat(LegArr[2]) && parseFloat((row[3])) <= parseFloat(LegArr[3])){
-                                                        aMyRows[nCount][3] = (LegArr[1]);
-                                                        bFound = 1
-                                                    }
-                                                }
-                                                else {
-                                                    aMyRows[nCount][3] = ('#ffffff');
+                                    if (aDxLegendSet[z]) {
+                                        var bFound = false;
+                                        for (var nLg = 0; nLg < aDxLegendSet[z].length; nLg++) {
+                                            if ((aDxLegendSet[z][nLg]) != undefined) {
+                                                var LegArr = (aDxLegendSet[z][nLg]).split(';');
+                                                if (parseFloat(row[3]) >= parseFloat(LegArr[2]) && parseFloat(row[3]) <= parseFloat(LegArr[3])) {
+                                                    aMyRows[nCount][3] = LegArr[1];
+                                                    bFound = true;
                                                 }
                                             }
-                                            if (bFound == 0){
+                                            else {
                                                 aMyRows[nCount][3] = ('#ffffff');
                                             }
                                         }
-                                        else {
+                                        
+                                        if (!bFound){
                                             aMyRows[nCount][3] = ('#ffffff');
                                         }
                                     }
@@ -2450,7 +2446,7 @@ Ext.onReady( function() {
 
                                     nHeaders = 0;
 
-                                    for (var x=nOuHierarchyOffSet; x<aParent.length; x++){
+                                    for (var x = nOuHierarchyOffSet; x < aParent.length; x++) {
                                         aMyRows[nCount][4 + nHeaders] = aParent[x];
                                         nHeaders += 1
                                     }
@@ -2488,7 +2484,7 @@ Ext.onReady( function() {
                                             for (var p = 0; p < (aTempNum.length - 1); p++) {
                                                 aTempNumFsub = (aTempNum[p]).split(".");
                                                 sTempNumLookup = aTempNumFsub[0].replace(/{/g,'').replace(/}/g,'').replace(/#/g,'');
-                                                nTempNumLookup = returnLookupValue(oMyData, sTempNumLookup, row[1], row[2]);
+                                                nTempNumLookup = returnLookupValue(aMyData, sTempNumLookup, row[1], row[2]);
                                                 nTempNumLookup = ((nTempNumLookup || '').toString().length == 0 ? 0 : nTempNumLookup);
                                                 if (sTempNumFormula.indexOf(aTempNumFsub[0] + '.' + aTempNumFsub[1]) < 0) {
                                                     sTempNumFormula = sTempNumFormula.replace(sTempNumLookup, nTempNumLookup);
@@ -2507,7 +2503,7 @@ Ext.onReady( function() {
                                             if ((aNumFormula[z]).indexOf('{') >= 0){
                                                 aTempNumFsub = aNumFormula[z].split(".")
                                                 sTempNumFormula = aTempNumFsub[0].replace(/{/g,'').replace(/}/g,'').replace(/#/g,'');
-                                                nTempNumTotal = returnLookupValue(oMyData, sTempNumLookup, row[1], row[2]);
+                                                nTempNumTotal = returnLookupValue(aMyData, sTempNumLookup, row[1], row[2]);
                                             }
                                             else
                                             {
@@ -2522,7 +2518,7 @@ Ext.onReady( function() {
                                             for (var p = 0; p < (aTempDenom.length - 1); p++) {
                                                 aTempDenomFsub = (aTempDenom[p]).split(".");
                                                 sTempDenomLookup = aTempDenomFsub[0].replace(/{/g,'').replace(/}/g,'').replace(/#/g,'');
-                                                nTempDenomLookup = returnLookupValue(oMyData, sTempDenomLookup, row[1], row[2]);
+                                                nTempDenomLookup = returnLookupValue(aMyData, sTempDenomLookup, row[1], row[2]);
                                                 nTempDenomLookup = ((nTempDenomLookup || '').toString().length == 0 ? 0 : nTempDenomLookup);
                                                 if (sTempDenomFormula.indexOf(aTempDenomFsub[0] + '.' + aTempDenomFsub[1]) < 0) {
                                                     sTempDenomFormula = sTempDenomFormula.replace(sTempDenomLookup, nTempDenomLookup);
@@ -2540,7 +2536,7 @@ Ext.onReady( function() {
                                             if ((aDenomFormula[z]).indexOf('{') >= 0) {
                                                 aTempDenomFsub = aDenomFormula[z].split(".")
                                                 sTempDenomFormula = aTempDenomFsub[0].replace(/{/g,'').replace(/}/g,'').replace(/#/g,'');
-                                                nTempDenomTotal = returnLookupValue(oMyData, sTempDenomLookup, row[1], row[2]);
+                                                nTempDenomTotal = returnLookupValue(aMyData, sTempDenomLookup, row[1], row[2]);
                                             }
                                             else
                                             {
@@ -2592,7 +2588,7 @@ Ext.onReady( function() {
                             if (sDestination) {
                                 $(sDestination).html(sReturn);
                             }
-
+                            
                             if (fCallback) {
                                 fCallback(sReturn);
                             }
