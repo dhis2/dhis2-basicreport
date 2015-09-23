@@ -1,5 +1,5 @@
 Ext.onReady( function() {
-	var NS = PT,
+	var NS = BR,
 
 		LayoutWindow,
 		OptionsWindow,

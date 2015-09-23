@@ -38,8 +38,8 @@ Ext.onReady( function() {
     };
 
 	// namespace
-	PT = {};
-	var NS = PT;
+	BR = {};
+	var NS = BR;
 
 	NS.instances = [];
 	NS.i18n = {};
@@ -501,7 +501,7 @@ Ext.onReady( function() {
 					// layout
 					layout.columns = config.columns;
                     layout.rows = config.rows;
-                    
+
 					layout.showHierarchy = Ext.isBoolean(config.showHierarchy) ? config.showHierarchy : false;
 
 					layout.displayDensity = Ext.isString(config.displayDensity) && !Ext.isEmpty(config.displayDensity) ? config.displayDensity : 'normal';
@@ -536,73 +536,166 @@ Ext.onReady( function() {
 
 			api.response = {};
 
-			api.response.Header = function(config) {
-				var config = Ext.clone(config);
+            // Response
+            (function() {
+                var R = api.response.Response = function(config) {
+                    var r = this;
 
-				// name: string
+                    r.headers = config.headers;
+                    r.metaData = config.metaData;
+                    r.rows = config.rows;
 
-				// meta: boolean
+                    // initialized transient properties
+                    r.nameHeaderMap = {};
 
-				return function() {
-					if (!Ext.isObject(config)) {
-						console.log('Header: config is not an object: ' + config);
-						return;
-					}
+                    // uninitialized transient properties
+                    r.idValueMap = {};
 
-					if (!Ext.isString(config.name)) {
-						console.log('Header: name is not a string: ' + config);
-						return;
-					}
+                    // header index
+                    (function() {
+                        for (var i = 0; i < r.headers.length; i++) {
+                            r.headers[i].index = i;
+                        }
+                    })();
 
-					if (!Ext.isBoolean(config.meta)) {
-						console.log('Header: meta is not boolean: ' + config);
-						return;
-					}
+                    // nameHeaderMap
+                    (function() {
+                        r.nameHeaderMap = {};
 
-					return config;
-				}();
-			};
+                        for (var i = 0; i < r.headers.length; i++) {
+                            r.nameHeaderMap[r.headers[i].name] = r.headers[i];
+                        }
+                    })();
+                };
 
-			api.response.Response = function(config) {
-				var config = Ext.clone(config);
+                R.prototype.getHeaderByName = function(name) {
+                    return this.nameHeaderMap[name];
+                };
 
-				// headers: [Header]
+                R.prototype.getHeaderIndexByName = function(name) {
+                    return this.nameHeaderMap[name].index;
+                };
 
-				return function() {
-					if (!(config && Ext.isObject(config))) {
-						console.log('Response: config is not an object');
-						return;
-					}
+                R.prototype.getNameById = function(id) {
+                    return this.metaData.names[id];
+                };
 
-					if (!(config.headers && Ext.isArray(config.headers))) {
-						console.log('Response: headers is not an array');
-						return;
-					}
+                R.prototype.getLevelById = function(id) {
+                    return Ext.Array.clean((this.metaData.ouHierarchy[id] || '').split('/') || []).length + 1;
+                };
 
-					for (var i = 0, header; i < config.headers.length; i++) {
-						config.headers[i] = api.response.Header(config.headers[i]);
-					}
+                R.prototype.getAncestorIdArray = function(id) {
+                    return Ext.Array.clean((this.metaData.ouHierarchy[id] || '').split('/') || []);
+                };
 
-					config.headers = Ext.Array.clean(config.headers);
+                R.prototype.getAncestorNameArray = function(id) {
+                    var getAncestorIdArray = this.getAncestorIdArray(id),
+                        anchestorNameArray = [];
 
-					if (!config.headers.length) {
-						console.log('Response: no valid headers');
-						return;
-					}
+                    for (var i = 0; i < getAncestorIdArray.length; i++) {
+                        anchestorNameArray[i] = this.getNameById(getAncestorIdArray[i]);
+                    }
 
-					if (!(Ext.isArray(config.rows) && config.rows.length > 0)) {
-						//console.log('No values found');
-						//return;
-					}
+                    return anchestorNameArray;
+                };
 
-					if (config.rows.length > 0 && config.headers.length !== config.rows[0].length) {
-						console.log('Response: headers.length !== rows[0].length');
-					}
+                R.prototype.getMaxLevel = function() {
+                    var ouh = this.metaData.ouHierarchy,
+                        anLevels = [];
 
-					return config;
-				}();
-			};
-		}());
+                    for (var i in ouh) {
+                        if (ouh.hasOwnProperty(i)) {
+                            anLevels.push(this.getLevelById(i));
+                        }
+                    }
+
+                    return Ext.Array.max(anLevels);
+                };
+
+                R.prototype.createIdValueMap = function() {
+                    var dxIndex = this.getHeaderIndexByName('dx'),
+                        peIndex = this.getHeaderIndexByName('pe'),
+                        ouIndex = this.getHeaderIndexByName('ou'),
+                        valueIndex = this.getHeaderIndexByName('value');
+
+                    for (var i = 0, row, key; i < this.rows.length; i++) {
+                        row = this.rows[i];
+                        key = row[dxIndex] + '-' + row[peIndex] + '-' + row[ouIndex];
+
+                        this.idValueMap[key] = row[valueIndex];
+                    }
+                };
+
+                R.prototype.getValueById = function(id) {
+                    return this.idValueMap[id];
+                };
+
+                R.prototype.getValueByIdParams = function(dxId, peId, ouId) {
+                    return this.idValueMap[dxId + '-' + peId + '-' + ouId];
+                };
+			})();
+
+            api.data = {};
+
+            // Data object
+            (function() {
+                var D = api.data.DataObject = function(config, dataType) {
+                    var d = this,
+                        indicator = 'indicator',
+                        dataElement = 'dataElement';
+
+                    d.dataType = dataType;
+                    d.isIndicator = d.dataType === indicator;
+                    d.isDataElement = d.dataType === dataElement;
+
+                    d.id = config.id;
+                    d.name = config.name;
+                    d.displayName = config.displayName;
+                    d.displayShortName = config.displayShortName;
+                    d.groups = config.indicatorGroups || config.dataElementGroups || [];
+                    d.group = d.groups[0] || {};
+                    d.groupName = d.group.name || '(Unknown)';
+
+                    d.numerator = config.numerator;
+                    d.numeratorDescription = config.numeratorDescription;
+                    d.denominator = config.denominator;
+                    d.denominatorDescription = config.denominatorDescription;
+
+                    d.type = config.indicatorType ? config.indicatorType.name : (config.aggregationType ? config.aggregationType : '(Unknown)');
+                    d.legendSet = config.legendSet || null;
+
+                    d.defaultLegendSet = {
+                        name: 'Default percentage legend set',
+                        legends: [
+                            {name: 'Bad', startValue: 0, endValue: 50, color: '#ff0000'},
+                            {name: 'Medium', startValue: 50, endValue: 80, color: '#ffff00'},
+                            {name: 'Good', startValue: 80, endValue: 100, color: '#00bf00'},
+                            {name: 'Too high', startValue: 100, endValue: 1000000000, color: '#f5f5f5'}
+                        ]
+                    };
+
+                    d.defaultBgColor = '#fff';
+                };
+
+                D.prototype.getBgColorByValue = function(value) {
+                    var set = this.legendSet || (this.isIndicator ? this.defaultLegendSet : null);
+
+                    if (!set) {
+                        return this.defaultBgColor;
+                    }
+
+                    for (var i = 0, legend; i < set.legends.length; i++) {
+                        legend = set.legends[i];
+
+                        if (value > legend.startValue && value <= legend.endValue) {
+                            return legend.color;
+                        }
+                    }
+
+                    return this.defaultBgColor;
+                };
+            })();
+        }());
 
 		// support
 		(function() {
@@ -2109,7 +2202,6 @@ Ext.onReady( function() {
                     getOuLevelName,
                     formatNumber;
 
-var count = 0;
                 buildOutputReport = function(sDestination) {
                     var aInReqIds = [],
                         aInReqItems = [],
@@ -2152,7 +2244,7 @@ var count = 0;
                             }
                         }
                     })();
-                    
+
                     // rows
                     if (Ext.isArray(layout.rows)) {
                         for (var i = 0, dim; i < layout.rows.length; i++) {
@@ -2165,7 +2257,7 @@ var count = 0;
                             }
                         }
                     }
-                                                        
+
                     ////tmp
                     //columns: [
                         //{
@@ -2231,28 +2323,37 @@ var count = 0;
                         }
 
                         $.ajax({
-                            url: init.contextPath + '/api/indicators.json?paging=false&filter=id:in:[' + aInReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,indicatorType,indicatorGroups[name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
+                            url: init.contextPath + '/api/indicators.json?paging=false&filter=id:in:[' + aInReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,indicatorType,indicatorGroups[id,name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
                             headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
-                        }).done(function(r) {                          
-                            aInReqItems = r.indicators;
-                            support.prototype.array.addObjectProperty(aInReqItems, 'type', sInName);
+                        }).done(function(r) {
+                            if (r.indicators) {
+                                for (var i = 0; i < r.indicators.length; i++) {
+                                    aInReqItems.push(new api.data.DataObject(r.indicators[i], sInName));
+                                }
+                            }
+
                             getDataElements();
                         });
                     };
 
                     getDataElements = function() {
                         if (!aDeReqIds.length) {
-                            getDataSets();
+                            //getDataSets();
+                            getData();
                             return;
                         }
 
                         $.ajax({
-                            url: init.contextPath + '/api/dataElements.json?paging=false&filter=id:in:[' + aDeReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,valueType,dataElementGroups[name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
+                            url: init.contextPath + '/api/dataElements.json?paging=false&filter=id:in:[' + aDeReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,aggregationType,dataElementGroups[id,name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
                             headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
                         }).done(function(r) {
-                            aDeReqItems = r.dataElements;
-                            support.prototype.array.addObjectProperty(aDeReqItems, 'type', sDeName);
-                            getDataSets();
+                            if (r.dataElements) {
+                                for (var i = 0; i < r.dataElements.length; i++) {
+                                    aDeReqItems.push(new api.data.DataObject(r.dataElements[i], sDeName));
+                                }
+                            }
+
+                            getData();
                         });
                     };
 
@@ -2275,11 +2376,11 @@ var count = 0;
                     getData = function() {
                         aDxReqIds = [].concat(aInReqIds || [], aDeReqIds || [], aDsReqIds || []);
                         aDxReqItems = [].concat(aInReqItems || [], aDeReqItems || [], aDsReqItems || []);
-                        
+console.log(aDxReqItems);
                         for (var i = 0, oDxItem; i < aDxReqItems.length; i++) {
                             oDxItem = aDxReqItems[i];
                             sDxUniqueId += (oDxItem.id + ';');
-                            aDxIsIndicator[i] = oDxItem.type === sInName ? 1 : 0;
+                            aDxIsIndicator[i] = oDxItem.isIndicator ? 1 : 0;
                             aDxName[i] = oDxItem.displayName;
                             aDxShort[i] = oDxItem.displayShortName;
                             aNumFormula[i] = oDxItem.numerator;
@@ -2302,12 +2403,12 @@ var count = 0;
                                 var sNumItems = '';
                                 if (aNumFormula[i].indexOf('{') != 0) {
                                     var aNumTmpOuter = aNumFormula[i].split('{');
-                                    for (var p = 1; p < aNumTmpOuter.length; p++) 
+                                    for (var p = 1; p < aNumTmpOuter.length; p++)
                                     {
                                         var aNumTmpInner = aNumTmpOuter[p].split('}');
-                                        // if current UID not already listed in 'known lookup uids' 
+                                        // if current UID not already listed in 'known lookup uids'
                                         if (sLookupSubElements.indexOf(aNumTmpInner[0] + ';') < 0) {
-                                            sLookupSubElements += (aNumTmpInner[0]+';'); 
+                                            sLookupSubElements += (aNumTmpInner[0]+';');
                                             sNumItems += (aNumTmpInner[0]+';');
                                         }
                                     }
@@ -2321,10 +2422,10 @@ var count = 0;
                                     var aDenomTmpOuter = aDenomFormula[i].split('{');
                                     for (var p = 1; p < aDenomTmpOuter.length; p++) {
                                         var aDenomTmpInner = aDenomTmpOuter[p].split('}');
-                                        // if current UID not already listed in 'known lookup uids' 
+                                        // if current UID not already listed in 'known lookup uids'
                                         sDenomItems += (aDenomTmpInner[0] + ';');
                                         if (sLookupSubElements.indexOf(aDenomTmpInner[0] + ';') < 0) {
-                                            sLookupSubElements += (aDenomTmpInner[0] + ';'); 
+                                            sLookupSubElements += (aDenomTmpInner[0] + ';');
                                         }
                                     }
                                 }
@@ -2333,52 +2434,52 @@ var count = 0;
                         }
 
                         // analytics
-                    
+
                         $.ajax({
                             url: init.contextPath + '/api/analytics.json?dimension=pe:' + aPeReqIds.join(';') + '&dimension=dx:' + sLookupSubElements + aDxReqIds.join(';') + '&dimension=ou:' + aOuReqIds.join(';') + '&hierarchyMeta=true&displayProperty=NAME&showHierarchy=true',
                             headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
                         }).done(function(analyticsData) {
-                            var aMyData = analyticsData,
-                            
+                            var response = new api.response.Response(analyticsData),
+
                                 sParentPath,
                                 aParent,
                                 nHeaders = 0,
 
-                                oMetaDataNames = aMyData.metaData.names,
-                                oMetaDataParentNames = aMyData.metaData.ouNameHierarchy,
-                                oMetaDataParentUids = aMyData.metaData.ouHierarchy,
-                                
+                                oMetaDataNames = response.metaData.names,
+                                oMetaDataParentNames = response.metaData.ouNameHierarchy,
+                                oMetaDataParentUids = response.metaData.ouHierarchy,
+
                                 aOrganisationUnitLevels = init.organisationUnitLevels,
-                            
+
                                 aMyHeaders = [],
                                 aMyRows = [],
 
                                 aPeNameSplit,
-                                
+
                                 fMySortingA,
                                 fMySortingAsc,
                                 fMySortingDesc,
-                                
+
                                 sReturn = '';
-                            
-                            aOuResIds = aMyData.metaData.ou;
 
-                            sParentPath = returnLookup(oMetaDataParentUids, aMyData.rows[1][2]);
-                            aParent = Ext.Array.clean(sParentPath.split('/'));
+                            aOuResIds = response.metaData.ou;
 
-                            for (var x = 0; x < aParent.length; x++) {
-                                nOuHierarchyOffSet = x;
-                                if (Ext.Array.contains(aOuResIds, aParent[x])) {
-                                    break;
-                                }
-                            }
-                            
-                            sParentPath = returnLookup(oMetaDataParentNames, returnLookup(oMetaDataNames, aMyData.rows[1][2]));
-                            aParent = sParentPath.split('/');
+                            //sParentPath = returnLookup(oMetaDataParentUids, response.rows[1][2]);
+                            //aParent = Ext.Array.clean(sParentPath.split('/'));
 
-                            aMyHeaders[0] = 'RESERVED_ouh'; 
-                            aMyHeaders[1] = 'RESERVED_dx'; 
-                            aMyHeaders[2] = 'RESERVED_pe'; 
+                            //for (var x = 0; x < aParent.length; x++) {
+                                //nOuHierarchyOffSet = x;
+                                //if (Ext.Array.contains(aOuResIds, aParent[x])) {
+                                    //break;
+                                //}
+                            //}
+
+                            //sParentPath = returnLookup(oMetaDataParentNames, returnLookup(oMetaDataNames, response.rows[1][2]));
+                            //aParent = sParentPath.split('/');
+
+                            aMyHeaders[0] = 'RESERVED_ouh';
+                            aMyHeaders[1] = 'RESERVED_dx';
+                            aMyHeaders[2] = 'RESERVED_pe';
                             aMyHeaders[3] = 'RESERVED_bgCol';
 
                             for (var x = nOuHierarchyOffSet; x < aParent.length; x++) {
@@ -2387,12 +2488,12 @@ var count = 0;
                             }
 
                             aMyHeaders[4 + nHeaders] = 'Group';
-                            aMyHeaders[4 + nHeaders+1] = returnLookup(oMetaDataNames, aMyData.headers[0].name);
+                            aMyHeaders[4 + nHeaders+1] = returnLookup(oMetaDataNames, response.headers[0].name);
                             aMyHeaders[4 + nHeaders+2] = 'Type';
-                            aMyHeaders[4 + nHeaders+3] = returnLookup(oMetaDataNames, aMyData.headers[1].name);
+                            aMyHeaders[4 + nHeaders+3] = returnLookup(oMetaDataNames, response.headers[1].name);
 
-                            aPeNameSplit = (returnLookup(oMetaDataNames, aMyData.rows[0][1])).split(' ');
-                            
+                            aPeNameSplit = (returnLookup(oMetaDataNames, response.rows[0][1])).split(' ');
+
                             for (var y = 0; y < aPeNameSplit.length; y++) {
                                 aMyHeaders[(4 + nHeaders + 3) + (y + 1)] = ('Period P' + (y+1));
                             }
@@ -2403,9 +2504,9 @@ var count = 0;
 
                             var nCount = 0;
 
-                            for (var i = 0, row; i < aMyData.rows.length; i++) {
-                                row = aMyData.rows[i];
-                                
+                            for (var i = 0, row; i < response.rows.length; i++) {
+                                row = response.rows[i];
+
                                 if ((aDxReqIds.join(';') + ';').indexOf(row[0] + ';') >= 0) {
                                     for (var z = 0; z < aDxReqIds.length; z++) {
                                         if (row[0] == aDxReqIds[z]) {
@@ -2435,7 +2536,7 @@ var count = 0;
                                                 aMyRows[nCount][3] = ('#ffffff');
                                             }
                                         }
-                                        
+
                                         if (!bFound){
                                             aMyRows[nCount][3] = ('#ffffff');
                                         }
@@ -2457,7 +2558,7 @@ var count = 0;
                                     aMyRows[nCount][4 + nHeaders+3] = returnLookup(oMetaDataNames,row[1]);
 
                                     aPeNameSplit = (returnLookup(oMetaDataNames,row[1])).split(" ");
-                                    
+
                                     for (var y = 0; y < aPeNameSplit.length; y++) {
                                         aMyRows[nCount][(7 + nHeaders) + (y + 1)] = aPeNameSplit[y];
                                     }
@@ -2471,11 +2572,11 @@ var count = 0;
                                             sTempNumLookup,
                                             nTempNumLookup,
                                             nTempNumTotal,
-                                        
+
                                             aTempDenom = aDenomFormulaItems[z].split(';'),
                                             sTempDenomFormula,
                                             aTempDenomFsub,
-                                            sTempDenomLookup,                                            
+                                            sTempDenomLookup,
                                             nTempDenomLookup,
                                             nTempDenomTotal;
 
@@ -2484,13 +2585,13 @@ var count = 0;
                                             for (var p = 0; p < (aTempNum.length - 1); p++) {
                                                 aTempNumFsub = (aTempNum[p]).split(".");
                                                 sTempNumLookup = aTempNumFsub[0].replace(/{/g,'').replace(/}/g,'').replace(/#/g,'');
-                                                nTempNumLookup = returnLookupValue(aMyData, sTempNumLookup, row[1], row[2]);
+                                                nTempNumLookup = returnLookupValue(response, sTempNumLookup, row[1], row[2]);
                                                 nTempNumLookup = ((nTempNumLookup || '').toString().length == 0 ? 0 : nTempNumLookup);
                                                 if (sTempNumFormula.indexOf(aTempNumFsub[0] + '.' + aTempNumFsub[1]) < 0) {
                                                     sTempNumFormula = sTempNumFormula.replace(sTempNumLookup, nTempNumLookup);
                                                 }
                                                 else {
-                                                    sTempNumFormula = sTempNumFormula.replace(aTempNumFsub[0] + '.' + aTempNumFsub[1], nTempNumLookup);					
+                                                    sTempNumFormula = sTempNumFormula.replace(aTempNumFsub[0] + '.' + aTempNumFsub[1], nTempNumLookup);
                                                 }
                                             }
                                             sTempNumFormula = sTempNumFormula.replace(/{/g,'(');
@@ -2503,7 +2604,7 @@ var count = 0;
                                             if ((aNumFormula[z]).indexOf('{') >= 0){
                                                 aTempNumFsub = aNumFormula[z].split(".")
                                                 sTempNumFormula = aTempNumFsub[0].replace(/{/g,'').replace(/}/g,'').replace(/#/g,'');
-                                                nTempNumTotal = returnLookupValue(aMyData, sTempNumLookup, row[1], row[2]);
+                                                nTempNumTotal = returnLookupValue(response, sTempNumLookup, row[1], row[2]);
                                             }
                                             else
                                             {
@@ -2518,13 +2619,13 @@ var count = 0;
                                             for (var p = 0; p < (aTempDenom.length - 1); p++) {
                                                 aTempDenomFsub = (aTempDenom[p]).split(".");
                                                 sTempDenomLookup = aTempDenomFsub[0].replace(/{/g,'').replace(/}/g,'').replace(/#/g,'');
-                                                nTempDenomLookup = returnLookupValue(aMyData, sTempDenomLookup, row[1], row[2]);
+                                                nTempDenomLookup = returnLookupValue(response, sTempDenomLookup, row[1], row[2]);
                                                 nTempDenomLookup = ((nTempDenomLookup || '').toString().length == 0 ? 0 : nTempDenomLookup);
                                                 if (sTempDenomFormula.indexOf(aTempDenomFsub[0] + '.' + aTempDenomFsub[1]) < 0) {
                                                     sTempDenomFormula = sTempDenomFormula.replace(sTempDenomLookup, nTempDenomLookup);
                                                 }
                                                 else{
-                                                    sTempDenomFormula = sTempDenomFormula.replace(aTempDenomFsub[0] + '.' + aTempDenomFsub[1],nTempDenomLookup);					
+                                                    sTempDenomFormula = sTempDenomFormula.replace(aTempDenomFsub[0] + '.' + aTempDenomFsub[1],nTempDenomLookup);
                                                 }
                                             }
                                             sTempDenomFormula = sTempDenomFormula.replace(/{/g,'(');
@@ -2536,7 +2637,7 @@ var count = 0;
                                             if ((aDenomFormula[z]).indexOf('{') >= 0) {
                                                 aTempDenomFsub = aDenomFormula[z].split(".")
                                                 sTempDenomFormula = aTempDenomFsub[0].replace(/{/g,'').replace(/}/g,'').replace(/#/g,'');
-                                                nTempDenomTotal = returnLookupValue(aMyData, sTempDenomLookup, row[1], row[2]);
+                                                nTempDenomTotal = returnLookupValue(response, sTempDenomLookup, row[1], row[2]);
                                             }
                                             else
                                             {
@@ -2549,13 +2650,13 @@ var count = 0;
                                         nTempNumTotal = parseFloat((row[3]).replace('.0',''));
                                         nTempDenomTotal = 1;
                                     }
-                                    
+
                                     //aMyRows[nCount][7+ nHeaders + (aPeNameSplit.length) + 1] = ((aDxIsIndicator[z] == 0) ? '' : nTempNumTotal);
                                     //aMyRows[nCount][7+ nHeaders + (aPeNameSplit.length) + 2] = ((aDxIsIndicator[z] == 0) ? '' : nTempDenomTotal);
                                     aMyRows[nCount][7 + nHeaders + (aPeNameSplit.length) + 1] = nTempNumTotal;
                                     aMyRows[nCount][7 + nHeaders + (aPeNameSplit.length) + 2] = nTempDenomTotal;
                                     aMyRows[nCount][7 + nHeaders + (aPeNameSplit.length) + 3] = parseFloat((row[3]).replace('.0',''));
-                                    
+
                                     nCount += 1;
                                 }
                             }
@@ -2588,7 +2689,7 @@ var count = 0;
                             if (sDestination) {
                                 $(sDestination).html(sReturn);
                             }
-                            
+
                             if (fCallback) {
                                 fCallback(sReturn);
                             }
@@ -2640,7 +2741,7 @@ var count = 0;
                     for (i = 0; i < oLevel.length; i++) {
                         if (oLevel[i].level === nLevel) {
                             return oLevel[i].name;
-                        }                        
+                        }
                     }
                 };
 

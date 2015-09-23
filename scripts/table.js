@@ -40,15 +40,15 @@ Ext.onReady( function() {
     };
 
 	// namespace
-	PT = {};
-	var PT = PT;
+	BR = {};
+	var BR = BR;
 
-	PT.instances = [];
-	PT.i18n = {};
-	PT.isDebug = false;
-	PT.isSessionStorage = ('sessionStorage' in window && window['sessionStorage'] !== null);
+	BR.instances = [];
+	BR.i18n = {};
+	BR.isDebug = false;
+	BR.isSessionStorage = ('sessionStorage' in window && window['sessionStorage'] !== null);
 
-	PT.getCore = function(init, appConfig) {
+	BR.getCore = function(init, appConfig) {
         var conf = {},
             api = {},
             support = {},
@@ -75,24 +75,24 @@ Ext.onReady( function() {
 				dimension: {
 					data: {
 						value: 'data',
-						name: PT.i18n.data || 'Data',
+						name: BR.i18n.data || 'Data',
 						dimensionName: 'dx',
 						objectName: 'dx'
 					},
 					category: {
-						name: PT.i18n.assigned_categories || 'Assigned categories',
+						name: BR.i18n.assigned_categories || 'Assigned categories',
 						dimensionName: 'co',
 						objectName: 'co',
 					},
 					indicator: {
 						value: 'indicators',
-						name: PT.i18n.indicators || 'Indicators',
+						name: BR.i18n.indicators || 'Indicators',
 						dimensionName: 'dx',
 						objectName: 'in'
 					},
 					dataElement: {
 						value: 'dataElements',
-						name: PT.i18n.data_elements || 'Data elements',
+						name: BR.i18n.data_elements || 'Data elements',
 						dimensionName: 'dx',
 						objectName: 'de'
 					},
@@ -104,25 +104,25 @@ Ext.onReady( function() {
 					},
 					dataSet: {
 						value: 'dataSets',
-						name: PT.i18n.data_sets || 'Data sets',
+						name: BR.i18n.data_sets || 'Data sets',
 						dimensionName: 'dx',
 						objectName: 'ds'
 					},
 					eventDataItem: {
 						value: 'eventDataItem',
-						name: PT.i18n.event_data_items || 'Event data items',
+						name: BR.i18n.event_data_items || 'Event data items',
 						dimensionName: 'dx',
 						objectName: 'di'
 					},
 					programIndicator: {
 						value: 'programIndicator',
-						name: PT.i18n.program_indicators || 'Program indicators',
+						name: BR.i18n.program_indicators || 'Program indicators',
 						dimensionName: 'dx',
 						objectName: 'pi'
 					},
 					period: {
 						value: 'period',
-						name: PT.i18n.periods || 'Periods',
+						name: BR.i18n.periods || 'Periods',
 						dimensionName: 'pe',
 						objectName: 'pe'
 					},
@@ -134,7 +134,7 @@ Ext.onReady( function() {
 					},
 					organisationUnit: {
 						value: 'organisationUnits',
-						name: PT.i18n.organisation_units || 'Organisation units',
+						name: BR.i18n.organisation_units || 'Organisation units',
 						dimensionName: 'ou',
 						objectName: 'ou'
 					},
@@ -166,17 +166,17 @@ Ext.onReady( function() {
 
 			conf.period = {
 				periodTypes: [
-					{id: 'Daily', name: PT.i18n.daily},
-					{id: 'Weekly', name: PT.i18n.weekly},
-					{id: 'Monthly', name: PT.i18n.monthly},
-					{id: 'BiMonthly', name: PT.i18n.bimonthly},
-					{id: 'Quarterly', name: PT.i18n.quarterly},
-					{id: 'SixMonthly', name: PT.i18n.sixmonthly},
-					{id: 'SixMonthlyApril', name: PT.i18n.sixmonthly_april},
-					{id: 'Yearly', name: PT.i18n.yearly},
-					{id: 'FinancialOct', name: PT.i18n.financial_oct},
-					{id: 'FinancialJuly', name: PT.i18n.financial_july},
-					{id: 'FinancialApril', name: PT.i18n.financial_april}
+					{id: 'Daily', name: BR.i18n.daily},
+					{id: 'Weekly', name: BR.i18n.weekly},
+					{id: 'Monthly', name: BR.i18n.monthly},
+					{id: 'BiMonthly', name: BR.i18n.bimonthly},
+					{id: 'Quarterly', name: BR.i18n.quarterly},
+					{id: 'SixMonthly', name: BR.i18n.sixmonthly},
+					{id: 'SixMonthlyApril', name: BR.i18n.sixmonthly_april},
+					{id: 'Yearly', name: BR.i18n.yearly},
+					{id: 'FinancialOct', name: BR.i18n.financial_oct},
+					{id: 'FinancialJuly', name: BR.i18n.financial_july},
+					{id: 'FinancialApril', name: BR.i18n.financial_april}
 				],
                 relativePeriods: []
 			};
@@ -456,19 +456,19 @@ Ext.onReady( function() {
 
 							// Indicators as filter
 							if (layout.filters[i].dimension === dimConf.indicator.objectName) {
-								webAlert(PT.i18n.indicators_cannot_be_specified_as_filter || 'Indicators cannot be specified as filter');
+								webAlert(BR.i18n.indicators_cannot_be_specified_as_filter || 'Indicators cannot be specified as filter');
 								return;
 							}
 
 							// Categories as filter
 							if (layout.filters[i].dimension === dimConf.category.objectName) {
-								webAlert(PT.i18n.categories_cannot_be_specified_as_filter || 'Categories cannot be specified as filter');
+								webAlert(BR.i18n.categories_cannot_be_specified_as_filter || 'Categories cannot be specified as filter');
 								return;
 							}
 
 							// Data sets as filter
 							if (layout.filters[i].dimension === dimConf.dataSet.objectName) {
-								webAlert(PT.i18n.data_sets_cannot_be_specified_as_filter || 'Data sets cannot be specified as filter');
+								webAlert(BR.i18n.data_sets_cannot_be_specified_as_filter || 'Data sets cannot be specified as filter');
 								return;
 							}
 						}
@@ -523,7 +523,7 @@ Ext.onReady( function() {
 
 					// at least one dimension specified as column or row
 					if (!(config.columns || config.rows)) {
-						webAlert(PT.i18n.at_least_one_dimension_must_be_specified_as_row_or_column);
+						webAlert(BR.i18n.at_least_one_dimension_must_be_specified_as_row_or_column);
 						return;
 					}
 
@@ -538,7 +538,7 @@ Ext.onReady( function() {
 
 					// at least one period
 					if (!Ext.Array.contains(objectNames, dimConf.period.objectName)) {
-						webAlert(PT.i18n.at_least_one_period_must_be_specified_as_column_row_or_filter);
+						webAlert(BR.i18n.at_least_one_period_must_be_specified_as_column_row_or_filter);
 						return;
 					}
 
@@ -3082,7 +3082,7 @@ Ext.onReady( function() {
 
 	// PLUGIN
 
-	PT.plugin = {};
+	BR.plugin = {};
 
 	var init = {
 			user: {}
@@ -3558,7 +3558,7 @@ Ext.onReady( function() {
 
 				web.mask.hide(ns.app.centerRegion);
 
-                if (PT.isDebug) {
+                if (BR.isDebug) {
                     console.log("layout", layout);
                     console.log("response", response);
                     console.log("xResponse", xResponse);
@@ -3636,13 +3636,13 @@ Ext.onReady( function() {
             applyCss(config);
 
 			// core
-			ns.core = PT.getCore(init, appConfig);
+			ns.core = BR.getCore(init, appConfig);
 			extendInstance(ns, appConfig);
 
 			ns.app.viewport = createViewport();
 			ns.app.centerRegion = ns.app.viewport.centerRegion;
 
-            PT.instances.push(ns);
+            BR.instances.push(ns);
 
             if (el) {
                 el.setViewportWidth = function(width) {
@@ -3665,7 +3665,7 @@ Ext.onReady( function() {
 		}();
 	};
 
-	PT.plugin.getTable = function(config) {
+	BR.plugin.getTable = function(config) {
 		if (Ext.isString(config.url) && config.url.split('').pop() === '/') {
 			config.url = config.url.substr(0, config.url.length - 1);
 		}
@@ -3684,5 +3684,5 @@ Ext.onReady( function() {
 	};
 
 	DHIS = Ext.isObject(window['DHIS']) ? DHIS : {};
-	DHIS.getTable = PT.plugin.getTable;
+	DHIS.getTable = BR.plugin.getTable;
 });
