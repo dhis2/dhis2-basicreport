@@ -2519,7 +2519,7 @@ Ext.onReady( function() {
                             headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
                         }).done(function(analyticsData) {
                             var response = new api.data.Response(analyticsData),
-                                aDxResIds = response.metaData.dx,
+                                aDxResIds = aDxReqIds,
                                 aPeResIds = response.metaData.pe,
                                 aOuResIds = response.metaData.ou,
                                 idCombinations = response.createIdCombinations(aDxResIds, aPeResIds, aOuResIds),
@@ -2597,17 +2597,16 @@ console.log("tableHeaders", tableHeaders);
 
                             (function() {
 
-                                for (var i = 0, row, idComb, dxId, peId, ouId; i < idCombinations.length; i++) {
+                                for (var i = 0, row, idComb, dxId, peId, ouId, dataObject; i < idCombinations.length; i++) {
                                     idComb = idCombinations[i];
                                     dxId = response.getIdByIdComb(idComb, 'dx');
                                     peId = response.getIdByIdComb(idComb, 'pe');
                                     ouId = response.getIdByIdComb(idComb, 'ou');
                                     row = {};
+                                    dataObject = idDataObjectMap[dxId];
 
                                     for (var j = 0, th, name; j < tableHeaders.length; j++) {
                                         th = tableHeaders[j];
-
-                                        // ou
 
                                         if (th.objectName === 'ou') {
                                             name = response.getParentNameByIdAndLevel(ouId, th) || response.getNameById(ouId);
@@ -2619,7 +2618,7 @@ console.log("tableHeaders", tableHeaders);
                                             };
                                         }
                                         else if (th.id === 'pe') {
-                                            row['pe'] = {
+                                            row[th.id] = {
                                                 name: response.getNameById(peId),
                                                 sortingId: peId,
                                                 cls: 'pivot-value'
@@ -2627,7 +2626,25 @@ console.log("tableHeaders", tableHeaders);
                                         }
                                         else if (th.objectName === 'dx') {
 
-
+                                            // group
+                                            if (th.id === 'dx-group') {
+                                                row[th.id] = {
+                                                    name: dataObject.group.name,
+                                                    sortingId: dataObject.group.name
+                                                };
+                                            }
+                                            else if (th.id === 'dx') {
+                                                row[th.id] = {
+                                                    name: dataObject.name,
+                                                    sortingId: dataObject.name
+                                                };
+                                            }
+                                            else if (th.id === 'dx-type') {
+                                                row[th.id] = {
+                                                    name: dataObject.type,
+                                                    sortingId: dataObject.type
+                                                };
+                                            }
                                         }
                                     }
                                 }
