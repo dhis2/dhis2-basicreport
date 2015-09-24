@@ -2665,7 +2665,7 @@ console.log("tableHeaders", tableHeaders);
                                     dataObject = idDataObjectMap[dxId];
                                     row = {};
 
-                                    for (var j = 0, th, name; j < tableHeaders.length; j++) {
+                                    for (var j = 0, th, name, value; j < tableHeaders.length; j++) {
                                         th = tableHeaders[j];
 
                                         if (th.objectName === 'ou') {
@@ -2689,19 +2689,22 @@ console.log("tableHeaders", tableHeaders);
                                             if (th.id === 'dx-group') {
                                                 row[th.id] = {
                                                     name: dataObject.group.name,
-                                                    sortingId: dataObject.group.name
+                                                    sortingId: dataObject.group.name,
+                                                    cls: 'pivot-value'
                                                 };
                                             }
                                             else if (th.id === 'dx') {
                                                 row[th.id] = {
                                                     name: dataObject.name,
-                                                    sortingId: dataObject.name
+                                                    sortingId: dataObject.name,
+                                                    cls: 'pivot-value'
                                                 };
                                             }
                                             else if (th.id === 'dx-type') {
                                                 row[th.id] = {
                                                     name: dataObject.type,
-                                                    sortingId: dataObject.type
+                                                    sortingId: dataObject.type,
+                                                    cls: 'pivot-value'
                                                 };
                                             }
                                             else if (th.id === 'dx-numerator') {
@@ -2720,7 +2723,38 @@ console.log("tableHeaders", tableHeaders);
 
                                                 row[th.id] = {
                                                     name: numeratorTotal,
-                                                    sortingId: numeratorTotal
+                                                    sortingId: numeratorTotal,
+                                                    cls: 'pivot-value'
+                                                };
+                                            }
+                                            else if (th.id === 'dx-denominator') {
+                                                var denominatorIds = dataObject.generateDenominatorIds(),
+                                                    strippedDenominator = Ext.clone(dataObject.generateStrippedDenominator()),
+                                                    denominatorTotal;
+
+                                                for (var k = 0, id, value; k < denominatorIds.length; k++) {
+                                                    id = denominatorIds[k];
+                                                    value = response.getValueByIdParams(id, peId, ouId);
+
+                                                    strippedDenominator = strippedDenominator.replace(id, value);
+                                                }
+
+                                                denominatorTotal = eval(strippedDenominator);
+
+                                                row[th.id] = {
+                                                    name: denominatorTotal,
+                                                    sortingId: denominatorTotal,
+                                                    cls: 'pivot-value'
+                                                };
+                                            }
+                                            else if (th.id === 'dx-value') {
+                                                value = response.getValueByIdComb(idComb);
+
+                                                row[th.id] = {
+                                                    name: value,
+                                                    sortingId: parseFloat(value),
+                                                    cls: 'pivot-value',
+                                                    style: 'background-color:' + dataObject.getBgColorByValue(parseFloat(value))
                                                 };
                                             }
                                         }
@@ -2728,14 +2762,9 @@ console.log("tableHeaders", tableHeaders);
 
                                     tableRows.push(row);
                                 }
+                            })();
 
 console.log("tableRows", tableRows);
-
-
-
-
-
-                            })();
 
                             return;
 
