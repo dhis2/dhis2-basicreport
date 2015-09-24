@@ -647,7 +647,7 @@ Ext.onReady( function() {
                     return anchestorNameArray;
                 };
 
-                R.prototype.createIdValueMap = function() {
+                R.prototype.generateIdValueMap = function() {
                     var dxIndex = this.getHeaderIndexByName('dx'),
                         peIndex = this.getHeaderIndexByName('pe'),
                         ouIndex = this.getHeaderIndexByName('ou'),
@@ -659,17 +659,23 @@ Ext.onReady( function() {
 
                         this.idValueMap[key] = row[valueIndex];
                     }
+
+                    return this.idValueMap;
                 };
 
-                R.prototype.getValueById = function(id) {
-                    return this.idValueMap[id];
+                R.prototype.getValueByIdComb = function(idComb) {
+                    return this.idValueMap[idComb];
                 };
 
                 R.prototype.getValueByIdParams = function(dxId, peId, ouId) {
                     return this.idValueMap[dxId + '-' + peId + '-' + ouId];
                 };
 
-                R.prototype.createIdCombinations = function(aDxResIds, aPeResIds, aOuResIds) {
+                R.prototype.getValueByDxIdAndIdComb = function(idComb, dxId) {
+                    return this.getValueByIdComb(dxId + '-' + this.getIdByIdComb(idComb, 'pe') + '-' + this.getIdByIdComb(idComb, 'ou'));
+                };
+
+                R.prototype.generateIdCombinations = function(aDxResIds, aPeResIds, aOuResIds) {
                     for (var i = 0, dx, a; i < aDxResIds.length; i++) {
                         a = [];
                         dx = aDxResIds[i];
@@ -733,12 +739,27 @@ Ext.onReady( function() {
                     d.defaultBgColor = '#fff';
 
                     // transient
+                    d.strippedNumerator;
+                    d.strippedDenominator;
+
                     d.numeratorIds;
                     d.denominatorIds;
                 };
 
+                D.prototype.stripFormula = function(formula) {
+                    return (formula || '').replace(/#/g, '').replace(/{/g, '').replace(/}/g, '').replace(/\(|\)/g, "");
+                };
+
+                D.prototype.generateStrippedNumerator = function() {
+                    return this.strippedNumerator = this.stripFormula(this.numerator);
+                };
+
+                D.prototype.generateStrippedDenominator = function() {
+                    return this.strippedDenominator = this.stripFormula(this.denominator);
+                };
+
                 D.prototype.getIdsFromFormula = function(formula) {
-                    var s = (formula || '').replace(/#/g, '').replace(/\(|\)/g, ""),
+                    var s = this.stripFormula(formula),
                         a1 = s.split('{'),
                         a2 = [],
                         ids = [],
@@ -759,6 +780,14 @@ Ext.onReady( function() {
                     }
 
                     return ids;
+                };
+
+                D.prototype.generateNumeratorIds = function() {
+                    return this.numeratorIds = this.getIdsFromFormula(this.numerator);
+                };
+
+                D.prototype.generateDenominatorIds = function() {
+                    return this.denominatorIds = this.getIdsFromFormula(this.denominator);
                 };
 
                 D.prototype.getBgColorByValue = function(value) {
@@ -2550,12 +2579,15 @@ Ext.onReady( function() {
                                 aDxResIds = aDxReqIds,
                                 aPeResIds = response.metaData.pe,
                                 aOuResIds = response.metaData.ou,
-                                idCombinations = response.createIdCombinations(aDxResIds, aPeResIds, aOuResIds),
+                                idCombinations = response.generateIdCombinations(aDxResIds, aPeResIds, aOuResIds),
                                 tableHeaders = [],
                                 tableRows = [],
                                 nOuHeaders;
 console.log("response", response);
 console.log("idDataObjectMap", idDataObjectMap);
+
+                            response.generateIdValueMap();
+
                             // table headers
 
                             (function() {
@@ -2630,8 +2662,8 @@ console.log("tableHeaders", tableHeaders);
                                     dxId = response.getIdByIdComb(idComb, 'dx');
                                     peId = response.getIdByIdComb(idComb, 'pe');
                                     ouId = response.getIdByIdComb(idComb, 'ou');
-                                    row = {};
                                     dataObject = idDataObjectMap[dxId];
+                                    row = {};
 
                                     for (var j = 0, th, name; j < tableHeaders.length; j++) {
                                         th = tableHeaders[j];
@@ -2654,7 +2686,6 @@ console.log("tableHeaders", tableHeaders);
                                         }
                                         else if (th.objectName === 'dx') {
 
-                                            // group
                                             if (th.id === 'dx-group') {
                                                 row[th.id] = {
                                                     name: dataObject.group.name,
@@ -2671,6 +2702,25 @@ console.log("tableHeaders", tableHeaders);
                                                 row[th.id] = {
                                                     name: dataObject.type,
                                                     sortingId: dataObject.type
+                                                };
+                                            }
+                                            else if (th.id === 'dx-numerator') {
+                                                var numeratorIds = dataObject.generateNumeratorIds(),
+                                                    strippedNumerator = Ext.clone(dataObject.generateStrippedNumerator()),
+                                                    numeratorTotal;
+
+                                                for (var k = 0, id, value; i < numeratorIds.length; k++) {
+                                                    id = numeratorIds[k];
+                                                    value = response.getValueByIdParams(id, peId, ouId);
+
+                                                    strippedNumerator = strippedNumerator.replace(id, value);
+                                                }
+
+                                                numeratorTotal = eval(strippedNumerator);
+
+                                                row[th.id] = {
+                                                    name: numeratorTotal,
+                                                    sortingId: numeratorTotal
                                                 };
                                             }
                                         }
