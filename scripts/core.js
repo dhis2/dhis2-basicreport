@@ -731,6 +731,34 @@ Ext.onReady( function() {
                     };
 
                     d.defaultBgColor = '#fff';
+
+                    // transient
+                    d.numeratorIds;
+                    d.denominatorIds;
+                };
+
+                D.prototype.getIdsFromFormula = function(formula) {
+                    var s = (formula || '').replace(/#/g, '').replace(/\(|\)/g, ""),
+                        a1 = s.split('{'),
+                        a2 = [],
+                        ids = [],
+                        regexp = /^[a-z0-9]+$/i;
+
+                    for (var i = 0, item; i < a1.length; i++) {
+                        item = a1[i];
+
+                        a2 = a2.concat(item.split('}'));
+                    }
+
+                    for (var j = 0, item; j < a2.length; j++) {
+                        item = a2[j];
+
+                        if (item.length === 11 && regexp.test(item)) {
+                            ids.push(item);
+                        }
+                    }
+
+                    return ids;
                 };
 
                 D.prototype.getBgColorByValue = function(value) {
@@ -2656,6 +2684,8 @@ console.log("row", row);
 
 
                             })();
+
+                            return;
 
 
 
