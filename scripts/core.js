@@ -759,7 +759,7 @@ Ext.onReady( function() {
                 };
 
                 D.prototype.getIdsFromFormula = function(formula) {
-                    var s = this.stripFormula(formula),
+                    var s = (formula || '').replace(/#/g, '').replace(/\(|\)/g, ""),
                         a1 = s.split('{'),
                         a2 = [],
                         ids = [],
@@ -2709,7 +2709,7 @@ console.log("tableHeaders", tableHeaders);
                                                     strippedNumerator = Ext.clone(dataObject.generateStrippedNumerator()),
                                                     numeratorTotal;
 
-                                                for (var k = 0, id, value; i < numeratorIds.length; k++) {
+                                                for (var k = 0, id, value; k < numeratorIds.length; k++) {
                                                     id = numeratorIds[k];
                                                     value = response.getValueByIdParams(id, peId, ouId);
 
@@ -2725,9 +2725,11 @@ console.log("tableHeaders", tableHeaders);
                                             }
                                         }
                                     }
+
+                                    tableRows.push(row);
                                 }
 
-console.log("row", row);
+console.log("tableRows", tableRows);
 
 
 
