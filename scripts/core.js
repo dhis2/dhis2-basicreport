@@ -550,6 +550,12 @@ Ext.onReady( function() {
                     r.metaData = config.metaData;
                     r.rows = config.rows;
 
+                    r.idCombinationIndex = {
+                        'dx': 0,
+                        'pe': 1,
+                        'ou': 2
+                    };
+
                     // initialized transient properties
                     r.nameHeaderMap = {};
 
@@ -586,15 +592,14 @@ Ext.onReady( function() {
                     return this.metaData.names[id];
                 };
 
-                R.prototype.getNameByIdComb = function(idComb, dataType) {
-                    var ids = idComb.split('-'),
-                        map = {
-                            'dx': ids[0],
-                            'pe': ids[1],
-                            'ou': ids[2]
-                        };
+                R.prototype.getIdByIdComb = function(idComb, dataType) {
+                    return idComb.split('-')[this.idCombinationIndex[dataType]];
+                };
 
-                    return this.getNameById(map[dataType]);
+                R.prototype.getNameByIdComb = function(idComb, dataType) {
+                    var id = idComb.split('-')[this.idCombinationIndex[dataType]];
+
+                    return this.getNameById(id);
                 };
 
                 R.prototype.getLevelById = function(id) {
@@ -614,12 +619,17 @@ Ext.onReady( function() {
                     return Ext.Array.max(anLevels);
                 };
 
-                R.prototype.getParentNameByIdAndLevel = function(id, level) {
-                    var ouId = id.split('-').pop(),
-                        parentGraphIdArray = this.getParentGraphIdArray(ouId),
+                R.prototype.getParentNameByIdAndLevel = function(ouId, level) {
+                    var parentGraphIdArray = this.getParentGraphIdArray(ouId),
                         nLevel = level.level;
 
-                    return this.getNameById(parentGraphIdArray[nLevel]);
+                    return this.getNameById(parentGraphIdArray[nLevel - 1]);
+                };
+
+                R.prototype.getParentNameByIdCombAndLevel = function(idComb, level) {
+                    var ouId = idComb.split('-')[this.idCombinationIndex['ou']];
+
+                    return this.getParentNameByIdAndLevel(ouId, level);
                 };
 
                 R.prototype.getParentGraphIdArray = function(id) {
@@ -659,8 +669,9 @@ Ext.onReady( function() {
                     return this.idValueMap[dxId + '-' + peId + '-' + ouId];
                 };
 
-                R.prototype.createIdCombinations = function() {
-                    for (var i = 0, dx; i < aDxResIds.length; i++) {
+                R.prototype.createIdCombinations = function(aDxResIds, aPeResIds, aOuResIds) {
+                    for (var i = 0, dx, a; i < aDxResIds.length; i++) {
+                        a = [];
                         dx = aDxResIds[i];
 
                         for (var j = 0, pe; j < aPeResIds.length; j++) {
@@ -669,7 +680,11 @@ Ext.onReady( function() {
                             for (var k = 0, ou; k < aOuResIds.length; k++) {
                                 ou = aOuResIds[k];
 
-                                this.idCombinations.push(dx + '-' + pe + '-' + ou);
+                                a[this.idCombinationIndex['dx']] = dx;
+                                a[this.idCombinationIndex['pe']] = pe;
+                                a[this.idCombinationIndex['ou']] = ou;
+
+                                this.idCombinations.push(a.join('-'));
                             }
                         }
                     }
@@ -745,6 +760,10 @@ Ext.onReady( function() {
                     h.id = config.id;
                     h.name = config.name;
                     h.objectName = config.objectName;
+
+                    if (Ext.isNumeric(config.level)) {
+                        h.level = parseInt(config.level);
+                    }
 
                     h.cls = 'pivot-dim td-sortable';
                 };
@@ -2367,7 +2386,8 @@ Ext.onReady( function() {
                         getIndicators,
                         getDataElements,
                         getDataSets,
-                        getData;
+                        getData,
+                        idDataObjectMap = {};
 
                     getIndicators = function() {
                         if (!aInReqIds.length) {
@@ -2380,8 +2400,11 @@ Ext.onReady( function() {
                             headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
                         }).done(function(r) {
                             if (r.indicators) {
-                                for (var i = 0; i < r.indicators.length; i++) {
-                                    aInReqItems.push(new api.data.DataObject(r.indicators[i], sInName));
+                                for (var i = 0, obj; i < r.indicators.length; i++) {
+                                    obj = new api.data.DataObject(r.indicators[i], sInName);
+
+                                    idDataObjectMap[obj.id] = obj;
+                                    aInReqItems.push(obj);
                                 }
                             }
 
@@ -2401,8 +2424,11 @@ Ext.onReady( function() {
                             headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
                         }).done(function(r) {
                             if (r.dataElements) {
-                                for (var i = 0; i < r.dataElements.length; i++) {
-                                    aDeReqItems.push(new api.data.DataObject(r.dataElements[i], sDeName));
+                                for (var i = 0, obj; i < r.dataElements.length; i++) {
+                                    obj = new api.data.DataObject(r.dataElements[i], sDeName);
+
+                                    idDataObjectMap[obj.id] = obj;
+                                    aDeReqItems.push(obj);
                                 }
                             }
 
@@ -2429,7 +2455,7 @@ Ext.onReady( function() {
                     getData = function() {
                         aDxReqIds = [].concat(aInReqIds || [], aDeReqIds || [], aDsReqIds || []);
                         aDxReqItems = [].concat(aInReqItems || [], aDeReqItems || [], aDsReqItems || []);
-console.log(aDxReqItems);
+
                         for (var i = 0, oDxItem; i < aDxReqItems.length; i++) {
                             oDxItem = aDxReqItems[i];
                             sDxUniqueId += (oDxItem.id + ';');
@@ -2493,14 +2519,15 @@ console.log(aDxReqItems);
                             headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
                         }).done(function(analyticsData) {
                             var response = new api.data.Response(analyticsData),
-                                idCombinations = response.createIdCombinations(),
                                 aDxResIds = response.metaData.dx,
                                 aPeResIds = response.metaData.pe,
                                 aOuResIds = response.metaData.ou,
+                                idCombinations = response.createIdCombinations(aDxResIds, aPeResIds, aOuResIds),
                                 tableHeaders = [],
                                 tableRows = [],
                                 nOuHeaders;
-
+console.log("response", response);
+console.log("idDataObjectMap", idDataObjectMap);
                             // table headers
 
                             (function() {
@@ -2525,7 +2552,7 @@ console.log(aDxReqItems);
                                     id: 'pe',
                                     name: 'Period',
                                     objectName: 'pe'
-                                });
+                                }));
 
                                 // dx headers
                                 tableHeaders.push(new api.data.TableHeader({
@@ -2538,63 +2565,79 @@ console.log(aDxReqItems);
                                     id: 'dx',
                                     name: 'Data',
                                     objectName: 'dx'
-                                });
+                                }));
 
                                 tableHeaders.push(new api.data.TableHeader({
                                     id: 'dx-type',
                                     name: 'Type',
                                     objectName: 'dx'
-                                });
+                                }));
 
                                 tableHeaders.push(new api.data.TableHeader({
                                     id: 'dx-numerator',
                                     name: 'Numerator',
                                     objectName: 'dx'
-                                });
+                                }));
 
                                 tableHeaders.push(new api.data.TableHeader({
                                     id: 'dx-denominator',
                                     name: 'Denominator',
                                     objectName: 'dx'
-                                });
+                                }));
 
                                 tableHeaders.push(new api.data.TableHeader({
                                     id: 'dx-value',
                                     name: 'Value',
                                     objectName: 'dx'
-                                });
+                                }));
                             })();
 
+console.log("tableHeaders", tableHeaders);
                             // table rows
 
                             (function() {
-                                for (var i = 0, row, idComb; i < idCombinations.length; i++) {
+
+                                for (var i = 0, row, idComb, dxId, peId, ouId; i < idCombinations.length; i++) {
                                     idComb = idCombinations[i];
+                                    dxId = response.getIdByIdComb(idComb, 'dx');
+                                    peId = response.getIdByIdComb(idComb, 'pe');
+                                    ouId = response.getIdByIdComb(idComb, 'ou');
                                     row = {};
 
                                     for (var j = 0, th, name; j < tableHeaders.length; j++) {
                                         th = tableHeaders[j];
 
+                                        // ou
+
                                         if (th.objectName === 'ou') {
-                                            name = response.getParentNameByIdCombAndLevel(idComb, th) || response.getNameByIdComb(idComb, 'ou');
+                                            name = response.getParentNameByIdAndLevel(ouId, th) || response.getNameById(ouId);
 
                                             row[th.id] = {
                                                 name: name,
-                                                sortingId: name
+                                                sortingId: name,
+                                                cls: 'pivot-value'
                                             };
+                                        }
+                                        else if (th.id === 'pe') {
+                                            row['pe'] = {
+                                                name: response.getNameById(peId),
+                                                sortingId: peId,
+                                                cls: 'pivot-value'
+                                            };
+                                        }
+                                        else if (th.objectName === 'dx') {
+
+
                                         }
                                     }
                                 }
 
+console.log("row", row);
 
 
 
 
 
-
-
-                                    //todo
-                                }
                             })();
 
 
