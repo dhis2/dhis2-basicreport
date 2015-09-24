@@ -586,6 +586,17 @@ Ext.onReady( function() {
                     return this.metaData.names[id];
                 };
 
+                R.prototype.getNameByIdComb = function(idComb, dataType) {
+                    var ids = idComb.split('-'),
+                        map = {
+                            'dx': ids[0],
+                            'pe': ids[1],
+                            'ou': ids[2]
+                        };
+
+                    return this.getNameById(map[dataType]);
+                };
+
                 R.prototype.getLevelById = function(id) {
                     return Ext.Array.clean((this.metaData.ouHierarchy[id] || '').split('/') || []).length + 1;
                 };
@@ -603,11 +614,19 @@ Ext.onReady( function() {
                     return Ext.Array.max(anLevels);
                 };
 
-                R.prototype.getAncestorIdArray = function(id) {
+                R.prototype.getParentNameByIdAndLevel = function(id, level) {
+                    var ouId = id.split('-').pop(),
+                        parentGraphIdArray = this.getParentGraphIdArray(ouId),
+                        nLevel = level.level;
+
+                    return this.getNameById(parentGraphIdArray[nLevel]);
+                };
+
+                R.prototype.getParentGraphIdArray = function(id) {
                     return Ext.Array.clean((this.metaData.ouHierarchy[id] || '').split('/') || []);
                 };
 
-                R.prototype.getAncestorNameArray = function(id) {
+                R.prototype.getParentGraphNameArray = function(id) {
                     var getAncestorIdArray = this.getAncestorIdArray(id),
                         anchestorNameArray = [];
 
@@ -640,7 +659,7 @@ Ext.onReady( function() {
                     return this.idValueMap[dxId + '-' + peId + '-' + ouId];
                 };
 
-                R.prototype.createIdCombinationArray = function() {
+                R.prototype.createIdCombinations = function() {
                     for (var i = 0, dx; i < aDxResIds.length; i++) {
                         dx = aDxResIds[i];
 
@@ -723,8 +742,9 @@ Ext.onReady( function() {
                 var H = api.data.TableHeader = function(config) {
                     var h = this;
 
-                    h.elementId = config.id;
+                    h.id = config.id;
                     h.name = config.name;
+                    h.objectName = config.objectName;
 
                     h.cls = 'pivot-dim td-sortable';
                 };
@@ -2478,6 +2498,7 @@ console.log(aDxReqItems);
                                 aPeResIds = response.metaData.pe,
                                 aOuResIds = response.metaData.ou,
                                 tableHeaders = [],
+                                tableRows = [],
                                 nOuHeaders;
 
                             // table headers
@@ -2491,53 +2512,85 @@ console.log(aDxReqItems);
 
                                     nOuHeaders = (maxLevel === 1) ? 1 : (maxLevel - 1);
 
-                                    for (; i < maxLevel; i++) {
-                                        tableHeaders.push(new api.data.TableHeader(init.organisationUnitLevels[i]));
+                                    for (var level; i < maxLevel; i++) {
+                                        level = Ext.clone(init.organisationUnitLevels[i]);
+                                        level.objectName = 'ou';
+
+                                        tableHeaders.push(new api.data.TableHeader(level));
                                     }
                                 })();
 
                                 // pe headers
                                 tableHeaders.push(new api.data.TableHeader({
                                     id: 'pe',
-                                    name: 'Period'
+                                    name: 'Period',
+                                    objectName: 'pe'
                                 });
 
                                 // dx headers
                                 tableHeaders.push(new api.data.TableHeader({
                                     id: 'dx-group',
-                                    name: 'Data group'
+                                    name: 'Data group',
+                                    objectName: 'dx'
                                 }));
 
                                 tableHeaders.push(new api.data.TableHeader({
                                     id: 'dx',
-                                    name: 'Data'
+                                    name: 'Data',
+                                    objectName: 'dx'
                                 });
 
                                 tableHeaders.push(new api.data.TableHeader({
                                     id: 'dx-type',
-                                    name: 'Type'
+                                    name: 'Type',
+                                    objectName: 'dx'
                                 });
 
                                 tableHeaders.push(new api.data.TableHeader({
                                     id: 'dx-numerator',
-                                    name: 'Numerator'
+                                    name: 'Numerator',
+                                    objectName: 'dx'
                                 });
 
                                 tableHeaders.push(new api.data.TableHeader({
                                     id: 'dx-denominator',
-                                    name: 'Denominator'
+                                    name: 'Denominator',
+                                    objectName: 'dx'
                                 });
 
                                 tableHeaders.push(new api.data.TableHeader({
                                     id: 'dx-value',
-                                    name: 'Value'
+                                    name: 'Value',
+                                    objectName: 'dx'
                                 });
                             })();
 
                             // table rows
 
                             (function() {
-                                for (var i = 0; i < idCombinations.length; i++) {
+                                for (var i = 0, row, idComb; i < idCombinations.length; i++) {
+                                    idComb = idCombinations[i];
+                                    row = {};
+
+                                    for (var j = 0, th, name; j < tableHeaders.length; j++) {
+                                        th = tableHeaders[j];
+
+                                        if (th.objectName === 'ou') {
+                                            name = response.getParentNameByIdCombAndLevel(idComb, th) || response.getNameByIdComb(idComb, 'ou');
+
+                                            row[th.id] = {
+                                                name: name,
+                                                sortingId: name
+                                            };
+                                        }
+                                    }
+                                }
+
+
+
+
+
+
 
 
                                     //todo
