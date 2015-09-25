@@ -823,9 +823,106 @@ Ext.onReady( function() {
                     }
 
                     h.cls = 'pivot-dim td-sortable';
+
+                    // transient
+                    h.html;
+                };
+
+                H.prototype.generateHtml = function() {
+                    this.html = '<td';
+                    this.html += this.cls ? (' class="' + this.cls + '"') : '';
+                    this.html += this.style ? (' style="' + this.style + '"') : '';
+                    this.html += '>' + name + '</td>';
+
+                    return this.html;
                 };
             })();
-        }());
+
+            // Table cell
+            (function() {
+                var C = api.data.TableCell = function(config) {
+                    var c = this;
+
+                    c.name = config.name;
+                    c.sortId = config.sortId;
+                    c.cls = config.cls;
+                    c.style = config.style;
+
+                    // transient
+                    c.html;
+                };
+
+                C.prototype.generateHtml = function() {
+                    this.html = '<td';
+                    this.html += this.cls ? (' class="' + this.cls + '"') : '';
+                    this.html += this.style ? (' style="' + this.style + '"') : '';
+                    this.html += '>' + name + '</td>';
+
+                    return this.html;
+                };
+            })();
+
+            // Data
+            (function() {
+                var D = api.data.Data = function(config) {
+                    var d = this;
+
+                    d.tableHeaders = config.tableHeaders;
+                    d.tableRows = config.tableRows;
+
+                    d.sorting = {
+                        sort: false,
+                        sortIndex: 0,
+                        sortDirection: 'ASC',
+                        emptyFirst: false
+                    };
+                };
+
+                D.prototype.sortData = function() {
+                    var sorting = this.sorting;
+
+                    if (!sorting.sort) {
+                        return;
+                    }
+
+                    this.tableRows.sort( function(a, b) {
+
+                        a = a[sorting.sortIndex]['sortId'];
+                        b = b[sorting.sortIndex]['sortId'];
+
+                        // string
+                        if (Ext.isString(a) && Ext.isString(b)) {
+                            a = a.toLowerCase();
+                            b = b.toLowerCase();
+
+                            if (sorting.direction === 'DESC') {
+                                return a < b ? 1 : (a > b ? -1 : 0);
+                            }
+                            else {
+                                return a < b ? -1 : (a > b ? 1 : 0);
+                            }
+                        }
+
+                        // number
+                        else if (Ext.isNumber(a) && Ext.isNumber(b)) {
+                            return sorting.sortDirection === 'DESC' ? b - a : a - b;
+                        }
+
+                        else if (a === undefined || a === null) {
+                            return sorting.emptyFirst ? -1 : 1;
+                        }
+
+                        else if (b === undefined || b === null) {
+                            return sorting.emptyFirst ? 1 : -1;
+                        }
+
+                        return -1;
+                    });
+
+                    return array;
+                };
+            })();
+        })();
 
 		// support
 		(function() {
@@ -2324,788 +2421,462 @@ Ext.onReady( function() {
 			web.report = {};
 
 			web.report.getHtml = function(layout, fCallback) {
-                var buildOutputReport,
-                    createTableHeader,
-                    createTableBody,
-                    returnLookupValue,
-                    returnLookup,
-                    getOuLevelName,
-                    formatNumber;
+                var data,
+                    aInReqIds = [],
+                    aInReqItems = [],
+                    aDeReqIds = [],
+                    aDeReqItems = [],
+                    aDsReqIds = [],
+                    aDsReqItems = [],
+                    aPeReqIds = [],
+                    aOuReqIds = [],
+                    oDimNameReqItemArrayMap = {},
+                    sInName = 'indicator',
+                    sDeName = 'dataElement',
+                    sDsName = 'dataSet';
 
-                buildOutputReport = function(sDestination) {
-                    var aInReqIds = [],
-                        aInReqItems = [],
-                        aDeReqIds = [],
-                        aDeReqItems = [],
-                        aDsReqIds = [],
-                        aDsReqItems = [],
-                        aPeReqIds = [],
-                        aOuReqIds = [],
-                        oDimNameReqItemArrayMap = {},
-                        sInName = 'indicator',
-                        sDeName = 'dataElement',
-                        sDsName = 'dataSet';
+                oDimNameReqItemArrayMap[dimConf.period.dimensionName] = aPeReqIds;
+                oDimNameReqItemArrayMap[dimConf.organisationUnit.dimensionName] = aOuReqIds;
 
-                    oDimNameReqItemArrayMap[dimConf.period.dimensionName] = aPeReqIds;
-                    oDimNameReqItemArrayMap[dimConf.organisationUnit.dimensionName] = aOuReqIds;
+                // columns (data)
+                (function() {
+                    var ddi = layout.dataDimensionItems,
+                        dimMap = {};
 
-                    // columns (data)
-                    (function() {
-                        var ddi = layout.dataDimensionItems,
-                            dimMap = {};
+                    dimMap[sInName] = aInReqIds;
+                    dimMap[sDeName] = aDeReqIds;
+                    dimMap[sDsName] = aDsReqIds;
 
-                        dimMap[sInName] = aInReqIds;
-                        dimMap[sDeName] = aDeReqIds;
-                        dimMap[sDsName] = aDsReqIds;
+                    // add objects to corresponding array
+                    if (Ext.isArray(ddi) && ddi.length) {
+                        for (var i = 0, obj; i < ddi.length; i++) {
+                            obj = ddi[i];
 
-                        // add objects to corresponding array
-                        if (Ext.isArray(ddi) && ddi.length) {
-                            for (var i = 0, obj; i < ddi.length; i++) {
-                                obj = ddi[i];
+                            for (var j = 0, names = [sInName, sDeName, sDsName]; j < names.length; j++) {
+                                name = names[j];
 
-                                for (var j = 0, names = [sInName, sDeName, sDsName]; j < names.length; j++) {
-                                    name = names[j];
-
-                                    if (obj.hasOwnProperty(name) && Ext.isObject(obj[name])) {
-                                        dimMap[name].push(obj[name].id);
-                                    }
+                                if (obj.hasOwnProperty(name) && Ext.isObject(obj[name])) {
+                                    dimMap[name].push(obj[name].id);
                                 }
-                            }
-                        }
-                    })();
-
-                    // rows
-                    if (Ext.isArray(layout.rows)) {
-                        for (var i = 0, dim; i < layout.rows.length; i++) {
-                            dim = layout.rows[i];
-
-                            for (var j = 0, item; j < dim.items.length; j++) {
-                                item = dim.items[j];
-
-                                oDimNameReqItemArrayMap[dim.dimension].push(item.id);
                             }
                         }
                     }
+                })();
 
-                    ////tmp
-                    //columns: [
-                        //{
-                            //dimension: 'dx',
-                            //items: [
-                                //{
-                                    //id: sdfgfdsg,
-                                    //name: sffg
-                                //},
-                                //{
-                                    //id: sdfgfdsg,
-                                    //name: sffg
-                                //}
-                            //]
-                        //}
-                    //];
+                // rows
+                if (Ext.isArray(layout.rows)) {
+                    for (var i = 0, dim; i < layout.rows.length; i++) {
+                        dim = layout.rows[i];
 
-                    ////tmp
-                    //dataDimensionItems: [
-                        //{
-                            //indicator:  {
-                                //id: sdfsdf,
-                                //name: eerert
-                            //}
-                        //},
-                        //{
-                            //dataElement: {
-                                //id: rfgfdg,
-                                //name: gdfgd
-                            //}
-                        //}
-                    //];
+                        for (var j = 0, item; j < dim.items.length; j++) {
+                            item = dim.items[j];
 
-                    // meta data
-                    var nRank = 1,
-                        nOuHierarchyOffSet = 0,
-                        aDxName = [],
-                        aDxShort = [],
-                        aNumFormula = [],
-                        aNumFormulaItems = [],
-                        aNumDescription = [],
-                        aDenomFormula = [],
-                        aDenomFormulaItems = [],
-                        aDenomDescription = [],
-                        aTypeName = [],
-                        aDxGroupName = [],
-                        aDxIsIndicator = [],
-                        aDxLegendSet = [],
-                        nLgIncr = 0,
-                        sDxUniqueId = '',
-                        sLookupSubElements = '',
-                        sNums = '',
-                        sDenoms = '',
-                        getIndicators,
-                        getDataElements,
-                        getDataSets,
-                        getData,
-                        idDataObjectMap = {};
+                            oDimNameReqItemArrayMap[dim.dimension].push(item.id);
+                        }
+                    }
+                }
 
-                    getIndicators = function() {
-                        if (!aInReqIds.length) {
-                            getDataElements();
-                            return;
+                // meta data
+                var nRank = 1,
+                    nOuHierarchyOffSet = 0,
+                    aDxName = [],
+                    aDxShort = [],
+                    aNumFormula = [],
+                    aNumFormulaItems = [],
+                    aNumDescription = [],
+                    aDenomFormula = [],
+                    aDenomFormulaItems = [],
+                    aDenomDescription = [],
+                    aTypeName = [],
+                    aDxGroupName = [],
+                    aDxIsIndicator = [],
+                    aDxLegendSet = [],
+                    nLgIncr = 0,
+                    sDxUniqueId = '',
+                    sLookupSubElements = '',
+                    sNums = '',
+                    sDenoms = '',
+                    getIndicators,
+                    getDataElements,
+                    getDataSets,
+                    getData,
+                    idDataObjectMap = {};
+
+                getIndicators = function() {
+                    if (!aInReqIds.length) {
+                        getDataElements();
+                        return;
+                    }
+
+                    $.ajax({
+                        url: init.contextPath + '/api/indicators.json?paging=false&filter=id:in:[' + aInReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,indicatorType,indicatorGroups[id,name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
+                        headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
+                    }).done(function(r) {
+                        if (r.indicators) {
+                            for (var i = 0, obj; i < r.indicators.length; i++) {
+                                obj = new api.data.DataObject(r.indicators[i], sInName);
+
+                                idDataObjectMap[obj.id] = obj;
+                                aInReqItems.push(obj);
+                            }
                         }
 
-                        $.ajax({
-                            url: init.contextPath + '/api/indicators.json?paging=false&filter=id:in:[' + aInReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,indicatorType,indicatorGroups[id,name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
-                            headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
-                        }).done(function(r) {
-                            if (r.indicators) {
-                                for (var i = 0, obj; i < r.indicators.length; i++) {
-                                    obj = new api.data.DataObject(r.indicators[i], sInName);
+                        getDataElements();
+                    });
+                };
 
-                                    idDataObjectMap[obj.id] = obj;
-                                    aInReqItems.push(obj);
-                                }
+                getDataElements = function() {
+                    if (!aDeReqIds.length) {
+                        //getDataSets();
+                        getData();
+                        return;
+                    }
+
+                    $.ajax({
+                        url: init.contextPath + '/api/dataElements.json?paging=false&filter=id:in:[' + aDeReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,aggregationType,dataElementGroups[id,name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
+                        headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
+                    }).done(function(r) {
+                        if (r.dataElements) {
+                            for (var i = 0, obj; i < r.dataElements.length; i++) {
+                                obj = new api.data.DataObject(r.dataElements[i], sDeName);
+
+                                idDataObjectMap[obj.id] = obj;
+                                aDeReqItems.push(obj);
                             }
-
-                            getDataElements();
-                        });
-                    };
-
-                    getDataElements = function() {
-                        if (!aDeReqIds.length) {
-                            //getDataSets();
-                            getData();
-                            return;
                         }
 
-                        $.ajax({
-                            url: init.contextPath + '/api/dataElements.json?paging=false&filter=id:in:[' + aDeReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,aggregationType,dataElementGroups[id,name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
-                            headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
-                        }).done(function(r) {
-                            if (r.dataElements) {
-                                for (var i = 0, obj; i < r.dataElements.length; i++) {
-                                    obj = new api.data.DataObject(r.dataElements[i], sDeName);
+                        getData();
+                    });
+                };
 
-                                    idDataObjectMap[obj.id] = obj;
-                                    aDeReqItems.push(obj);
-                                }
+                getDataSets = function() {
+                    if (!aDsReqIds.length) {
+                        getData();
+                        return;
+                    }
+
+                    $.ajax({
+                        url: init.contextPath + '/api/dataSets.json?paging=false&filter=id:in:[' + aDsReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,valueType,dataSetGroups[name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
+                        headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
+                    }).done(function(r) {
+                        aDsReqItems = r.dataSets;
+                        support.prototype.array.addObjectProperty(aDsReqItems, 'type', sDsName);
+                        getData();
+                    });
+                };
+
+                getData = function() {
+                    aDxReqIds = [].concat(aInReqIds || [], aDeReqIds || [], aDsReqIds || []);
+                    aDxReqItems = [].concat(aInReqItems || [], aDeReqItems || [], aDsReqItems || []);
+
+                    for (var i = 0, oDxItem; i < aDxReqItems.length; i++) {
+                        oDxItem = aDxReqItems[i];
+                        sDxUniqueId += (oDxItem.id + ';');
+                        aDxIsIndicator[i] = oDxItem.isIndicator ? 1 : 0;
+                        aDxName[i] = oDxItem.displayName;
+                        aDxShort[i] = oDxItem.displayShortName;
+                        aNumFormula[i] = oDxItem.numerator;
+                        aNumDescription[i] = oDxItem.numeratorDescription;
+                        aDenomFormula[i] = oDxItem.denominator;
+                        aDenomDescription[i] = oDxItem.denominatorDescription;
+                        aTypeName[i] = oDxItem.indicatorType ? oDxItem.indicatorType.name : ''; //todo
+                        aDxGroupName[i] = (oDxItem.indicatorGroups && oDxItem.indicatorGroups.length) ? oDxItem.indicatorGroups[0].name : ''; //todo
+                        aDxLegendSet[i] = [];
+
+                        if (oDxItem.legendSet) {
+                            for (var p = 0; p < oDxItem.legendSet.legends.length; p++) {
+                                var sLegendSet = (oDxItem.legendSet.legends[p].name + ';' + oDxItem.legendSet.legends[p].color + ';' + oDxItem.legendSet.legends[p].startValue + ';' + oDxItem.legendSet.legends[p].endValue);
+                                aDxLegendSet[i][nLgIncr] = sLegendSet;
+                                nLgIncr += 1;
                             }
-
-                            getData();
-                        });
-                    };
-
-                    getDataSets = function() {
-                        if (!aDsReqIds.length) {
-                            getData();
-                            return;
                         }
 
-                        $.ajax({
-                            url: init.contextPath + '/api/dataSets.json?paging=false&filter=id:in:[' + aDsReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,valueType,dataSetGroups[name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
-                            headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
-                        }).done(function(r) {
-                            aDsReqItems = r.dataSets;
-                            support.prototype.array.addObjectProperty(aDsReqItems, 'type', sDsName);
-                            getData();
-                        });
-                    };
-
-                    getData = function() {
-                        aDxReqIds = [].concat(aInReqIds || [], aDeReqIds || [], aDsReqIds || []);
-                        aDxReqItems = [].concat(aInReqItems || [], aDeReqItems || [], aDsReqItems || []);
-
-                        for (var i = 0, oDxItem; i < aDxReqItems.length; i++) {
-                            oDxItem = aDxReqItems[i];
-                            sDxUniqueId += (oDxItem.id + ';');
-                            aDxIsIndicator[i] = oDxItem.isIndicator ? 1 : 0;
-                            aDxName[i] = oDxItem.displayName;
-                            aDxShort[i] = oDxItem.displayShortName;
-                            aNumFormula[i] = oDxItem.numerator;
-                            aNumDescription[i] = oDxItem.numeratorDescription;
-                            aDenomFormula[i] = oDxItem.denominator;
-                            aDenomDescription[i] = oDxItem.denominatorDescription;
-                            aTypeName[i] = oDxItem.indicatorType ? oDxItem.indicatorType.name : ''; //todo
-                            aDxGroupName[i] = (oDxItem.indicatorGroups && oDxItem.indicatorGroups.length) ? oDxItem.indicatorGroups[0].name : ''; //todo
-                            aDxLegendSet[i] = [];
-
-                            if (oDxItem.legendSet) {
-                                for (var p = 0; p < oDxItem.legendSet.legends.length; p++) {
-                                    var sLegendSet = (oDxItem.legendSet.legends[p].name + ';' + oDxItem.legendSet.legends[p].color + ';' + oDxItem.legendSet.legends[p].startValue + ';' + oDxItem.legendSet.legends[p].endValue);
-                                    aDxLegendSet[i][nLgIncr] = sLegendSet;
-                                    nLgIncr += 1;
-                                }
-                            }
-
-                            if (aNumFormula[i]) {
-                                var sNumItems = '';
-                                if (aNumFormula[i].indexOf('{') != 0) {
-                                    var aNumTmpOuter = aNumFormula[i].split('{');
-                                    for (var p = 1; p < aNumTmpOuter.length; p++)
-                                    {
-                                        var aNumTmpInner = aNumTmpOuter[p].split('}');
-                                        // if current UID not already listed in 'known lookup uids'
-                                        if (sLookupSubElements.indexOf(aNumTmpInner[0] + ';') < 0) {
-                                            sLookupSubElements += (aNumTmpInner[0]+';');
-                                            sNumItems += (aNumTmpInner[0]+';');
-                                        }
+                        if (aNumFormula[i]) {
+                            var sNumItems = '';
+                            if (aNumFormula[i].indexOf('{') != 0) {
+                                var aNumTmpOuter = aNumFormula[i].split('{');
+                                for (var p = 1; p < aNumTmpOuter.length; p++)
+                                {
+                                    var aNumTmpInner = aNumTmpOuter[p].split('}');
+                                    // if current UID not already listed in 'known lookup uids'
+                                    if (sLookupSubElements.indexOf(aNumTmpInner[0] + ';') < 0) {
+                                        sLookupSubElements += (aNumTmpInner[0]+';');
+                                        sNumItems += (aNumTmpInner[0]+';');
                                     }
                                 }
-                                aNumFormulaItems[i] = sNumItems;
                             }
-
-                            if (aDenomFormula[i]) {
-                                var sDenomItems = '';
-                                if (aDenomFormula[i].indexOf('{') != 0){
-                                    var aDenomTmpOuter = aDenomFormula[i].split('{');
-                                    for (var p = 1; p < aDenomTmpOuter.length; p++) {
-                                        var aDenomTmpInner = aDenomTmpOuter[p].split('}');
-                                        // if current UID not already listed in 'known lookup uids'
-                                        sDenomItems += (aDenomTmpInner[0] + ';');
-                                        if (sLookupSubElements.indexOf(aDenomTmpInner[0] + ';') < 0) {
-                                            sLookupSubElements += (aDenomTmpInner[0] + ';');
-                                        }
-                                    }
-                                }
-                                aDenomFormulaItems[i] = sDenomItems;
-                            }
+                            aNumFormulaItems[i] = sNumItems;
                         }
 
-                        // analytics
+                        if (aDenomFormula[i]) {
+                            var sDenomItems = '';
+                            if (aDenomFormula[i].indexOf('{') != 0){
+                                var aDenomTmpOuter = aDenomFormula[i].split('{');
+                                for (var p = 1; p < aDenomTmpOuter.length; p++) {
+                                    var aDenomTmpInner = aDenomTmpOuter[p].split('}');
+                                    // if current UID not already listed in 'known lookup uids'
+                                    sDenomItems += (aDenomTmpInner[0] + ';');
+                                    if (sLookupSubElements.indexOf(aDenomTmpInner[0] + ';') < 0) {
+                                        sLookupSubElements += (aDenomTmpInner[0] + ';');
+                                    }
+                                }
+                            }
+                            aDenomFormulaItems[i] = sDenomItems;
+                        }
+                    }
 
-                        $.ajax({
-                            url: init.contextPath + '/api/analytics.json?dimension=pe:' + aPeReqIds.join(';') + '&dimension=dx:' + sLookupSubElements + aDxReqIds.join(';') + '&dimension=ou:' + aOuReqIds.join(';') + '&hierarchyMeta=true&displayProperty=NAME&showHierarchy=true',
-                            headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
-                        }).done(function(analyticsData) {
-                            var response = new api.data.Response(analyticsData),
-                                aDxResIds = aDxReqIds,
-                                aPeResIds = response.metaData.pe,
-                                aOuResIds = response.metaData.ou,
-                                idCombinations = response.generateIdCombinations(aDxResIds, aPeResIds, aOuResIds),
-                                tableHeaders = [],
-                                tableRows = [],
-                                nOuHeaders;
+                    // analytics
+
+                    $.ajax({
+                        url: init.contextPath + '/api/analytics.json?dimension=pe:' + aPeReqIds.join(';') + '&dimension=dx:' + sLookupSubElements + aDxReqIds.join(';') + '&dimension=ou:' + aOuReqIds.join(';') + '&hierarchyMeta=true&displayProperty=NAME&showHierarchy=true',
+                        headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
+                    }).done(function(analyticsData) {
+                        var response = new api.data.Response(analyticsData),
+                            aDxResIds = aDxReqIds,
+                            aPeResIds = response.metaData.pe,
+                            aOuResIds = response.metaData.ou,
+                            idCombinations = response.generateIdCombinations(aDxResIds, aPeResIds, aOuResIds),
+                            tableHeaders = [],
+                            tableRows = [];
 console.log("response", response);
 console.log("idDataObjectMap", idDataObjectMap);
 
-                            response.generateIdValueMap();
+                        response.generateIdValueMap();
 
-                            // table headers
+                        // table headers
 
+                        (function() {
+                            var index = 0;
+
+                            // ou headers
                             (function() {
+                                var maxLevel = response.getMaxLevel(),
+                                    i = maxLevel > 1 ? 1 : 0;
 
-                                // ou headers
-                                (function() {
-                                    var maxLevel = response.getMaxLevel(),
-                                        i = maxLevel > 1 ? 1 : 0;
+                                for (var level; i < maxLevel; i++) {
+                                    level = Ext.clone(init.organisationUnitLevels[i]);
+                                    level.objectName = 'ou';
+                                    level.cls = 'pivot-dim';
+                                    level.index = index++;
 
-                                    nOuHeaders = (maxLevel === 1) ? 1 : (maxLevel - 1);
-
-                                    for (var level; i < maxLevel; i++) {
-                                        level = Ext.clone(init.organisationUnitLevels[i]);
-                                        level.objectName = 'ou';
-
-                                        tableHeaders.push(new api.data.TableHeader(level));
-                                    }
-                                })();
-
-                                // pe headers
-                                tableHeaders.push(new api.data.TableHeader({
-                                    id: 'pe',
-                                    name: 'Period',
-                                    objectName: 'pe'
-                                }));
-
-                                // dx headers
-                                tableHeaders.push(new api.data.TableHeader({
-                                    id: 'dx-group',
-                                    name: 'Data group',
-                                    objectName: 'dx'
-                                }));
-
-                                tableHeaders.push(new api.data.TableHeader({
-                                    id: 'dx',
-                                    name: 'Data',
-                                    objectName: 'dx'
-                                }));
-
-                                tableHeaders.push(new api.data.TableHeader({
-                                    id: 'dx-type',
-                                    name: 'Type',
-                                    objectName: 'dx'
-                                }));
-
-                                tableHeaders.push(new api.data.TableHeader({
-                                    id: 'dx-numerator',
-                                    name: 'Numerator',
-                                    objectName: 'dx'
-                                }));
-
-                                tableHeaders.push(new api.data.TableHeader({
-                                    id: 'dx-denominator',
-                                    name: 'Denominator',
-                                    objectName: 'dx'
-                                }));
-
-                                tableHeaders.push(new api.data.TableHeader({
-                                    id: 'dx-value',
-                                    name: 'Value',
-                                    objectName: 'dx'
-                                }));
-                            })();
-
-console.log("tableHeaders", tableHeaders);
-                            // table rows
-
-                            (function() {
-
-                                for (var i = 0, row, idComb, dxId, peId, ouId, dataObject; i < idCombinations.length; i++) {
-                                    idComb = idCombinations[i];
-                                    dxId = response.getIdByIdComb(idComb, 'dx');
-                                    peId = response.getIdByIdComb(idComb, 'pe');
-                                    ouId = response.getIdByIdComb(idComb, 'ou');
-                                    dataObject = idDataObjectMap[dxId];
-                                    row = {};
-
-                                    for (var j = 0, th, name, value; j < tableHeaders.length; j++) {
-                                        th = tableHeaders[j];
-
-                                        if (th.objectName === 'ou') {
-                                            name = response.getParentNameByIdAndLevel(ouId, th) || response.getNameById(ouId);
-
-                                            row[th.id] = {
-                                                name: name,
-                                                sortingId: name,
-                                                cls: 'pivot-value'
-                                            };
-                                        }
-                                        else if (th.id === 'pe') {
-                                            row[th.id] = {
-                                                name: response.getNameById(peId),
-                                                sortingId: peId,
-                                                cls: 'pivot-value'
-                                            };
-                                        }
-                                        else if (th.objectName === 'dx') {
-
-                                            if (th.id === 'dx-group') {
-                                                row[th.id] = {
-                                                    name: dataObject.group.name,
-                                                    sortingId: dataObject.group.name,
-                                                    cls: 'pivot-value'
-                                                };
-                                            }
-                                            else if (th.id === 'dx') {
-                                                row[th.id] = {
-                                                    name: dataObject.name,
-                                                    sortingId: dataObject.name,
-                                                    cls: 'pivot-value'
-                                                };
-                                            }
-                                            else if (th.id === 'dx-type') {
-                                                row[th.id] = {
-                                                    name: dataObject.type,
-                                                    sortingId: dataObject.type,
-                                                    cls: 'pivot-value'
-                                                };
-                                            }
-                                            else if (th.id === 'dx-numerator') {
-                                                var numeratorIds = dataObject.generateNumeratorIds(),
-                                                    strippedNumerator = Ext.clone(dataObject.generateStrippedNumerator()),
-                                                    numeratorTotal;
-
-                                                for (var k = 0, id, value; k < numeratorIds.length; k++) {
-                                                    id = numeratorIds[k];
-                                                    value = response.getValueByIdParams(id, peId, ouId);
-
-                                                    strippedNumerator = strippedNumerator.replace(id, value);
-                                                }
-
-                                                numeratorTotal = eval(strippedNumerator);
-
-                                                row[th.id] = {
-                                                    name: numeratorTotal,
-                                                    sortingId: numeratorTotal,
-                                                    cls: 'pivot-value'
-                                                };
-                                            }
-                                            else if (th.id === 'dx-denominator') {
-                                                var denominatorIds = dataObject.generateDenominatorIds(),
-                                                    strippedDenominator = Ext.clone(dataObject.generateStrippedDenominator()),
-                                                    denominatorTotal;
-
-                                                for (var k = 0, id, value; k < denominatorIds.length; k++) {
-                                                    id = denominatorIds[k];
-                                                    value = response.getValueByIdParams(id, peId, ouId);
-
-                                                    strippedDenominator = strippedDenominator.replace(id, value);
-                                                }
-
-                                                denominatorTotal = eval(strippedDenominator);
-
-                                                row[th.id] = {
-                                                    name: denominatorTotal,
-                                                    sortingId: denominatorTotal,
-                                                    cls: 'pivot-value'
-                                                };
-                                            }
-                                            else if (th.id === 'dx-value') {
-                                                value = response.getValueByIdComb(idComb);
-
-                                                row[th.id] = {
-                                                    name: value,
-                                                    sortingId: parseFloat(value),
-                                                    cls: 'pivot-value',
-                                                    style: 'background-color:' + dataObject.getBgColorByValue(parseFloat(value))
-                                                };
-                                            }
-                                        }
-                                    }
-
-                                    tableRows.push(row);
+                                    tableHeaders.push(new api.data.TableHeader(level));
                                 }
                             })();
+
+                            // pe headers
+                            tableHeaders.push(new api.data.TableHeader({
+                                id: 'pe',
+                                name: 'Period',
+                                objectName: 'pe',
+                                cls: 'pivot-dim',
+                                index: index++
+                            }));
+
+                            // dx headers
+                            tableHeaders.push(new api.data.TableHeader({
+                                id: 'dx-group',
+                                name: 'Data group',
+                                objectName: 'dx',
+                                cls: 'pivot-dim',
+                                index: index++
+                            }));
+
+                            tableHeaders.push(new api.data.TableHeader({
+                                id: 'dx',
+                                name: 'Data',
+                                objectName: 'dx',
+                                cls: 'pivot-dim',
+                                index: index++
+                            }));
+
+                            tableHeaders.push(new api.data.TableHeader({
+                                id: 'dx-type',
+                                name: 'Type',
+                                objectName: 'dx',
+                                cls: 'pivot-dim'
+                            }));
+
+                            tableHeaders.push(new api.data.TableHeader({
+                                id: 'dx-numerator',
+                                name: 'Numerator',
+                                objectName: 'dx',
+                                cls: 'pivot-dim',
+                                index: index++
+                            }));
+
+                            tableHeaders.push(new api.data.TableHeader({
+                                id: 'dx-denominator',
+                                name: 'Denominator',
+                                objectName: 'dx',
+                                cls: 'pivot-dim',
+                                index: index++
+                            }));
+
+                            tableHeaders.push(new api.data.TableHeader({
+                                id: 'dx-value',
+                                name: 'Value',
+                                objectName: 'dx',
+                                cls: 'pivot-dim',
+                                index: index++
+                            }));
+                        })();
+
+console.log("tableHeaders", tableHeaders);
+                        // table rows
+
+                        (function() {
+
+                            for (var i = 0, row, idComb, dxId, peId, ouId, dataObject; i < idCombinations.length; i++) {
+                                idComb = idCombinations[i];
+                                dxId = response.getIdByIdComb(idComb, 'dx');
+                                peId = response.getIdByIdComb(idComb, 'pe');
+                                ouId = response.getIdByIdComb(idComb, 'ou');
+                                dataObject = idDataObjectMap[dxId];
+                                row = {};
+
+                                for (var j = 0, th, name, value; j < tableHeaders.length; j++) {
+                                    th = tableHeaders[j];
+
+                                    if (th.objectName === 'ou') {
+                                        name = response.getParentNameByIdAndLevel(ouId, th) || response.getNameById(ouId);
+
+                                        row[th.id] = new api.data.TableCell({
+                                            name: name,
+                                            sortId: name,
+                                            cls: 'pivot-value'
+                                        });
+                                    }
+                                    else if (th.id === 'pe') {
+                                        row[th.id] = new api.data.TableCell({
+                                            name: response.getNameById(peId),
+                                            sortId: peId,
+                                            cls: 'pivot-value'
+                                        });
+                                    }
+                                    else if (th.objectName === 'dx') {
+
+                                        if (th.id === 'dx-group') {
+                                            row[th.id] = new api.data.TableCell({
+                                                name: dataObject.group.name,
+                                                sortId: dataObject.group.name,
+                                                cls: 'pivot-value'
+                                            });
+                                        }
+                                        else if (th.id === 'dx') {
+                                            row[th.id] = new api.data.TableCell({
+                                                name: dataObject.name,
+                                                sortId: dataObject.name,
+                                                cls: 'pivot-value'
+                                            });
+                                        }
+                                        else if (th.id === 'dx-type') {
+                                            row[th.id] = new api.data.TableCell({
+                                                name: dataObject.type,
+                                                sortId: dataObject.type,
+                                                cls: 'pivot-value'
+                                            });
+                                        }
+                                        else if (th.id === 'dx-numerator') {
+                                            var numeratorIds = dataObject.generateNumeratorIds(),
+                                                strippedNumerator = Ext.clone(dataObject.generateStrippedNumerator()),
+                                                numeratorTotal;
+
+                                            for (var k = 0, id, value; k < numeratorIds.length; k++) {
+                                                id = numeratorIds[k];
+                                                value = response.getValueByIdParams(id, peId, ouId);
+
+                                                strippedNumerator = strippedNumerator.replace(id, value);
+                                            }
+
+                                            numeratorTotal = eval(strippedNumerator);
+
+                                            row[th.id] = new api.data.TableCell({
+                                                name: numeratorTotal,
+                                                sortId: numeratorTotal,
+                                                cls: 'pivot-value'
+                                            });
+                                        }
+                                        else if (th.id === 'dx-denominator') {
+                                            var denominatorIds = dataObject.generateDenominatorIds(),
+                                                strippedDenominator = Ext.clone(dataObject.generateStrippedDenominator()),
+                                                denominatorTotal;
+
+                                            for (var k = 0, id, value; k < denominatorIds.length; k++) {
+                                                id = denominatorIds[k];
+                                                value = response.getValueByIdParams(id, peId, ouId);
+
+                                                strippedDenominator = strippedDenominator.replace(id, value);
+                                            }
+
+                                            denominatorTotal = eval(strippedDenominator);
+
+                                            row[th.id] = new api.data.TableCell({
+                                                name: denominatorTotal,
+                                                sortId: denominatorTotal,
+                                                cls: 'pivot-value'
+                                            });
+                                        }
+                                        else if (th.id === 'dx-value') {
+                                            value = response.getValueByIdComb(idComb);
+
+                                            row[th.id] = new api.data.TableCell({
+                                                name: value,
+                                                sortId: parseFloat(value),
+                                                cls: 'pivot-value',
+                                                style: 'background-color:' + dataObject.getBgColorByValue(parseFloat(value))
+                                            });
+                                        }
+                                    }
+                                }
+
+                                tableRows.push(row);
+                            }
+                        })();
 
 console.log("tableRows", tableRows);
 
-                            return;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                            var sParentPath,
-                                aParent,
-                                nHeaders = 0,
-
-                                oMetaDataNames = response.metaData.names,
-                                oMetaDataParentNames = response.metaData.ouNameHierarchy,
-                                oMetaDataParentUids = response.metaData.ouHierarchy,
-
-                                aOrganisationUnitLevels = init.organisationUnitLevels,
-
-                                aMyHeaders = [],
-                                aMyRows = [],
-
-                                aPeNameSplit,
-
-                                fMySortingA,
-                                fMySortingAsc,
-                                fMySortingDesc,
-
-                                sReturn = '';
-
-                            aOuResIds = response.metaData.ou;
-
-                            //sParentPath = returnLookup(oMetaDataParentUids, response.rows[1][2]);
-                            //aParent = Ext.Array.clean(sParentPath.split('/'));
-
-                            //for (var x = 0; x < aParent.length; x++) {
-                                //nOuHierarchyOffSet = x;
-                                //if (Ext.Array.contains(aOuResIds, aParent[x])) {
-                                    //break;
-                                //}
-                            //}
-
-                            //sParentPath = returnLookup(oMetaDataParentNames, returnLookup(oMetaDataNames, response.rows[1][2]));
-                            //aParent = sParentPath.split('/');
-
-                            aMyHeaders[0] = 'RESERVED_ouh';
-                            aMyHeaders[1] = 'RESERVED_dx';
-                            aMyHeaders[2] = 'RESERVED_pe';
-                            aMyHeaders[3] = 'RESERVED_bgCol';
-
-                            for (var x = nOuHierarchyOffSet; x < aParent.length; x++) {
-                                aMyHeaders[4 + nHeaders] = getOuLevelName(aOrganisationUnitLevels, x);
-                                nHeaders += 1;
-                            }
-
-                            aMyHeaders[4 + nHeaders] = 'Group';
-                            aMyHeaders[4 + nHeaders+1] = returnLookup(oMetaDataNames, response.headers[0].name);
-                            aMyHeaders[4 + nHeaders+2] = 'Type';
-                            aMyHeaders[4 + nHeaders+3] = returnLookup(oMetaDataNames, response.headers[1].name);
-
-                            aPeNameSplit = (returnLookup(oMetaDataNames, response.rows[0][1])).split(' ');
-
-                            for (var y = 0; y < aPeNameSplit.length; y++) {
-                                aMyHeaders[(4 + nHeaders + 3) + (y + 1)] = ('Period P' + (y+1));
-                            }
-
-                            aMyHeaders[(4 + nHeaders + 3) + aPeNameSplit.length + 1] = 'Numerator';
-                            aMyHeaders[(4 + nHeaders + 3) + aPeNameSplit.length + 2] = 'Denominator';
-                            aMyHeaders[(4 + nHeaders + 3) + aPeNameSplit.length + 3] = 'Value';
-
-                            var nCount = 0;
-
-                            for (var i = 0, row; i < response.rows.length; i++) {
-                                row = response.rows[i];
-
-                                if ((aDxReqIds.join(';') + ';').indexOf(row[0] + ';') >= 0) {
-                                    for (var z = 0; z < aDxReqIds.length; z++) {
-                                        if (row[0] == aDxReqIds[z]) {
-                                            break;
-                                        }
-                                    }
-
-                                    sParentPath = returnLookup(oMetaDataParentNames, returnLookup(oMetaDataNames, row[2]));
-                                    aParent = sParentPath.split('/');
-                                    aMyRows[nCount] = [];
-
-                                    aMyRows[nCount][0] = sParentPath;
-                                    aMyRows[nCount][1] = returnLookup(oMetaDataNames, row[0]);
-                                    aMyRows[nCount][2] = row[1];
-
-                                    if (aDxLegendSet[z]) {
-                                        var bFound = false;
-                                        for (var nLg = 0; nLg < aDxLegendSet[z].length; nLg++) {
-                                            if ((aDxLegendSet[z][nLg]) != undefined) {
-                                                var LegArr = (aDxLegendSet[z][nLg]).split(';');
-                                                if (parseFloat(row[3]) >= parseFloat(LegArr[2]) && parseFloat(row[3]) <= parseFloat(LegArr[3])) {
-                                                    aMyRows[nCount][3] = LegArr[1];
-                                                    bFound = true;
-                                                }
-                                            }
-                                            else {
-                                                aMyRows[nCount][3] = ('#ffffff');
-                                            }
-                                        }
-
-                                        if (!bFound){
-                                            aMyRows[nCount][3] = ('#ffffff');
-                                        }
-                                    }
-                                    else {
-                                        aMyRows[nCount][3] = ('#ffffff');
-                                    }
-
-                                    nHeaders = 0;
-
-                                    for (var x = nOuHierarchyOffSet; x < aParent.length; x++) {
-                                        aMyRows[nCount][4 + nHeaders] = aParent[x];
-                                        nHeaders += 1
-                                    }
-
-                                    aMyRows[nCount][4 + nHeaders] = aDxGroupName[z];
-                                    aMyRows[nCount][4 + nHeaders+1] = aMyRows[nCount][1];
-                                    aMyRows[nCount][4 + nHeaders+2] = aTypeName[z];
-                                    aMyRows[nCount][4 + nHeaders+3] = returnLookup(oMetaDataNames,row[1]);
-
-                                    aPeNameSplit = (returnLookup(oMetaDataNames,row[1])).split(" ");
-
-                                    for (var y = 0; y < aPeNameSplit.length; y++) {
-                                        aMyRows[nCount][(7 + nHeaders) + (y + 1)] = aPeNameSplit[y];
-                                    }
-
-                                    if (aDxIsIndicator[z]) {
-
-                                        /* START OF NUM/DENOM CALCULATIONS */
-                                        var aTempNum = aNumFormulaItems[z].split(';'),
-                                            sTempNumFormula,
-                                            aTempNumFsub,
-                                            sTempNumLookup,
-                                            nTempNumLookup,
-                                            nTempNumTotal,
-
-                                            aTempDenom = aDenomFormulaItems[z].split(';'),
-                                            sTempDenomFormula,
-                                            aTempDenomFsub,
-                                            sTempDenomLookup,
-                                            nTempDenomLookup,
-                                            nTempDenomTotal;
-
-                                        if (aTempNum.length > 1) {
-                                            sTempNumFormula = aNumFormula[z];
-                                            for (var p = 0; p < (aTempNum.length - 1); p++) {
-                                                aTempNumFsub = (aTempNum[p]).split(".");
-                                                sTempNumLookup = aTempNumFsub[0].replace(/{/g,'').replace(/}/g,'').replace(/#/g,'');
-                                                nTempNumLookup = returnLookupValue(response, sTempNumLookup, row[1], row[2]);
-                                                nTempNumLookup = ((nTempNumLookup || '').toString().length == 0 ? 0 : nTempNumLookup);
-                                                if (sTempNumFormula.indexOf(aTempNumFsub[0] + '.' + aTempNumFsub[1]) < 0) {
-                                                    sTempNumFormula = sTempNumFormula.replace(sTempNumLookup, nTempNumLookup);
-                                                }
-                                                else {
-                                                    sTempNumFormula = sTempNumFormula.replace(aTempNumFsub[0] + '.' + aTempNumFsub[1], nTempNumLookup);
-                                                }
-                                            }
-                                            sTempNumFormula = sTempNumFormula.replace(/{/g,'(');
-                                            sTempNumFormula = sTempNumFormula.replace(/}/g,')');
-                                            sTempNumFormula = sTempNumFormula.replace(/#/g,'');
-                                            nTempNumTotal = eval(sTempNumFormula);
-                                            //console.log(aTypeName[z] + ' NUM: ' + aNumFormula[z] + ' = ' + sTempNumFormula + ' [' + nTempNumTotal + ']');
-                                        }
-                                        else {
-                                            if ((aNumFormula[z]).indexOf('{') >= 0){
-                                                aTempNumFsub = aNumFormula[z].split(".")
-                                                sTempNumFormula = aTempNumFsub[0].replace(/{/g,'').replace(/}/g,'').replace(/#/g,'');
-                                                nTempNumTotal = returnLookupValue(response, sTempNumLookup, row[1], row[2]);
-                                            }
-                                            else
-                                            {
-                                                sTempNumFormula = aNumFormula[z];
-                                                nTempNumTotal = eval(sTempNumFormula);
-                                            }
-                                            //console.log(aTypeName[z] + ' NUM: ' + aNumFormula[z] + ' = ' + sTempNumFormula + ' [' + nTempNumTotal + ']');
-                                        }
-
-                                        if (aTempDenom.length > 1) {
-                                            sTempDenomFormula = aDenomFormula[z];
-                                            for (var p = 0; p < (aTempDenom.length - 1); p++) {
-                                                aTempDenomFsub = (aTempDenom[p]).split(".");
-                                                sTempDenomLookup = aTempDenomFsub[0].replace(/{/g,'').replace(/}/g,'').replace(/#/g,'');
-                                                nTempDenomLookup = returnLookupValue(response, sTempDenomLookup, row[1], row[2]);
-                                                nTempDenomLookup = ((nTempDenomLookup || '').toString().length == 0 ? 0 : nTempDenomLookup);
-                                                if (sTempDenomFormula.indexOf(aTempDenomFsub[0] + '.' + aTempDenomFsub[1]) < 0) {
-                                                    sTempDenomFormula = sTempDenomFormula.replace(sTempDenomLookup, nTempDenomLookup);
-                                                }
-                                                else{
-                                                    sTempDenomFormula = sTempDenomFormula.replace(aTempDenomFsub[0] + '.' + aTempDenomFsub[1],nTempDenomLookup);
-                                                }
-                                            }
-                                            sTempDenomFormula = sTempDenomFormula.replace(/{/g,'(');
-                                            sTempDenomFormula = sTempDenomFormula.replace(/}/g,')');
-                                            sTempDenomFormula = sTempDenomFormula.replace(/#/g,'');
-                                            nTempDenomTotal = eval(sTempDenomFormula);
-                                        }
-                                        else {
-                                            if ((aDenomFormula[z]).indexOf('{') >= 0) {
-                                                aTempDenomFsub = aDenomFormula[z].split(".")
-                                                sTempDenomFormula = aTempDenomFsub[0].replace(/{/g,'').replace(/}/g,'').replace(/#/g,'');
-                                                nTempDenomTotal = returnLookupValue(response, sTempDenomLookup, row[1], row[2]);
-                                            }
-                                            else
-                                            {
-                                                sTempDenomFormula = aDenomFormula[z];
-                                                nTempDenomTotal = eval(sTempDenomFormula);
-                                            }
-                                        }
-                                    }
-                                    else {
-                                        nTempNumTotal = parseFloat((row[3]).replace('.0',''));
-                                        nTempDenomTotal = 1;
-                                    }
-
-                                    //aMyRows[nCount][7+ nHeaders + (aPeNameSplit.length) + 1] = ((aDxIsIndicator[z] == 0) ? '' : nTempNumTotal);
-                                    //aMyRows[nCount][7+ nHeaders + (aPeNameSplit.length) + 2] = ((aDxIsIndicator[z] == 0) ? '' : nTempDenomTotal);
-                                    aMyRows[nCount][7 + nHeaders + (aPeNameSplit.length) + 1] = nTempNumTotal;
-                                    aMyRows[nCount][7 + nHeaders + (aPeNameSplit.length) + 2] = nTempDenomTotal;
-                                    aMyRows[nCount][7 + nHeaders + (aPeNameSplit.length) + 3] = parseFloat((row[3]).replace('.0',''));
-
-                                    nCount += 1;
-                                }
-                            }
-
-                            mySortingA = function(a,b) {
-                                a = a[0]+a[1]+a[2];
-                                b = b[0]+b[1]+b[2];
-                                return a == b ? 0 : (a < b ? -1 : 1)
-                            };
-
-                            mySortingAsc = function(a,b) {
-                                a = a[1]+a[a.length-1];
-                                b = b[1]+b[b.length-1];
-                                return a == b ? 0 : (a < b ? -1 : 1)
-                            }
-
-                            mySortingDesc = function(a,b) {
-                                a = a[1]+a[a.length-1];
-                                b = b[1]+b[b.length-1];
-                                return a == b ? 0 : (a < b ? -1 : 1)
-                            }
-
-                            aMyRows.sort(nRank === 1 ? mySortingAsc : (nRank === -1 ? mySortingDesc : mySortingA));
-
-                            sReturn = '<table class="pivot displaydensity-comfortable">';
-                            sReturn += createTableHeader(aMyHeaders);
-                            sReturn += createTableBody(aMyRows);
-                            sReturn += '</table>';
-
-                            if (sDestination) {
-                                $(sDestination).html(sReturn);
-                            }
-
-                            if (fCallback) {
-                                fCallback(sReturn);
-                            }
+                        data = new api.data.Data({
+                            tableHeaders: tableHeaders,
+                            tableRows: tableRows
                         });
 
-                    // end of indicator "done"
-                    };
+                        generateHtml();
+                    });
 
-                    getIndicators();
+                // end of indicator "done"
                 };
 
-                createTableHeader = function(myArray) {
-                    var result = "<thead>";
-                    result += "<tr>";
-                    for(var i = 4; i < (myArray.length); i++) {
-                        result += "<th class='pivot-dim-label'>" + myArray[i] + "</th>";
+                generateHtml = function() {
+                    var html = '<table class="pivot displaydensity-comfortable">';
+
+                    html += '<tr>';
+
+                    for (var i = 0; i < data.tableHeaders.length; i++) {
+                        html += data.tableHeaders[i].generateHtml();
                     }
-                    result += "</tr>";
-                    result += "</thead>";
-                    return result;
-                };
 
-                createTableBody = function(myMultiDimensionArray) {
-                    var result = "<tbody>";
-                    for(var i = 0; i < myMultiDimensionArray.length; i++) {
-                        result += "<tr>";
-                        for (var j = 4; j < myMultiDimensionArray[i].length; j++) {
-                            result += "<td style='white-space: normal;" + ((j == (myMultiDimensionArray[i].length-1)) ? "background-color:" + myMultiDimensionArray[i][3] + ";" : "") + "'>" + myMultiDimensionArray[i][j] + "</td>";
+                    html += '</tr>';
+
+                    for (var j = 0, row; j < data.tableRows.length; j++) {
+                        row = data.tableRows[j];
+                        html += '<tr>';
+
+                        for (var k = 0, th; k < data.tableHeaders.length; k++) {
+                            th = data.tableHeaders[k];
+                            html += row[th.id].generateHtml();
                         }
-                        result += "</tr>";
-                    }
-                    result += "</tbody>";
-                    return result;
-                };
 
-                returnLookupValue = function(theData, dx, pe, ou) {
-                    for (var i = 0; i < theData.rows.length; i++) {
-                        if ((theData.rows[i][0] === dx) && (theData.rows[i][1] === pe) && (theData.rows[i][2] === ou)) {
-                            return theData.rows[i][3];
-                        }
+                        html += '</tr>';
+                    }
+
+                    html += '</table>';
+
+                    if (fCallback) {
+                        fCallback(html);
                     }
                 };
 
-                returnLookup = function(theData,val) {
-                    return theData[val];
-                };
-
-                getOuLevelName = function(oLevel, nLevel) {
-                    for (i = 0; i < oLevel.length; i++) {
-                        if (oLevel[i].level === nLevel) {
-                            return oLevel[i].name;
-                        }
-                    }
-                };
-
-                formatNumber = function(num) {
-                    return ("" + num).replace(/(\d)(?=(\d\d\d)+(?!\d))/g, function($1) { return $1 + "," });
-                };
-
-                buildOutputReport();
+                getIndicators();
             };
         }());
 
