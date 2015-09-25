@@ -832,7 +832,7 @@ Ext.onReady( function() {
                     this.html = '<td';
                     this.html += this.cls ? (' class="' + this.cls + '"') : '';
                     this.html += this.style ? (' style="' + this.style + '"') : '';
-                    this.html += '>' + name + '</td>';
+                    this.html += '>' + this.name + '</td>';
 
                     return this.html;
                 };
@@ -856,7 +856,7 @@ Ext.onReady( function() {
                     this.html = '<td';
                     this.html += this.cls ? (' class="' + this.cls + '"') : '';
                     this.html += this.style ? (' style="' + this.style + '"') : '';
-                    this.html += '>' + name + '</td>';
+                    this.html += '>' + this.name + '</td>';
 
                     return this.html;
                 };

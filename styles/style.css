@@ -249,7 +249,6 @@ table.pivot.fontsize-small td {
 
 .pivot-value {
 	background-color: #fff;
-	text-align: right;
 	max-width: 700px;
 }
 .pivot-value.highlighted {
