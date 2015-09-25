@@ -107,11 +107,13 @@ Ext.onReady( function() {
 
 	// constructors
 	OptionsWindow = function() {
-		var displayDensity,
+		var showHierarchy,
+            displayDensity,
 			fontSize,
             digitGroupSeparator,
             legendSet,
-			
+
+            organisationUnits,
 			style,
 
 			comboboxWidth = 262,
@@ -119,6 +121,12 @@ Ext.onReady( function() {
             checkboxBottomMargin = 2,
             separatorTopMargin = 6,
 			window;
+
+		showHierarchy = Ext.create('Ext.form.field.Checkbox', {
+			boxLabel: NS.i18n.show_hierarchy,
+			style: 'margin-bottom:' + checkboxBottomMargin + 'px',
+            checked: true
+		});
 
 		displayDensity = Ext.create('Ext.form.field.ComboBox', {
 			cls: 'ns-combo',
@@ -130,7 +138,7 @@ Ext.onReady( function() {
 			queryMode: 'local',
 			valueField: 'id',
 			editable: false,
-			value: 'normal',
+			value: 'NORMAL',
 			store: Ext.create('Ext.data.Store', {
 				fields: ['id', 'text'],
 				data: [
@@ -151,7 +159,7 @@ Ext.onReady( function() {
 			queryMode: 'local',
 			valueField: 'id',
 			editable: false,
-			value: 'normal',
+			value: 'NORMAL',
 			store: Ext.create('Ext.data.Store', {
 				fields: ['id', 'text'],
 				data: [
@@ -172,7 +180,7 @@ Ext.onReady( function() {
 			queryMode: 'local',
 			valueField: 'id',
 			editable: false,
-			value: 'space',
+			value: 'SPACE',
 			store: Ext.create('Ext.data.Store', {
 				fields: ['id', 'text'],
 				data: [
@@ -197,6 +205,14 @@ Ext.onReady( function() {
 			store: ns.app.stores.legendSet
 		});
 
+		organisationUnits = {
+			bodyStyle: 'border:0 none',
+			style: 'margin-left:14px',
+			items: [
+				showHierarchy
+			]
+		};
+
 		style = {
 			bodyStyle: 'border:0 none',
 			style: 'margin-left:14px',
@@ -218,6 +234,7 @@ Ext.onReady( function() {
 			hideOnBlur: true,
 			getOptions: function() {
 				return {
+					showHierarchy: showHierarchy.getValue(),
 					displayDensity: displayDensity.getValue(),
 					fontSize: fontSize.getValue(),
 					digitGroupSeparator: digitGroupSeparator.getValue(),
@@ -225,15 +242,25 @@ Ext.onReady( function() {
 				};
 			},
 			setOptions: function(layout) {
-                displayDensity.setValue(Ext.isString(layout.displayDensity) ? layout.displayDensity : 'normal');
-				fontSize.setValue(Ext.isString(layout.fontSize) ? layout.fontSize : 'normal');
-				digitGroupSeparator.setValue(Ext.isString(layout.digitGroupSeparator) ? layout.digitGroupSeparator : 'space');
+                showHierarchy.setValue(Ext.isBoolean(layout.showHierarchy) ? layout.showHierarchy : false);
+                displayDensity.setValue(Ext.isString(layout.displayDensity) ? layout.displayDensity : 'NORMAL');
+				fontSize.setValue(Ext.isString(layout.fontSize) ? layout.fontSize : 'NORMAL');
+				digitGroupSeparator.setValue(Ext.isString(layout.digitGroupSeparator) ? layout.digitGroupSeparator : 'SPACE');
 				legendSet.setValue(Ext.isObject(layout.legendSet) && Ext.isString(layout.legendSet.id) ? layout.legendSet.id : 0);
 			},
 			items: [
 				{
 					bodyStyle: 'border:0 none; color:#222; font-size:12px; font-weight:bold',
 					style: 'margin-top:4px; margin-bottom:6px; margin-left:5px',
+					html: NS.i18n.organisation_units
+				},
+				organisationUnits,
+				{
+					bodyStyle: 'border:0 none; padding:7px'
+				},
+				{
+					bodyStyle: 'border:0 none; color:#222; font-size:12px; font-weight:bold',
+					style: 'margin-bottom:6px; margin-left:5px',
 					html: NS.i18n.style
 				},
 				style
@@ -277,6 +304,7 @@ Ext.onReady( function() {
 					}
 
 					// cmp
+					w.showHierarchy = showHierarchy;
 					w.displayDensity = displayDensity;
 					w.fontSize = fontSize;
 					w.digitGroupSeparator = digitGroupSeparator;
@@ -802,7 +830,7 @@ Ext.onReady( function() {
 				// panel data
 				for (var i = 0, dim, dimName; i < panels.length; i++) {
 					dim = panels[i].getDimension();
-                    
+
 					if (dim) {
                         if (dim.dimension === dx) {
 
@@ -814,7 +842,7 @@ Ext.onReady( function() {
                                 ddi = {};
                                 item = dim.items[j];
 
-                                ddi[map[item.objectName].value] = item;                                
+                                ddi[map[item.objectName].value] = item;
 
                                 config.dataDimensionItems.push(ddi);
                             }
@@ -826,7 +854,7 @@ Ext.onReady( function() {
                         }
 					}
 				}
-                
+
 				return config;
 			};
 
@@ -944,7 +972,7 @@ Ext.onReady( function() {
 
 			web.report.createReport = function(layout) {
                 web.mask.show(ns.app.centerRegion);
-                
+
                 web.report.getHtml(layout, function(html) {
                     ns.app.centerRegion.removeAll(true);
                     ns.app.centerRegion.update(html);
@@ -1090,7 +1118,7 @@ Ext.onReady( function() {
             },
             loadDataAndUpdate: function(data, append) {
                 ns.core.support.prototype.array.addObjectProperty(data, 'objectName', dimConf.indicator.objectName);
-                
+
                 this.clearFilter(); // work around
                 this.loadData(data, append);
                 this.updateFilter();
@@ -3570,7 +3598,7 @@ Ext.onReady( function() {
 		update = function() {
 			var config = ns.core.web.report.getLayoutConfig()
                 layout = ns.core.api.layout.Layout(config);
-                
+
 			if (!layout) {
 				return;
 			}
@@ -4181,7 +4209,7 @@ Ext.onReady( function() {
         ajax = function(requestConfig, authConfig, skipRequest) {
             requestConfig = requestConfig || {};
             authConfig = authConfig || cors;
-            
+
             if (authConfig.crossDomain && Ext.isString(authConfig.username) && Ext.isString(authConfig.password)) {
                 requestConfig.headers = Ext.isObject(authConfig.headers) ? authConfig.headers : {};
                 requestConfig.headers['Authorization'] = 'Basic ' + btoa(authConfig.username + ':' + authConfig.password);
@@ -4190,7 +4218,7 @@ Ext.onReady( function() {
             if (skipRequest) {
                 return btoa(authConfig.username + ':' + authConfig.password);
             }
-            
+
             Ext.Ajax.request(requestConfig);
         };
 
@@ -4199,7 +4227,7 @@ Ext.onReady( function() {
             url: 'conf/cors.conf',
             callback: function(options, success, r) {
                 cors = success ? Ext.decode(r.responseText) : {};
-                
+
                 Ext.Ajax.request({
                     url: 'manifest.webapp',
                     success: function(r) {

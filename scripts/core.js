@@ -507,9 +507,9 @@ Ext.onReady( function() {
 
 					layout.showHierarchy = Ext.isBoolean(config.showHierarchy) ? config.showHierarchy : false;
 
-					layout.displayDensity = Ext.isString(config.displayDensity) && !Ext.isEmpty(config.displayDensity) ? config.displayDensity : 'normal';
-					layout.fontSize = Ext.isString(config.fontSize) && !Ext.isEmpty(config.fontSize) ? config.fontSize : 'normal';
-					layout.digitGroupSeparator = Ext.isString(config.digitGroupSeparator) && !Ext.isEmpty(config.digitGroupSeparator) ? config.digitGroupSeparator : 'space';
+					layout.displayDensity = Ext.isString(config.displayDensity) && !Ext.isEmpty(config.displayDensity) ? config.displayDensity : 'NORMAL';
+					layout.fontSize = Ext.isString(config.fontSize) && !Ext.isEmpty(config.fontSize) ? config.fontSize : 'NORMAL';
+					layout.digitGroupSeparator = Ext.isString(config.digitGroupSeparator) && !Ext.isEmpty(config.digitGroupSeparator) ? config.digitGroupSeparator : 'SPACE';
 					layout.legendSet = Ext.isObject(config.legendSet) && Ext.isString(config.legendSet.id) ? config.legendSet : null;
 
 					layout.parentGraphMap = Ext.isObject(config.parentGraphMap) ? config.parentGraphMap : null;
@@ -619,6 +619,19 @@ Ext.onReady( function() {
                     return Ext.Array.max(anLevels);
                 };
 
+                R.prototype.getMinLevel = function() {
+                    var ouh = this.metaData.ouHierarchy,
+                        anLevels = [];
+
+                    for (var i in ouh) {
+                        if (ouh.hasOwnProperty(i)) {
+                            anLevels.push(this.getLevelById(i));
+                        }
+                    }
+
+                    return Ext.Array.min(anLevels);
+                };
+
                 R.prototype.getParentNameByIdAndLevel = function(ouId, level) {
                     var parentGraphIdArray = this.getParentGraphIdArray(ouId),
                         nLevel = level.level;
@@ -671,7 +684,10 @@ Ext.onReady( function() {
                     return this.idValueMap[dxId + '-' + peId + '-' + ouId];
                 };
 
-                R.prototype.getValueByDxIdAndIdComb = function(idComb, dxId) {
+                R.prototype.getValueByDxIdAndIdComb = function(dxId, idComb) {
+                    var pe = this.getIdByIdComb(idComb, 'pe');
+                    var ou = this.getIdByIdComb(idComb, 'ou');
+
                     return this.getValueByIdComb(dxId + '-' + this.getIdByIdComb(idComb, 'pe') + '-' + this.getIdByIdComb(idComb, 'ou'));
                 };
 
@@ -716,14 +732,17 @@ Ext.onReady( function() {
                     d.displayShortName = config.displayShortName;
                     d.groups = config.indicatorGroups || config.dataElementGroups || [];
                     d.group = d.groups[0] || {};
-                    d.groupName = d.group.name || '(Unknown)';
+                    d.groupName = d.group.name || '';
 
                     d.numerator = config.numerator;
                     d.numeratorDescription = config.numeratorDescription;
                     d.denominator = config.denominator;
                     d.denominatorDescription = config.denominatorDescription;
+                    d.annualized = config.annualized;
 
-                    d.type = config.indicatorType ? config.indicatorType.name : (config.aggregationType ? config.aggregationType : '(Unknown)');
+                    d.type = config.indicatorType ? config.indicatorType.name : (config.aggregationType ? config.aggregationType : '');
+                    d.typeName = d.type + (config.annualized ? ' (annualized)' : '');
+
                     d.legendSet = config.legendSet || null;
 
                     d.defaultLegendSet = {
@@ -744,6 +763,9 @@ Ext.onReady( function() {
 
                     d.numeratorIds;
                     d.denominatorIds;
+
+                    d.numeratorTotal;
+                    d.denominatorTotal;
                 };
 
                 D.prototype.stripFormula = function(formula) {
@@ -806,6 +828,44 @@ Ext.onReady( function() {
                     }
 
                     return this.defaultBgColor;
+                };
+
+                D.prototype.getNumeratorTotal = function(response, idComb) {
+                    if (this.isIndicator) {
+                        var numeratorIds = this.generateNumeratorIds(),
+                            strippedNumerator = Ext.clone(this.generateStrippedNumerator());
+
+                        for (var k = 0, id, value; k < numeratorIds.length; k++) {
+                            id = numeratorIds[k];
+                            value = response.getValueByDxIdAndIdComb(id, idComb);
+
+                            strippedNumerator = strippedNumerator.replace(id, value);
+                        }
+
+                        return this.numeratorTotal = eval(strippedNumerator);
+                    }
+                    else if (this.isDataElement) {
+                        return this.numeratorTotal = response.getValueByIdComb(idComb);
+                    }
+                };
+
+                D.prototype.getDenominatorTotal = function(response, idComb) {
+                    if (this.isIndicator) {
+                        var denominatorIds = this.generateDenominatorIds(),
+                            strippedDenominator = Ext.clone(this.generateStrippedDenominator());
+
+                        for (var k = 0, id, value; k < denominatorIds.length; k++) {
+                            id = denominatorIds[k];
+                            value = response.getValueByDxIdAndIdComb(id, idComb);
+
+                            strippedDenominator = strippedDenominator.replace(id, value);
+                        }
+
+                        return this.denominatorTotal = eval(strippedDenominator);
+                    }
+                    else if (this.isDataElement) {
+                        return this.denominatorTotal = 1;
+                    }
                 };
             })();
 
@@ -1976,15 +2036,15 @@ Ext.onReady( function() {
 					delete layout.showHierarchy;
 				}
 
-				if (layout.displayDensity === 'normal') {
+				if (layout.displayDensity === 'NORMAL') {
 					delete layout.displayDensity;
 				}
 
-				if (layout.fontSize === 'normal') {
+				if (layout.fontSize === 'NORMAL') {
 					delete layout.fontSize;
 				}
 
-				if (layout.digitGroupSeparator === 'space') {
+				if (layout.digitGroupSeparator === 'SPACE') {
 					delete layout.digitGroupSeparator;
 				}
 
@@ -2509,7 +2569,7 @@ Ext.onReady( function() {
                     }
 
                     $.ajax({
-                        url: init.contextPath + '/api/indicators.json?paging=false&filter=id:in:[' + aInReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,indicatorType,indicatorGroups[id,name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
+                        url: init.contextPath + '/api/indicators.json?paging=false&filter=id:in:[' + aInReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,indicatorType,annualized,indicatorGroups[id,name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
                         headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
                     }).done(function(r) {
                         if (r.indicators) {
@@ -2651,10 +2711,13 @@ console.log("idDataObjectMap", idDataObjectMap);
                             // ou headers
                             (function() {
                                 var maxLevel = response.getMaxLevel(),
-                                    i = maxLevel > 1 ? 1 : 0;
+                                    minLevel = response.getMinLevel(),
+                                    startLevel;
 
-                                for (var level; i < maxLevel; i++) {
-                                    level = Ext.clone(init.organisationUnitLevels[i]);
+                                startLevel = layout.showHierarchy ? (maxLevel > 1 ? 1 : 0) : minLevel - 1;
+
+                                for (var level; startLevel < maxLevel; startLevel++) {
+                                    level = Ext.clone(init.organisationUnitLevels[startLevel]);
                                     level.objectName = 'ou';
                                     level.cls = 'pivot-dim';
                                     level.index = index++;
@@ -2737,6 +2800,7 @@ console.log("tableHeaders", tableHeaders);
                                 for (var j = 0, th, name, value; j < tableHeaders.length; j++) {
                                     th = tableHeaders[j];
 
+                                    // ou
                                     if (th.objectName === 'ou') {
                                         name = response.getParentNameByIdAndLevel(ouId, th) || response.getNameById(ouId);
 
@@ -2746,6 +2810,8 @@ console.log("tableHeaders", tableHeaders);
                                             cls: 'pivot-value'
                                         });
                                     }
+
+                                    // pe
                                     else if (th.id === 'pe') {
                                         row[th.id] = new api.data.TableCell({
                                             name: response.getNameById(peId),
@@ -2753,12 +2819,14 @@ console.log("tableHeaders", tableHeaders);
                                             cls: 'pivot-value'
                                         });
                                     }
+
+                                    // dx
                                     else if (th.objectName === 'dx') {
 
                                         if (th.id === 'dx-group') {
                                             row[th.id] = new api.data.TableCell({
-                                                name: dataObject.group.name,
-                                                sortId: dataObject.group.name,
+                                                name: dataObject.groupName,
+                                                sortId: dataObject.groupName,
                                                 cls: 'pivot-value'
                                             });
                                         }
@@ -2771,24 +2839,13 @@ console.log("tableHeaders", tableHeaders);
                                         }
                                         else if (th.id === 'dx-type') {
                                             row[th.id] = new api.data.TableCell({
-                                                name: dataObject.type,
-                                                sortId: dataObject.type,
-                                                cls: 'pivot-value'
+                                                name: dataObject.typeName,
+                                                sortId: dataObject.typeName,
+                                                cls: 'pivot-value' + (dataObject.type.length === 1 ? ' td-nobreak' : '')
                                             });
                                         }
                                         else if (th.id === 'dx-numerator') {
-                                            var numeratorIds = dataObject.generateNumeratorIds(),
-                                                strippedNumerator = Ext.clone(dataObject.generateStrippedNumerator()),
-                                                numeratorTotal;
-
-                                            for (var k = 0, id, value; k < numeratorIds.length; k++) {
-                                                id = numeratorIds[k];
-                                                value = response.getValueByIdParams(id, peId, ouId);
-
-                                                strippedNumerator = strippedNumerator.replace(id, value);
-                                            }
-
-                                            numeratorTotal = eval(strippedNumerator);
+                                            var numeratorTotal = dataObject.getNumeratorTotal(response, idComb);
 
                                             row[th.id] = new api.data.TableCell({
                                                 name: numeratorTotal || '',
@@ -2797,18 +2854,7 @@ console.log("tableHeaders", tableHeaders);
                                             });
                                         }
                                         else if (th.id === 'dx-denominator') {
-                                            var denominatorIds = dataObject.generateDenominatorIds(),
-                                                strippedDenominator = Ext.clone(dataObject.generateStrippedDenominator()),
-                                                denominatorTotal;
-
-                                            for (var k = 0, id, value; k < denominatorIds.length; k++) {
-                                                id = denominatorIds[k];
-                                                value = response.getValueByIdParams(id, peId, ouId);
-
-                                                strippedDenominator = strippedDenominator.replace(id, value);
-                                            }
-
-                                            denominatorTotal = eval(strippedDenominator);
+                                            var denominatorTotal = dataObject.getDenominatorTotal(response, idComb);
 
                                             row[th.id] = new api.data.TableCell({
                                                 name: denominatorTotal || '',
