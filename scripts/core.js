@@ -774,7 +774,7 @@ Ext.onReady( function() {
                     for (var j = 0, item; j < a2.length; j++) {
                         item = a2[j];
 
-                        if (item.length === 11 && regexp.test(item)) {
+                        if ((item.length === 11 && regexp.test(item)) || (item.length === 23 && item.indexOf('.') !== -1 && regexp.test(item.replace('.', '')))) {
                             ids.push(item);
                         }
                     }
@@ -2791,8 +2791,8 @@ console.log("tableHeaders", tableHeaders);
                                             numeratorTotal = eval(strippedNumerator);
 
                                             row[th.id] = new api.data.TableCell({
-                                                name: numeratorTotal,
-                                                sortId: numeratorTotal,
+                                                name: numeratorTotal || '',
+                                                sortId: numeratorTotal || 0,
                                                 cls: 'pivot-value'
                                             });
                                         }
@@ -2811,8 +2811,8 @@ console.log("tableHeaders", tableHeaders);
                                             denominatorTotal = eval(strippedDenominator);
 
                                             row[th.id] = new api.data.TableCell({
-                                                name: denominatorTotal,
-                                                sortId: denominatorTotal,
+                                                name: denominatorTotal || '',
+                                                sortId: denominatorTotal || 0,
                                                 cls: 'pivot-value'
                                             });
                                         }
@@ -2820,8 +2820,8 @@ console.log("tableHeaders", tableHeaders);
                                             value = response.getValueByIdComb(idComb);
 
                                             row[th.id] = new api.data.TableCell({
-                                                name: value,
-                                                sortId: parseFloat(value),
+                                                name: value || '',
+                                                sortId: parseFloat(value) || 0,
                                                 cls: 'pivot-value',
                                                 style: 'background-color:' + dataObject.getBgColorByValue(parseFloat(value))
                                             });
