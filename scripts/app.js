@@ -218,9 +218,9 @@ Ext.onReady( function() {
 			style: 'margin-left:14px',
 			items: [
 				displayDensity,
-				fontSize,
-				digitGroupSeparator,
-				legendSet
+				fontSize
+				//digitGroupSeparator,
+				//legendSet
 			]
 		};
 
@@ -1835,8 +1835,8 @@ Ext.onReady( function() {
                 fields: ['id', 'name'],
                 data: [
                      {id: 'in', name: NS.i18n.indicators},
-                     {id: 'de', name: NS.i18n.data_elements},
-                     {id: 'ds', name: NS.i18n.reporting_rates}
+                     {id: 'de', name: NS.i18n.data_elements}
+                    // {id: 'ds', name: NS.i18n.reporting_rates}
                     // {id: 'di', name: NS.i18n.event_data_items},
                     // {id: 'pi', name: NS.i18n.program_indicators}
                 ]
@@ -2325,6 +2325,7 @@ Ext.onReady( function() {
 			displayField: 'text',
 			width: 90 - 1,
 			value: dimConf.dataElement.objectName,
+            disabled: true,
 			store: {
 				fields: ['id', 'text'],
 				data: [
