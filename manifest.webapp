@@ -9,13 +9,13 @@
         "128": "/img/icons/mortar-128.png"
     },
     "developer": {
-        "name": "Jan Henrik Øverland",
+        "name": "Greg Rowles / Jan Henrik Øverland",
         "url": "https://launchpad.net/~janhenrik-overland"
     },
     "default_locale": "en",
     "activities": {
         "dhis": {
-            "href": "http://localhost:8080"
+            "href": "*"
         }
     }
 }
