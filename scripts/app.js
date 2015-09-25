@@ -142,9 +142,9 @@ Ext.onReady( function() {
 			store: Ext.create('Ext.data.Store', {
 				fields: ['id', 'text'],
 				data: [
+					{id: 'COMFORTABLE', text: NS.i18n.comfortable},
 					{id: 'COMPACT', text: NS.i18n.compact},
-					{id: 'NORMAL', text: NS.i18n.normal},
-					{id: 'COMFORTABLE', text: NS.i18n.comfortable}
+					{id: 'NORMAL', text: NS.i18n.normal}
 				]
 			})
 		});
@@ -976,7 +976,10 @@ Ext.onReady( function() {
                 web.report.getHtml(layout, function(data) {
                     data.update = function(isSorting) {
                         ns.app.centerRegion.removeAll(true);
+
+                        ns.app.dateRender = new Date();
                         ns.app.centerRegion.update(data.generateHtml());
+                        ns.app.dateTotal = new Date();
 
                         data.addHeaderClickListeners();
                     };
@@ -988,7 +991,8 @@ Ext.onReady( function() {
 
                     if (NS.isDebug) {
                         console.log("RENDER", (ns.app.dateTotal - ns.app.dateRender) / 1000);
-                        console.log(ns.app.layout);
+                        console.log("layout", ns.app.layout);
+                        console.log("data", data);
                     }
 
                     web.mask.hide(ns.app.centerRegion);

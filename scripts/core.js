@@ -931,6 +931,7 @@ Ext.onReady( function() {
 
                     d.tableHeaders = config.tableHeaders;
                     d.tableRows = config.tableRows;
+                    d.cls = config.cls;
 
                     d.sorting = {
                         id: '',
@@ -996,7 +997,7 @@ Ext.onReady( function() {
                 };
 
                 D.prototype.generateHtml = function() {
-                    var html = '<table class="pivot displaydensity-comfortable">';
+                    var html = '<table class="pivot ' + this.cls + '">';
 
                     html += '<tr>';
 
@@ -2760,8 +2761,6 @@ Ext.onReady( function() {
                             idCombinations = response.generateIdCombinations(aDxResIds, aPeResIds, aOuResIds),
                             tableHeaders = [],
                             tableRows = [];
-console.log("response", response);
-console.log("idDataObjectMap", idDataObjectMap);
 
                         response.generateIdValueMap();
 
@@ -2846,7 +2845,6 @@ console.log("idDataObjectMap", idDataObjectMap);
                             }));
                         })();
 
-console.log("tableHeaders", tableHeaders);
                         // table rows
 
                         (function() {
@@ -2941,15 +2939,18 @@ console.log("tableHeaders", tableHeaders);
                             }
                         })();
 
-console.log("tableRows", tableRows);
-
                         data = new api.data.Data({
                             tableHeaders: tableHeaders,
-                            tableRows: tableRows
+                            tableRows: tableRows,
+                            cls: 'displaydensity-' + (layout.displayDensity || 'NORMAL').toLowerCase() + ' fontsize-' + (layout.fontSize || 'NORMAL').toLowerCase()
                         });
 
                         if (fCallback) {
                             fCallback(data);
+                        }
+
+                        if (NS.isDebug) {
+                            console.log('response', response);
                         }
                     });
 
