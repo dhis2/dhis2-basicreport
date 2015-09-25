@@ -875,6 +875,7 @@ Ext.onReady( function() {
                     var h = this;
 
                     h.id = config.id;
+                    h.elementId = Ext.data.IdGenerator.get('uuid').generate();
                     h.name = config.name;
                     h.objectName = config.objectName;
 
@@ -882,7 +883,7 @@ Ext.onReady( function() {
                         h.level = parseInt(config.level);
                     }
 
-                    h.cls = 'pivot-dim td-sortable';
+                    h.cls = 'pivot-dim td-sortable pointer';
 
                     // transient
                     h.html;
@@ -890,6 +891,7 @@ Ext.onReady( function() {
 
                 H.prototype.generateHtml = function() {
                     this.html = '<td';
+                    this.html += this.elementId ? (' id="' + this.elementId + '"') : '';
                     this.html += this.cls ? (' class="' + this.cls + '"') : '';
                     this.html += this.style ? (' style="' + this.style + '"') : '';
                     this.html += '>' + this.name + '</td>';
@@ -931,24 +933,37 @@ Ext.onReady( function() {
                     d.tableRows = config.tableRows;
 
                     d.sorting = {
-                        sort: false,
-                        sortIndex: 0,
-                        sortDirection: 'ASC',
+                        id: '',
+                        direction: '',
                         emptyFirst: false
                     };
+
+                    // transient
+                    d.lastSorting = {
+                        id: '',
+                        direction: ''
+                    };
+
+                    d.html;
+
+                    d.update;
+                };
+
+                D.prototype.getSortDirection = function(id) {
+                    if (id === this.lastSorting.id) {
+                        return this.lastSorting.direction === 'ASC' ? 'DESC' : 'ASC';
+                    }
+
+                    return 'ASC';
                 };
 
                 D.prototype.sortData = function() {
                     var sorting = this.sorting;
 
-                    if (!sorting.sort) {
-                        return;
-                    }
-
                     this.tableRows.sort( function(a, b) {
 
-                        a = a[sorting.sortIndex]['sortId'];
-                        b = b[sorting.sortIndex]['sortId'];
+                        a = a[sorting.id]['sortId'];
+                        b = b[sorting.id]['sortId'];
 
                         // string
                         if (Ext.isString(a) && Ext.isString(b)) {
@@ -965,7 +980,7 @@ Ext.onReady( function() {
 
                         // number
                         else if (Ext.isNumber(a) && Ext.isNumber(b)) {
-                            return sorting.sortDirection === 'DESC' ? b - a : a - b;
+                            return sorting.direction === 'DESC' ? b - a : a - b;
                         }
 
                         else if (a === undefined || a === null) {
@@ -978,8 +993,55 @@ Ext.onReady( function() {
 
                         return -1;
                     });
+                };
 
-                    return array;
+                D.prototype.generateHtml = function() {
+                    var html = '<table class="pivot displaydensity-comfortable">';
+
+                    html += '<tr>';
+
+                    for (var i = 0; i < this.tableHeaders.length; i++) {
+                        html += this.tableHeaders[i].generateHtml();
+                    }
+
+                    html += '</tr>';
+
+                    for (var j = 0, row; j < this.tableRows.length; j++) {
+                        row = this.tableRows[j];
+                        html += '<tr>';
+
+                        for (var k = 0, th; k < this.tableHeaders.length; k++) {
+                            th = this.tableHeaders[k];
+                            html += row[th.id].generateHtml();
+                        }
+
+                        html += '</tr>';
+                    }
+
+                    html += '</table>';
+
+                    return this.html = html;
+                };
+
+                D.prototype.addHeaderClickListeners = function() {
+                    var d = this;
+
+                    for (var i = 0, th, el; i < this.tableHeaders.length; i++) {
+                        th = this.tableHeaders[i];
+                        el = Ext.get(th.elementId);
+                        el.tableHeaderId = th.id;
+
+                        el.on('click', function() {
+                        	d.sorting.id = this.tableHeaderId;
+                            d.sorting.direction = d.getSortDirection(this.tableHeaderId);
+
+                            d.sortData();
+                            d.update();
+
+                            d.lastSorting.id = d.sorting.id;
+                            d.lastSorting.direction = d.sorting.direction;
+                        });
+                    }
                 };
             })();
         })();
@@ -2886,40 +2948,12 @@ console.log("tableRows", tableRows);
                             tableRows: tableRows
                         });
 
-                        generateHtml();
+                        if (fCallback) {
+                            fCallback(data);
+                        }
                     });
 
                 // end of indicator "done"
-                };
-
-                generateHtml = function() {
-                    var html = '<table class="pivot displaydensity-comfortable">';
-
-                    html += '<tr>';
-
-                    for (var i = 0; i < data.tableHeaders.length; i++) {
-                        html += data.tableHeaders[i].generateHtml();
-                    }
-
-                    html += '</tr>';
-
-                    for (var j = 0, row; j < data.tableRows.length; j++) {
-                        row = data.tableRows[j];
-                        html += '<tr>';
-
-                        for (var k = 0, th; k < data.tableHeaders.length; k++) {
-                            th = data.tableHeaders[k];
-                            html += row[th.id].generateHtml();
-                        }
-
-                        html += '</tr>';
-                    }
-
-                    html += '</table>';
-
-                    if (fCallback) {
-                        fCallback(html);
-                    }
                 };
 
                 getIndicators();

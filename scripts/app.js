@@ -973,9 +973,15 @@ Ext.onReady( function() {
 			web.report.createReport = function(layout) {
                 web.mask.show(ns.app.centerRegion);
 
-                web.report.getHtml(layout, function(html) {
-                    ns.app.centerRegion.removeAll(true);
-                    ns.app.centerRegion.update(html);
+                web.report.getHtml(layout, function(data) {
+                    data.update = function(isSorting) {
+                        ns.app.centerRegion.removeAll(true);
+                        ns.app.centerRegion.update(data.generateHtml());
+
+                        data.addHeaderClickListeners();
+                    };
+
+                    data.update();
 
                     // after render
                     ns.app.layout = layout;
