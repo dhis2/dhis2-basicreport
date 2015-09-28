@@ -938,8 +938,7 @@ Ext.onReady( function() {
 
                     d.sorting = {
                         id: '',
-                        direction: '',
-                        emptyFirst: false
+                        direction: ''
                     };
 
                     // transient
@@ -987,11 +986,11 @@ Ext.onReady( function() {
                             return sorting.direction === 'DESC' ? b - a : a - b;
                         }
 
-                        else if (a === undefined || a === null) {
+                        else if (Ext.isEmpty(a)) {
                             return sorting.emptyFirst ? -1 : 1;
                         }
 
-                        else if (b === undefined || b === null) {
+                        else if (Ext.isEmpty(b)) {
                             return sorting.emptyFirst ? 1 : -1;
                         }
 
