@@ -107,12 +107,14 @@ Ext.onReady( function() {
 
 	// constructors
 	OptionsWindow = function() {
-		var showHierarchy,
+		var showDataDescription,
+            showHierarchy,
             displayDensity,
 			fontSize,
             digitGroupSeparator,
             legendSet,
 
+            data,
             organisationUnits,
 			style,
 
@@ -121,6 +123,11 @@ Ext.onReady( function() {
             checkboxBottomMargin = 2,
             separatorTopMargin = 6,
 			window;
+
+		showDataDescription = Ext.create('Ext.form.field.Checkbox', {
+			boxLabel: NS.i18n.show_descriptions,
+			style: 'margin-bottom:' + checkboxBottomMargin + 'px'
+		});
 
 		showHierarchy = Ext.create('Ext.form.field.Checkbox', {
 			boxLabel: NS.i18n.show_hierarchy,
@@ -205,6 +212,14 @@ Ext.onReady( function() {
 			store: ns.app.stores.legendSet
 		});
 
+        data = {
+			bodyStyle: 'border:0 none',
+			style: 'margin-left:14px',
+			items: [
+				showDataDescription
+			]
+		};
+
 		organisationUnits = {
 			bodyStyle: 'border:0 none',
 			style: 'margin-left:14px',
@@ -234,6 +249,7 @@ Ext.onReady( function() {
 			hideOnBlur: true,
 			getOptions: function() {
 				return {
+                    showDataDescription: showDataDescription.getValue(),
 					showHierarchy: showHierarchy.getValue(),
 					displayDensity: displayDensity.getValue(),
 					fontSize: fontSize.getValue(),
@@ -242,6 +258,7 @@ Ext.onReady( function() {
 				};
 			},
 			setOptions: function(layout) {
+                showDataDescription.setValue(Ext.isBoolean(layout.showDataDescription) ? layout.showDataDescription : false);
                 showHierarchy.setValue(Ext.isBoolean(layout.showHierarchy) ? layout.showHierarchy : false);
                 displayDensity.setValue(Ext.isString(layout.displayDensity) ? layout.displayDensity : 'NORMAL');
 				fontSize.setValue(Ext.isString(layout.fontSize) ? layout.fontSize : 'NORMAL');
@@ -249,6 +266,15 @@ Ext.onReady( function() {
 				legendSet.setValue(Ext.isObject(layout.legendSet) && Ext.isString(layout.legendSet.id) ? layout.legendSet.id : 0);
 			},
 			items: [
+				{
+					bodyStyle: 'border:0 none; color:#222; font-size:12px; font-weight:bold',
+					style: 'margin-top:4px; margin-bottom:6px; margin-left:5px',
+					html: NS.i18n.data
+				},
+				data,
+				{
+					bodyStyle: 'border:0 none; padding:7px'
+				},
 				{
 					bodyStyle: 'border:0 none; color:#222; font-size:12px; font-weight:bold',
 					style: 'margin-top:4px; margin-bottom:6px; margin-left:5px',
@@ -304,6 +330,7 @@ Ext.onReady( function() {
 					}
 
 					// cmp
+                    w.showDataDescription = showDataDescription;
 					w.showHierarchy = showHierarchy;
 					w.displayDensity = displayDensity;
 					w.fontSize = fontSize;

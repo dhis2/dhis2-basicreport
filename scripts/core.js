@@ -376,6 +376,8 @@ Ext.onReady( function() {
 
 				// filters: [Dimension]
 
+                // showDataDescription: boolean (false)
+
                 // showHierarchy: boolean (false)
 
 				// displayDensity: string ('NORMAL') - 'COMPACT', 'NORMAL', 'COMFORTABLE'
@@ -504,6 +506,8 @@ Ext.onReady( function() {
 					// layout
 					layout.columns = config.columns;
                     layout.rows = config.rows;
+
+					layout.showDataDescription = Ext.isBoolean(config.showDataDescription) ? config.showDataDescription : false;
 
 					layout.showHierarchy = Ext.isBoolean(config.showHierarchy) ? config.showHierarchy : false;
 
@@ -736,6 +740,7 @@ Ext.onReady( function() {
                     d.numeratorDescription = config.numeratorDescription;
                     d.denominator = config.denominator;
                     d.denominatorDescription = config.denominatorDescription;
+                    d.description = config.description;
                     d.annualized = config.annualized;
 
                     d.type = config.indicatorType ? config.indicatorType.name : (config.aggregationType ? config.aggregationType : '');
@@ -992,6 +997,17 @@ Ext.onReady( function() {
 
                         return -1;
                     });
+                };
+
+                D.prototype.addOptionsCls = function(options) {
+
+                    // display density
+                    this.cls += ' displaydensity-' + (layout.displayDensity || 'NORMAL').toLowerCase();
+
+                    // font size
+                    this.cls += ' fontsize-' + (layout.fontSize || 'NORMAL').toLowerCase();
+
+                    return this.cls;
                 };
 
                 D.prototype.generateHtml = function() {
@@ -2630,7 +2646,7 @@ Ext.onReady( function() {
                     }
 
                     $.ajax({
-                        url: init.contextPath + '/api/indicators.json?paging=false&filter=id:in:[' + aInReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,indicatorType,annualized,indicatorGroups[id,name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
+                        url: init.contextPath + '/api/indicators.json?paging=false&filter=id:in:[' + aInReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,description,indicatorType,annualized,indicatorGroups[id,name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
                         headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
                     }).done(function(r) {
                         if (r.indicators) {
@@ -2654,7 +2670,7 @@ Ext.onReady( function() {
                     }
 
                     $.ajax({
-                        url: init.contextPath + '/api/dataElements.json?paging=false&filter=id:in:[' + aDeReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,aggregationType,dataElementGroups[id,name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
+                        url: init.contextPath + '/api/dataElements.json?paging=false&filter=id:in:[' + aDeReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,description,aggregationType,dataElementGroups[id,name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
                         headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
                     }).done(function(r) {
                         if (r.dataElements) {
@@ -2818,6 +2834,15 @@ Ext.onReady( function() {
                                 cls: 'pivot-dim'
                             }));
 
+                            if (layout.showDataDescription) {
+                                tableHeaders.push(new api.data.TableHeader({
+                                    id: 'dx-description',
+                                    name: 'Description',
+                                    objectName: 'dx',
+                                    cls: 'pivot-dim'
+                                }));
+                            }
+
                             tableHeaders.push(new api.data.TableHeader({
                                 id: 'dx-numerator',
                                 name: 'Numerator',
@@ -2903,6 +2928,13 @@ Ext.onReady( function() {
                                                 cls: 'pivot-value' + (dataObject.type.length === 1 ? ' td-nobreak' : '')
                                             });
                                         }
+                                        else if (th.id === 'dx-description') {
+                                            row[th.id] = new api.data.TableCell({
+                                                name: dataObject.description,
+                                                sortId: dataObject.description,
+                                                cls: 'pivot-value'
+                                            });
+                                        }
                                         else if (th.id === 'dx-numerator') {
                                             var numeratorTotal = dataObject.getNumeratorTotal(response, idComb);
 
@@ -2940,9 +2972,10 @@ Ext.onReady( function() {
 
                         data = new api.data.Data({
                             tableHeaders: tableHeaders,
-                            tableRows: tableRows,
-                            cls: 'displaydensity-' + (layout.displayDensity || 'NORMAL').toLowerCase() + ' fontsize-' + (layout.fontSize || 'NORMAL').toLowerCase()
+                            tableRows: tableRows
                         });
+
+                        data.addOptionsCls(layout);
 
                         if (fCallback) {
                             fCallback(data);
