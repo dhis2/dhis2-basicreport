@@ -634,6 +634,20 @@ Ext.onReady( function() {
                     return Ext.Array.min(anLevels);
                 };
 
+                R.prototype.getNumberOfNumericItemsInArray = function(array) {
+                    if (!Ext.isArray(array)) {
+                        return 0;
+                    }
+
+                    for (var i = 0, count = 0; i < array.length; i++) {
+                        if (Ext.isNumeric(array[i])) {
+                            count++;
+                        }
+                    }
+
+                    return count;
+                };
+
                 R.prototype.getParentNameByIdAndLevel = function(ouId, level) {
                     var parentGraphIdArray = this.getParentGraphIdArray(ouId),
                         nLevel = level.level;
@@ -660,6 +674,23 @@ Ext.onReady( function() {
                     }
 
                     return anchestorNameArray;
+                };
+
+                R.prototype.getPeGroupNameByPeId = function(peId) {
+                    var peName = this.getNameById(peId),
+                        a = peName.split(' '),
+                        a0 = a[0],
+                        map = {
+                            'Apr': 'April',
+                            'Jul': 'July',
+                            'Oct': 'October'
+                        };
+
+                    if (a.length === 1) {
+                        return a0.slice(0,4);
+                    }
+
+                    return this.getNumberOfNumericItemsInArray(a) === 1 ? a.pop() : 'Financial ' + map[a0];
                 };
 
                 R.prototype.generateIdValueMap = function() {
@@ -2802,6 +2833,14 @@ Ext.onReady( function() {
 
                             // pe headers
                             tableHeaders.push(new api.data.TableHeader({
+                                id: 'pe-group',
+                                name: 'Period group',
+                                objectName: 'pe',
+                                cls: 'pivot-dim',
+                                index: index++
+                            }));
+
+                            tableHeaders.push(new api.data.TableHeader({
                                 id: 'pe',
                                 name: 'Period',
                                 objectName: 'pe',
@@ -2895,12 +2934,22 @@ Ext.onReady( function() {
                                     }
 
                                     // pe
-                                    else if (th.id === 'pe') {
-                                        row[th.id] = new api.data.TableCell({
-                                            name: response.getNameById(peId),
-                                            sortId: peId,
-                                            cls: 'pivot-value'
-                                        });
+                                    else if (th.objectName === 'pe') {
+                                        if (th.id === 'pe-group') {
+                                            row[th.id] = new api.data.TableCell({
+                                                name: response.getPeGroupNameByPeId(peId),
+                                                sortId: peId,
+                                                cls: 'pivot-value'
+                                            });
+                                        }
+
+                                        else if (th.id === 'pe') {
+                                            row[th.id] = new api.data.TableCell({
+                                                name: response.getNameById(peId),
+                                                sortId: peId,
+                                                cls: 'pivot-value'
+                                            });
+                                        }
                                     }
 
                                     // dx
