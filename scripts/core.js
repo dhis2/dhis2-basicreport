@@ -597,9 +597,7 @@ Ext.onReady( function() {
                 };
 
                 R.prototype.getNameByIdComb = function(idComb, dataType) {
-                    var id = idComb.split('-')[this.idCombinationIndex[dataType]];
-
-                    return this.getNameById(id);
+                    return this.getNameById(this.getIdByIdComb(idComb, dataType));
                 };
 
                 R.prototype.getLevelById = function(id) {
@@ -2849,24 +2847,25 @@ Ext.onReady( function() {
 
                         (function() {
 
-                            for (var i = 0, row, idComb, dxId, peId, ouId, dataObject; i < idCombinations.length; i++) {
+                            for (var i = 0, row, idComb, dxId, peId, ouId, dataObject, ouLevel; i < idCombinations.length; i++) {
                                 idComb = idCombinations[i];
                                 dxId = response.getIdByIdComb(idComb, 'dx');
                                 peId = response.getIdByIdComb(idComb, 'pe');
                                 ouId = response.getIdByIdComb(idComb, 'ou');
+                                ouLevel = response.getLevelById(ouId);
                                 dataObject = idDataObjectMap[dxId];
                                 row = {};
 
-                                for (var j = 0, th, name, value; j < tableHeaders.length; j++) {
+                                for (var j = 0, th, ouName = '', value; j < tableHeaders.length; j++) {
                                     th = tableHeaders[j];
 
                                     // ou
                                     if (th.objectName === 'ou') {
-                                        name = response.getParentNameByIdAndLevel(ouId, th) || response.getNameById(ouId);
+                                        ouName = response.getParentNameByIdAndLevel(ouId, th) || (ouLevel === th.level ? response.getNameById(ouId) : '');
 
                                         row[th.id] = new api.data.TableCell({
-                                            name: name,
-                                            sortId: name,
+                                            name: ouName,
+                                            sortId: ouName,
                                             cls: 'pivot-value'
                                         });
                                     }
