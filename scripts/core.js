@@ -1173,13 +1173,13 @@ Ext.onReady( function() {
                     });
                 };
 
-                D.prototype.addOptionsCls = function(options) {
+                D.prototype.addOptionsCls = function(config) {
 
                     // display density
-                    this.cls += ' displaydensity-' + (layout.displayDensity || 'NORMAL').toLowerCase();
+                    this.cls += ' displaydensity-' + (config.displayDensity || 'NORMAL').toLowerCase();
 
                     // font size
-                    this.cls += ' fontsize-' + (layout.fontSize || 'NORMAL').toLowerCase();
+                    this.cls += ' fontsize-' + (config.fontSize || 'NORMAL').toLowerCase();
 
                     return this.cls;
                 };
@@ -3124,7 +3124,7 @@ Ext.onReady( function() {
                                         if (th.id === 'dx-group') {
                                             row[th.id] = new api.data.TableCell({
                                                 name: dataObject.groupName,
-                                                sortId: dataObject.groupName,
+                                                sortId: dataObject.groupName + dataObject.name + period.typeSortId + period.sortId,
                                                 cls: 'pivot-value'
                                             });
                                         }

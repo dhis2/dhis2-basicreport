@@ -150,8 +150,8 @@ Ext.onReady( function() {
 				fields: ['id', 'text'],
 				data: [
 					{id: 'COMFORTABLE', text: NS.i18n.comfortable},
-					{id: 'COMPACT', text: NS.i18n.compact},
-					{id: 'NORMAL', text: NS.i18n.normal}
+					{id: 'NORMAL', text: NS.i18n.normal},
+					{id: 'COMPACT', text: NS.i18n.compact}
 				]
 			})
 		});
@@ -302,14 +302,14 @@ Ext.onReady( function() {
 				{
 					text: '<b>' + NS.i18n.update + '</b>',
 					handler: function() {
-						var config = ns.core.web.report.getLayoutConfig(),
-							layout = ns.core.api.layout.Layout(config);
+                        var config = ns.core.web.report.getLayoutConfig(),
+                            layout = ns.core.api.layout.Layout(config);
 
-						if (!layout) {
-							return;
-						}
+                        if (!layout) {
+                            return;
+                        }
 
-						ns.core.web.report.createReport(layout, false);
+                        ns.core.web.report.createReport(layout, false);
 
 						window.hide();
 					}
@@ -1035,14 +1035,10 @@ Ext.onReady( function() {
 			dataElementAvailableStore,
 			dataElementGroupStore,
 			dataSetAvailableStore,
-            //eventDataItemAvailableStore,
-            //programIndicatorAvailableStore,
-            //programStore,
             dataSelectedStore,
 			periodTypeStore,
 			fixedPeriodAvailableStore,
 			fixedPeriodSelectedStore,
-			//reportTableStore,
 			organisationUnitLevelStore,
 			organisationUnitGroupStore,
 			legendSetStore,
@@ -1073,22 +1069,6 @@ Ext.onReady( function() {
             dataSetAvailable,
             dataSetSelected,
             dataSet,
-            //onEventDataItemProgramSelect,
-            //eventDataItemProgram,
-            //eventDataItemLabel,
-            //eventDataItemSearch,
-            //eventDataItemFilter,
-            //eventDataItemAvailable,
-            //eventDataItemSelected,
-            //eventDataItem,
-            //onProgramIndicatorProgramSelect,
-            //programIndicatorProgram,
-            //programIndicatorLabel,
-            //programIndicatorSearch,
-            //programIndicatorFilter,
-            //programIndicatorAvailable,
-            //programIndicatorSelected,
-            //programIndicator,
             data,
 
 			rewind,
@@ -1110,8 +1090,6 @@ Ext.onReady( function() {
             toolPanel,
             organisationUnit,
             dimensionPanelMap = {},
-			//getDimensionPanel,
-			//getDimensionPanels,
 			update,
 
 			accordionBody,
@@ -3634,7 +3612,7 @@ Ext.onReady( function() {
 		// viewport
 
 		update = function() {
-			var config = ns.core.web.report.getLayoutConfig()
+			var config = ns.core.web.report.getLayoutConfig(),
                 layout = ns.core.api.layout.Layout(config);
 
 			if (!layout) {
