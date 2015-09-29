@@ -1012,7 +1012,7 @@ Ext.onReady( function() {
                             var a = id.split('AprilS');
                             return a[0] + (a[1].length === 1 ? '000' : '00') + a[1];
                         }();
-                        this.typeSortId = '08';
+                        this.typeSortId = '07';
                         this.typeName = 'Six-monthly April';
                         this.displayName = Ext.String.trim(this.name.split(this.year)[0]);
                         return;
