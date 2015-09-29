@@ -2948,7 +2948,10 @@ Ext.onReady( function() {
                             aOuResIds = response.metaData.ou,
                             idCombinations = response.generateIdCombinations(aDxResIds, aPeResIds, aOuResIds),
                             tableHeaders = [],
-                            tableRows = [];
+                            tableRows = [],
+                            maxOuLevel = response.getMaxLevel(),
+                            minOuLevel = response.getMinLevel(),
+                            startOuLevel = layout.showHierarchy ? (maxOuLevel > 1 ? 1 : 0) : minOuLevel - 1;
 
                         response.generateIdValueMap();
 
@@ -2959,14 +2962,8 @@ Ext.onReady( function() {
 
                             // ou headers
                             (function() {
-                                var maxLevel = response.getMaxLevel(),
-                                    minLevel = response.getMinLevel(),
-                                    startLevel;
-
-                                startLevel = layout.showHierarchy ? (maxLevel > 1 ? 1 : 0) : minLevel - 1;
-
-                                for (var level; startLevel < maxLevel; startLevel++) {
-                                    level = Ext.clone(init.organisationUnitLevels[startLevel]);
+                                for (var level; startOuLevel < maxOuLevel; startOuLevel++) {
+                                    level = Ext.clone(init.organisationUnitLevels[startOuLevel]);
                                     level.objectName = 'ou';
                                     level.cls = 'pivot-dim';
                                     level.index = index++;
@@ -3096,7 +3093,7 @@ Ext.onReady( function() {
                                         if (th.id === 'pe-type') {
                                             row[th.id] = new api.data.TableCell({
                                                 name: period.typeName,
-                                                sortId: period.typeSortId + period.sortId,
+                                                sortId: period.typeSortId + period.sortId + dataObject.groupName + dataObject.name,
                                                 cls: 'pivot-value'
                                             });
                                         }
@@ -3104,7 +3101,7 @@ Ext.onReady( function() {
                                         if (th.id === 'pe-year') {
                                             row[th.id] = new api.data.TableCell({
                                                 name: period.year,
-                                                sortId: period.sortId,
+                                                sortId: period.sortId + dataObject.groupName + dataObject.name,
                                                 cls: 'pivot-value'
                                             });
                                         }
@@ -3112,7 +3109,7 @@ Ext.onReady( function() {
                                         else if (th.id === 'pe') {
                                             row[th.id] = new api.data.TableCell({
                                                 name: period.displayName,
-                                                sortId: period.typeSortId + period.sortId,
+                                                sortId: period.typeSortId + period.sortId + dataObject.groupName + dataObject.name,
                                                 cls: 'pivot-value'
                                             });
                                         }
