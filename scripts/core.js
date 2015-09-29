@@ -634,18 +634,20 @@ Ext.onReady( function() {
                     return Ext.Array.min(anLevels);
                 };
 
-                R.prototype.getNumberOfNumericItemsInArray = function(array) {
+                R.prototype.getUniqueNumericItemsInArray = function(array) {
+                    var a = [];
+
                     if (!Ext.isArray(array)) {
                         return 0;
                     }
 
-                    for (var i = 0, count = 0; i < array.length; i++) {
+                    for (var i = 0; i < array.length; i++) {
                         if (Ext.isNumeric(array[i])) {
-                            count++;
+                            a.push(array[i]);
                         }
                     }
 
-                    return count;
+                    return Ext.Array.unique(a);
                 };
 
                 R.prototype.getParentNameByIdAndLevel = function(ouId, level) {
@@ -679,18 +681,18 @@ Ext.onReady( function() {
                 R.prototype.getPeGroupNameByPeId = function(peId) {
                     var peName = this.getNameById(peId),
                         a = peName.split(' '),
-                        a0 = a[0],
-                        map = {
+                        uniqueNumerics = this.getUniqueNumericItemsInArray(a),
+                        monthMap = {
                             'Apr': 'April',
                             'Jul': 'July',
                             'Oct': 'October'
                         };
 
                     if (a.length === 1) {
-                        return a0.slice(0,4);
+                        return a[0].slice(0,4);
                     }
 
-                    return this.getNumberOfNumericItemsInArray(a) === 1 ? a.pop() : 'Financial ' + map[a0];
+                    return (uniqueNumerics.length === 1) ? uniqueNumerics[0] : ('Financial ' + monthMap[a[0]]);
                 };
 
                 R.prototype.generateIdValueMap = function() {
@@ -903,6 +905,149 @@ Ext.onReady( function() {
                 };
             })();
 
+            // Period
+            (function() {
+                var P = api.data.Period = function(config) {
+                    var p = this;
+
+                    p.id = '' + config.id;
+                    p.name = config.name;
+
+                    // transient
+                    p.sortId;
+
+                    p.year;
+
+                    p.typeSortId;
+                    p.typeName;
+
+                    p.displayName;
+                };
+
+                P.prototype.generateDisplayProperties = function() {
+                    var id = this.id,
+                        months = 'Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec'.split('|');
+
+                    this.year = id.slice(0, 4);
+
+                    if (Ext.isNumeric(id)) {
+
+                        // yearly
+                        if (id.length === 4) {
+                            this.sortId = id + '0000';
+                            this.typeSortId = '08';
+                            this.typeName = 'Yearly';
+                            this.displayName = this.name;
+                            return;
+                        }
+
+                        // monthly
+                        if (id.length === 6) {
+                            this.sortId = id.slice(0, 4) + '00' + id.slice(4,6);
+                            this.typeSortId = '03';
+                            this.typeName = 'Monthly';
+                            this.displayName = this.name.split(' ')[0];
+                            return;
+                        }
+
+                        // daily
+                        if (id.length === 8) {
+                            this.sortId = id;
+                            this.typeSortId = '01';
+                            this.typeName = 'Daily';
+                            this.displayName = months[(new Date(this.name)).getMonth()] + ' ' + parseInt(this.name.split('-')[2]);
+                            return;
+                        }
+
+                    }
+
+                    // weekly
+                    if (id.indexOf('W') !== -1) {
+                        this.sortId = function() {
+                            var a = id.split('W');
+                            return a[0] + (a[1].length === 1 ? '000' : '00') + a[1];
+                        }();
+                        this.typeSortId = '02';
+                        this.typeName = 'Weekly';
+                        this.displayName = 'Week ' + id.split('W')[1];
+                        return;
+                    }
+
+                    // bi-monthly
+                    if (id.indexOf('B') !== -1) {
+                        this.sortId = id.slice(0, 4) + '00' + id.slice(4,6);
+                        this.typeSortId = '04';
+                        this.typeName = 'Bi-monthly';
+                        this.displayName = Ext.String.trim(this.name.split(this.year)[0]);
+                        return;
+                    }
+
+                    // quarterly
+                    if (id.indexOf('Q') !== -1) {
+                        this.sortId = function() {
+                            var a = id.split('Q');
+                            return a[0] + (a[1].length === 1 ? '000' : '00') + a[1];
+                        }();
+                        this.typeSortId = '05';
+                        this.typeName = 'Quarterly';
+                        this.displayName = Ext.String.trim(this.name.split(this.year)[0]);
+                        return;
+                    }
+
+                    // six-monthly
+                    if (id.indexOf('S') !== -1 && id.length === 6) {
+                        this.sortId = function() {
+                            var a = id.split('S');
+                            return a[0] + (a[1].length === 1 ? '000' : '00') + a[1];
+                        }();
+                        this.typeSortId = '06';
+                        this.typeName = 'Six-monthly';
+                        this.displayName = Ext.String.trim(this.name.split(this.year)[0]);
+                        return;
+                    }
+
+                    // six-monthly april
+                    if (id.indexOf('AprilS') !== -1) {
+                        this.sortId = function() {
+                            var a = id.split('AprilS');
+                            return a[0] + (a[1].length === 1 ? '000' : '00') + a[1];
+                        }();
+                        this.typeSortId = '08';
+                        this.typeName = 'Six-monthly April';
+                        this.displayName = Ext.String.trim(this.name.split(this.year)[0]);
+                        return;
+                    }
+
+                    // financial april
+                    if (id.indexOf('April') !== -1 && id.indexOf('S') === -1) {
+                        this.sortId = id.slice(0, 4) + '0001';
+                        this.typeSortId = '09';
+                        this.typeName = 'Financial April';
+                        this.displayName = this.name;
+                        return;
+                    }
+
+                    // financial july
+                    if (id.indexOf('July') !== -1) {
+                        this.sortId = id.slice(0, 4) + '0002';
+                        this.typeSortId = '10';
+                        this.typeName = 'Financial July';
+                        this.displayName = this.name;
+                        return;
+                    }
+
+                    // financial october
+                    if (id.indexOf('Oct') !== -1) {
+                        this.sortId = id.slice(0, 4) + '0003';
+                        this.typeSortId = '11';
+                        this.typeName = 'Financial October';
+                        this.displayName = this.name;
+                        return;
+                    }
+console.log(this.sortId);
+                };
+            })();
+
             // Table header
             (function() {
                 var H = api.data.TableHeader = function(config) {
@@ -968,14 +1113,14 @@ Ext.onReady( function() {
                     d.cls = config.cls;
 
                     d.sorting = {
-                        id: '',
-                        direction: ''
+                        id: 'pe',
+                        direction: 'ASC'
                     };
 
                     // transient
                     d.lastSorting = {
-                        id: '',
-                        direction: ''
+                        id: 'pe',
+                        direction: 'ASC'
                     };
 
                     d.html;
@@ -2833,8 +2978,16 @@ Ext.onReady( function() {
 
                             // pe headers
                             tableHeaders.push(new api.data.TableHeader({
-                                id: 'pe-group',
-                                name: 'Period group',
+                                id: 'pe-type',
+                                name: 'Period type',
+                                objectName: 'pe',
+                                cls: 'pivot-dim',
+                                index: index++
+                            }));
+
+                            tableHeaders.push(new api.data.TableHeader({
+                                id: 'pe-year',
+                                name: 'Year',
                                 objectName: 'pe',
                                 cls: 'pivot-dim',
                                 index: index++
@@ -2910,14 +3063,20 @@ Ext.onReady( function() {
 
                         (function() {
 
-                            for (var i = 0, row, idComb, dxId, peId, ouId, dataObject, ouLevel; i < idCombinations.length; i++) {
+                            for (var i = 0, row, idComb, dxId, peId, ouId, dataObject, period, ouLevel; i < idCombinations.length; i++) {
+                                row = {};
                                 idComb = idCombinations[i];
                                 dxId = response.getIdByIdComb(idComb, 'dx');
                                 peId = response.getIdByIdComb(idComb, 'pe');
                                 ouId = response.getIdByIdComb(idComb, 'ou');
                                 ouLevel = response.getLevelById(ouId);
                                 dataObject = idDataObjectMap[dxId];
-                                row = {};
+                                period = new api.data.Period({
+                                    id: peId,
+                                    name: response.getNameById(peId)
+                                });
+
+                                period.generateDisplayProperties();
 
                                 for (var j = 0, th, ouName = '', value; j < tableHeaders.length; j++) {
                                     th = tableHeaders[j];
@@ -2935,18 +3094,26 @@ Ext.onReady( function() {
 
                                     // pe
                                     else if (th.objectName === 'pe') {
-                                        if (th.id === 'pe-group') {
+                                        if (th.id === 'pe-type') {
                                             row[th.id] = new api.data.TableCell({
-                                                name: response.getPeGroupNameByPeId(peId),
-                                                sortId: peId,
+                                                name: period.typeName,
+                                                sortId: period.typeSortId + period.sortId,
+                                                cls: 'pivot-value'
+                                            });
+                                        }
+
+                                        if (th.id === 'pe-year') {
+                                            row[th.id] = new api.data.TableCell({
+                                                name: period.year,
+                                                sortId: period.sortId,
                                                 cls: 'pivot-value'
                                             });
                                         }
 
                                         else if (th.id === 'pe') {
                                             row[th.id] = new api.data.TableCell({
-                                                name: response.getNameById(peId),
-                                                sortId: peId,
+                                                name: period.displayName,
+                                                sortId: period.typeSortId + period.sortId,
                                                 cls: 'pivot-value'
                                             });
                                         }
@@ -3024,6 +3191,7 @@ Ext.onReady( function() {
                         });
 
                         data.addOptionsCls(layout);
+                        data.sortData();
 
                         if (fCallback) {
                             fCallback(data);
