@@ -1044,7 +1044,6 @@ Ext.onReady( function() {
                         this.displayName = this.name;
                         return;
                     }
-console.log(this.sortId);
                 };
             })();
 
