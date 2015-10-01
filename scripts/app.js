@@ -151,7 +151,7 @@ Ext.onReady( function() {
 			queryMode: 'local',
 			valueField: 'id',
 			editable: false,
-			value: 'NORMAL',
+			value: 'COMFORTABLE',
 			store: Ext.create('Ext.data.Store', {
 				fields: ['id', 'text'],
 				data: [
