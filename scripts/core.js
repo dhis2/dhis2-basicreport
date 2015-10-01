@@ -595,8 +595,8 @@ Ext.onReady( function() {
                     return this.nameHeaderMap[name].index;
                 };
 
-                R.prototype.getNameById = function(id) {
-                    return this.metaData.names[id];
+                R.prototype.getNameById = function(ouId) {
+                    return this.metaData.names[ouId];
                 };
 
                 R.prototype.getIdByIdComb = function(idComb, dataType) {
@@ -607,8 +607,8 @@ Ext.onReady( function() {
                     return this.getNameById(this.getIdByIdComb(idComb, dataType));
                 };
 
-                R.prototype.getLevelById = function(id) {
-                    return Ext.Array.clean((this.metaData.ouHierarchy[id] || '').split('/') || []).length + 1;
+                R.prototype.getLevelById = function(ouId) {
+                    return Ext.Array.clean((this.metaData.ouHierarchy[ouId] || '').split('/') || []).length + 1;
                 };
 
                 R.prototype.getMaxLevel = function() {
@@ -666,19 +666,26 @@ Ext.onReady( function() {
                     return this.getParentNameByIdAndLevel(ouId, level);
                 };
 
-                R.prototype.getParentGraphIdArray = function(id) {
-                    return Ext.Array.clean((this.metaData.ouHierarchy[id] || '').split('/') || []);
-                };
+                R.prototype.getParentGraphIdArray = function(ouId, level) {
+                    var ids = Ext.Array.clean((this.metaData.ouHierarchy[ouId] || '').split('/') || []);
 
-                R.prototype.getParentGraphNameArray = function(id) {
-                    var getAncestorIdArray = this.getAncestorIdArray(id),
-                        anchestorNameArray = [];
-
-                    for (var i = 0; i < getAncestorIdArray.length; i++) {
-                        anchestorNameArray[i] = this.getNameById(getAncestorIdArray[i]);
+                    if (Ext.isNumber(level) && level > 0) {
+                        ids = ids.slice(level - 1);
                     }
 
-                    return anchestorNameArray;
+                    return ids;
+                };
+
+                R.prototype.getParentGraphNameArray = function(ouId, level) {
+                    var parentGraphIdArray = this.getParentGraphIdArray(ouId),
+                        parentGraphNameArray = [],
+                        i = (Ext.isNumber(level) && level > 0) ? (level - 1) : 0;
+
+                    for (; i < parentGraphIdArray.length; i++) {
+                        parentGraphNameArray[i] = this.getNameById(parentGraphIdArray[i]);
+                    }
+
+                    return parentGraphNameArray;
                 };
 
                 R.prototype.getPeGroupNameByPeId = function(peId) {
@@ -774,19 +781,13 @@ Ext.onReady( function() {
                             'dataElement': dataElement
                         };
 
+                    // constructor
                     d.dataType = dataType;
-                    d.dataTypeDisplayName = map[dataType].name;
-                    d.dataTypeSortId = map[dataType].sortId;
-                    d.isIndicator = !!map[dataType].isIndicator;
-                    d.isDataElement = !!map[dataType].isDataElement;
-
                     d.id = config.id;
                     d.name = config.name;
                     d.displayName = config.displayName;
                     d.displayShortName = config.displayShortName;
                     d.groups = config.indicatorGroups || config.dataElementGroups || [];
-                    d.group = d.groups[0] || {};
-                    d.groupName = d.group.name || '';
 
                     d.numerator = config.numerator;
                     d.numeratorDescription = config.numeratorDescription;
@@ -796,10 +797,21 @@ Ext.onReady( function() {
                     d.annualized = config.annualized;
 
                     d.type = config.indicatorType ? config.indicatorType.name : (config.aggregationType ? config.aggregationType : '');
-                    d.typeName = d.type + (config.annualized ? ' (annualized)' : '');
 
                     d.legendSet = config.legendSet || null;
 
+                    // transient
+                    d.dataTypeDisplayName = map[dataType].name;
+                    d.dataTypeSortId = map[dataType].sortId;
+                    d.isIndicator = !!map[dataType].isIndicator;
+                    d.isDataElement = !!map[dataType].isDataElement;
+
+                    d.group = d.groups[0] || {};
+                    d.groupName = d.group.name || '';
+
+                    d.typeName = d.type + (config.annualized ? ' (annualized)' : '');
+
+                    d.defaultBgColor = '#fff';
                     d.defaultLegendSet = {
                         name: 'Default percentage legend set',
                         legends: [
@@ -810,9 +822,7 @@ Ext.onReady( function() {
                         ]
                     };
 
-                    d.defaultBgColor = '#fff';
-
-                    // transient
+                    // uninitialized
                     d.strippedNumerator;
                     d.strippedDenominator;
 
@@ -821,74 +831,81 @@ Ext.onReady( function() {
 
                     d.numeratorTotal;
                     d.denominatorTotal;
+
+                    // support
+                    d.stripFormula = function(formula) {
+                        return (formula || '').replace(/#/g, '').replace(/{/g, '').replace(/}/g, '').replace(/\(|\)/g, "");
+                    };
+
+                    d.getIdsFromFormula = function(formula) {
+                        var s = (formula || '').replace(/#/g, '').replace(/\(|\)/g, ""),
+                            a1 = s.split('{'),
+                            a2 = [],
+                            ids = [],
+                            regexp = /^[a-z0-9]+$/i;
+
+                        for (var i = 0, item; i < a1.length; i++) {
+                            item = a1[i];
+
+                            a2 = a2.concat(item.split('}'));
+                        }
+
+                        for (var j = 0, item; j < a2.length; j++) {
+                            item = a2[j];
+
+                            if ((item.length === 11 && regexp.test(item)) || (item.length === 23 && item.indexOf('.') !== -1 && regexp.test(item.replace('.', '')))) {
+                                ids.push(item);
+                            }
+                        }
+
+                        return ids;
+                    }
                 };
 
-                D.prototype.stripFormula = function(formula) {
-                    return (formula || '').replace(/#/g, '').replace(/{/g, '').replace(/}/g, '').replace(/\(|\)/g, "");
-                };
+                // base
 
-                D.prototype.generateStrippedNumerator = function() {
+                D.prototype.getStrippedNumerator = function() {
+                    if (this.strippedNumerator) {
+                        return this.strippedNumerator;
+                    }
+
                     return this.strippedNumerator = this.stripFormula(this.numerator);
                 };
 
-                D.prototype.generateStrippedDenominator = function() {
+                D.prototype.getStrippedDenominator = function() {
+                    if (this.strippedDenominator) {
+                        return this.strippedDenominator;
+                    }
+
                     return this.strippedDenominator = this.stripFormula(this.denominator);
                 };
 
-                D.prototype.getIdsFromFormula = function(formula) {
-                    var s = (formula || '').replace(/#/g, '').replace(/\(|\)/g, ""),
-                        a1 = s.split('{'),
-                        a2 = [],
-                        ids = [],
-                        regexp = /^[a-z0-9]+$/i;
-
-                    for (var i = 0, item; i < a1.length; i++) {
-                        item = a1[i];
-
-                        a2 = a2.concat(item.split('}'));
+                D.prototype.getNumeratorIds = function() {
+                    if (this.numeratorIds) {
+                        return this.numeratorIds;
                     }
 
-                    for (var j = 0, item; j < a2.length; j++) {
-                        item = a2[j];
-
-                        if ((item.length === 11 && regexp.test(item)) || (item.length === 23 && item.indexOf('.') !== -1 && regexp.test(item.replace('.', '')))) {
-                            ids.push(item);
-                        }
-                    }
-
-                    return ids;
-                };
-
-                D.prototype.generateNumeratorIds = function() {
                     return this.numeratorIds = this.getIdsFromFormula(this.numerator);
                 };
 
-                D.prototype.generateDenominatorIds = function() {
+                D.prototype.getDenominatorIds = function() {
+                    if (this.denominatorIds) {
+                        return this.denominatorIds;
+                    }
+
                     return this.denominatorIds = this.getIdsFromFormula(this.denominator);
                 };
 
-                D.prototype.getBgColorByValue = function(value) {
-                    var set = this.legendSet || (this.isIndicator ? this.defaultLegendSet : null);
-
-                    if (!set) {
-                        return this.defaultBgColor;
-                    }
-
-                    for (var i = 0, legend; i < set.legends.length; i++) {
-                        legend = set.legends[i];
-
-                        if (value > legend.startValue && value <= legend.endValue) {
-                            return legend.color;
-                        }
-                    }
-
-                    return this.defaultBgColor;
-                };
+                // dynamic base
 
                 D.prototype.getNumeratorTotal = function(response, idComb) {
+                    if (this.numeratorTotal) {
+                        return this.numeratorTotal;
+                    }
+
                     if (this.isIndicator) {
-                        var numeratorIds = this.generateNumeratorIds(),
-                            strippedNumerator = Ext.clone(this.generateStrippedNumerator()),
+                        var numeratorIds = this.getNumeratorIds(),
+                            strippedNumerator = Ext.clone(this.getStrippedNumerator()),
                             value;
 
                         for (var k = 0, id, value; k < numeratorIds.length; k++) {
@@ -909,9 +926,13 @@ Ext.onReady( function() {
                 };
 
                 D.prototype.getDenominatorTotal = function(response, idComb) {
+                    if (this.denominatorTotal) {
+                        return this.denominatorTotal;
+                    }
+
                     if (this.isIndicator) {
-                        var denominatorIds = this.generateDenominatorIds(),
-                            strippedDenominator = Ext.clone(this.generateStrippedDenominator()),
+                        var denominatorIds = this.getDenominatorIds(),
+                            strippedDenominator = Ext.clone(this.getStrippedDenominator()),
                             value;
 
                         for (var k = 0, id, value; k < denominatorIds.length; k++) {
@@ -931,7 +952,27 @@ Ext.onReady( function() {
                     }
                 };
 
-                D.prototype.doHide = function(options) {
+                // dynamic
+
+                D.prototype.getBgColorByValue = function(value) {
+                    var set = this.legendSet || (this.isIndicator ? this.defaultLegendSet : null);
+
+                    if (!set) {
+                        return this.defaultBgColor;
+                    }
+
+                    for (var i = 0, legend; i < set.legends.length; i++) {
+                        legend = set.legends[i];
+
+                        if (value > legend.startValue && value <= legend.endValue) {
+                            return legend.color;
+                        }
+                    }
+
+                    return this.defaultBgColor;
+                };
+
+                D.prototype.isHideRow = function(options) {
                     if (options.hideEmptyRows) {
                         if (this.isIndicator && !this.numeratorTotal && !this.denominatorTotal) {
                             return true;
@@ -1088,6 +1129,84 @@ Ext.onReady( function() {
                 };
             })();
 
+            // Organisation unit
+            (function() {
+                var O = api.data.OrganisationUnit = function(config) {
+                    var o = this;
+
+                    // constructor
+                    o.id = config.id;
+                    o.name = config.name;
+                    o.level = config.level;
+                    o.metaData = config.metaData;
+
+                    // transient
+                    o.parentGraph = o.metaData[o.id];
+
+                    // uninitialized
+                    o.parentIdArray;
+
+                    o.parentNameArray;
+
+                    // support
+                    o.getValidLevel = function(level) {
+                        return (Ext.isNumber(level) && level > 0) ? level : 1;
+                    };
+                };
+
+                // base
+
+                O.prototype.getParentIdArray = function() {
+                    if (this.parentIdArray) {
+                        return this.parentIdArray;
+                    }
+
+                    return this.parentIdArray = Ext.Array.clean(parentGraph.split('/'));
+                };
+
+                O.prototype.getParentNameArray = function() {
+                    if (this.parentNameArray) {
+                        return this.parentNameArray;
+                    }
+
+                    return this.parentNameArray = Ext.Array.clean((this.metaData.ouNameHierarchy[this.name] || '').split('/'));
+                };
+
+                // dynamic
+
+                O.prototype.getParentIdByLevel = function(level) {
+                    var parentIdArray = this.getParentIdArray(),
+                        i = this.getValidLevel(level) - 1;
+
+                    return parentIdArray[i];
+                };
+
+                O.prototype.getParentIdArrayByLevel = function(level) {
+                    var parentIdArray = this.getParentIdArray(),
+                        i = this.getValidLevel(level) - 1;
+
+                    return parentIdArray.slice(i);
+                };
+
+                O.prototype.getParentNameByLevel = function(level) {
+                    var parentNameArray = this.getParentNameArray(),
+                        i = this.getValidLevel(level) - 1;
+
+                    return parentNameArray[i];
+                };
+
+                O.prototype.getParentNameArrayByLevel = function(level) {
+                    var parentNameArray = this.getParentNameArray(),
+                        i = this.getValidLevel(level) - 1;
+
+                    return parentNameArray.slice(i);
+                };
+
+                O.prototype.getSortIdByLevel = function(level) {
+                    return this.getParentNameArrayByLevel(level).join('');
+                };
+            })();
+
             // Table header
             (function() {
                 var H = api.data.TableHeader = function(config) {
@@ -1180,7 +1299,7 @@ Ext.onReady( function() {
                     var sorting = this.sorting;
 
                     this.tableRows.sort( function(a, b) {
-
+console.log(a[sorting.id]['sortId']);
                         a = a[sorting.id]['sortId'];
                         b = b[sorting.id]['sortId'];
 
@@ -3109,36 +3228,52 @@ Ext.onReady( function() {
 
                         (function() {
 
-                            for (var i = 0, row, idComb, dxId, peId, ouId, dataObject, period, ouLevel, numeratorTotal, denominatorTotal, value; i < idCombinations.length; i++) {
+                            for (var i = 0, idComb, dxId, peId, ouId, row, dataObject, numeratorTotal, denominatorTotal, period, orgUnit, value; i < idCombinations.length; i++) {
                                 idComb = idCombinations[i];
                                 dxId = response.getIdByIdComb(idComb, 'dx');
                                 peId = response.getIdByIdComb(idComb, 'pe');
                                 ouId = response.getIdByIdComb(idComb, 'ou');
+                                row = {};
+
+                                // data object
                                 dataObject = idDataObjectMap[dxId];
                                 numeratorTotal = dataObject.getNumeratorTotal(response, idComb);
                                 denominatorTotal = dataObject.getDenominatorTotal(response, idComb);
 
-                                // hide empty rows
-                                if (dataObject.doHide(layout)) {
+                                if (dataObject.isHideRow(layout)) {
                                     continue;
                                 }
 
-                                ouLevel = response.getLevelById(ouId);
-                                period = new api.data.Period({id: peId, name: response.getNameById(peId)});
+                                // period
+                                period = new api.data.Period({
+                                    id: peId,
+                                    name: response.getNameById(peId)
+                                });
+
                                 period.generateDisplayProperties();
+
+                                // organisation unit
+                                orgUnit = new api.data.OrganisationUnit({
+                                    id: ouId,
+                                    name: response.getNameById(ouId),
+                                    level: response.getLevelById(ouId),
+                                    metaData: response.metaData
+                                });
+
+                                // value
                                 value = response.getValueByIdComb(idComb);
-                                row = {};
 
-                                for (var j = 0, th, ouName = ''; j < tableHeaders.length; j++) {
+                                // create rows
+                                for (var j = 0, th, ouName, ouSortId; j < tableHeaders.length; j++) {
                                     th = tableHeaders[j];
-
+                                    ouName = orgUnit.getParentNameByLevel(th.level);
+                                    ouSortId = orgUnit.getSortIdByLevel(th.level);
+console.log(ouName, ouSortId);
                                     // ou
                                     if (th.objectName === 'ou') {
-                                        ouName = response.getParentNameByIdAndLevel(ouId, th) || (ouLevel === th.level ? response.getNameById(ouId) : '');
-
                                         row[th.id] = new api.data.TableCell({
                                             name: ouName,
-                                            sortId: ouName,
+                                            sortId: ouSortId,
                                             cls: 'pivot-value'
                                         });
                                     }
