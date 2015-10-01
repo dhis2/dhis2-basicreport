@@ -380,6 +380,8 @@ Ext.onReady( function() {
 
                 // showHierarchy: boolean (false)
 
+                // hideEmptyRows: boolean (false)
+
 				// displayDensity: string ('NORMAL') - 'COMPACT', 'NORMAL', 'COMFORTABLE'
 
 				// fontSize: string ('NORMAL') - 'SMALL', 'NORMAL', 'LARGE'
@@ -508,6 +510,7 @@ Ext.onReady( function() {
                     layout.rows = config.rows;
 
 					layout.showDataDescription = Ext.isBoolean(config.showDataDescription) ? config.showDataDescription : false;
+					layout.hideEmptyRows = Ext.isBoolean(config.hideEmptyRows) ? config.hideEmptyRows : false;
 
 					layout.showHierarchy = Ext.isBoolean(config.showHierarchy) ? config.showHierarchy : false;
 
@@ -754,12 +757,28 @@ Ext.onReady( function() {
             (function() {
                 var D = api.data.DataObject = function(config, dataType) {
                     var d = this,
-                        indicator = 'indicator',
-                        dataElement = 'dataElement';
+                        indicator = {
+                            id: 'indicator',
+                            name: NS.i18n.indicator,
+                            sortId: 1,
+                            isIndicator: true
+                        },
+                        dataElement = {
+                            id: 'dataElement',
+                            name: NS.i18n.data_element,
+                            sortId: 2,
+                            isDataElement: true
+                        },
+                        map = {
+                            'indicator': indicator,
+                            'dataElement': dataElement
+                        };
 
                     d.dataType = dataType;
-                    d.isIndicator = d.dataType === indicator;
-                    d.isDataElement = d.dataType === dataElement;
+                    d.dataTypeDisplayName = map[dataType].name;
+                    d.dataTypeSortId = map[dataType].sortId;
+                    d.isIndicator = !!map[dataType].isIndicator;
+                    d.isDataElement = !!map[dataType].isDataElement;
 
                     d.id = config.id;
                     d.name = config.name;
@@ -869,7 +888,8 @@ Ext.onReady( function() {
                 D.prototype.getNumeratorTotal = function(response, idComb) {
                     if (this.isIndicator) {
                         var numeratorIds = this.generateNumeratorIds(),
-                            strippedNumerator = Ext.clone(this.generateStrippedNumerator());
+                            strippedNumerator = Ext.clone(this.generateStrippedNumerator()),
+                            value;
 
                         for (var k = 0, id, value; k < numeratorIds.length; k++) {
                             id = numeratorIds[k];
@@ -878,7 +898,10 @@ Ext.onReady( function() {
                             strippedNumerator = strippedNumerator.replace(id, value);
                         }
 
-                        return this.numeratorTotal = eval(strippedNumerator);
+                        value = eval(strippedNumerator);
+                        value = Ext.isNumeric(value) ? value : undefined;
+
+                        return this.numeratorTotal = value;
                     }
                     else if (this.isDataElement) {
                         return this.numeratorTotal = response.getValueByIdComb(idComb);
@@ -888,7 +911,8 @@ Ext.onReady( function() {
                 D.prototype.getDenominatorTotal = function(response, idComb) {
                     if (this.isIndicator) {
                         var denominatorIds = this.generateDenominatorIds(),
-                            strippedDenominator = Ext.clone(this.generateStrippedDenominator());
+                            strippedDenominator = Ext.clone(this.generateStrippedDenominator()),
+                            value;
 
                         for (var k = 0, id, value; k < denominatorIds.length; k++) {
                             id = denominatorIds[k];
@@ -897,12 +921,29 @@ Ext.onReady( function() {
                             strippedDenominator = strippedDenominator.replace(id, value);
                         }
 
-                        return this.denominatorTotal = eval(strippedDenominator);
+                        value = eval(strippedDenominator);
+                        value = Ext.isNumeric(value) ? value : undefined;
+
+                        return this.denominatorTotal = value;
                     }
                     else if (this.isDataElement) {
                         return this.denominatorTotal = 1;
                     }
                 };
+
+                D.prototype.doHide = function(options) {
+                    if (options.hideEmptyRows) {
+                        if (this.isIndicator && !this.numeratorTotal && !this.denominatorTotal) {
+                            return true;
+                        }
+
+                        if (this.isDataElement && !this.numeratorTotal) {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                }
             })();
 
             // Period
@@ -3014,6 +3055,15 @@ Ext.onReady( function() {
                                 index: index++
                             }));
 
+                            if (layout.showDataDescription) {
+                                tableHeaders.push(new api.data.TableHeader({
+                                    id: 'dx-datatype',
+                                    name: 'Data type',
+                                    objectName: 'dx',
+                                    cls: 'pivot-dim'
+                                }));
+                            }
+
                             tableHeaders.push(new api.data.TableHeader({
                                 id: 'dx-type',
                                 name: 'Type',
@@ -3059,22 +3109,27 @@ Ext.onReady( function() {
 
                         (function() {
 
-                            for (var i = 0, row, idComb, dxId, peId, ouId, dataObject, period, ouLevel; i < idCombinations.length; i++) {
-                                row = {};
+                            for (var i = 0, row, idComb, dxId, peId, ouId, dataObject, period, ouLevel, numeratorTotal, denominatorTotal, value; i < idCombinations.length; i++) {
                                 idComb = idCombinations[i];
                                 dxId = response.getIdByIdComb(idComb, 'dx');
                                 peId = response.getIdByIdComb(idComb, 'pe');
                                 ouId = response.getIdByIdComb(idComb, 'ou');
-                                ouLevel = response.getLevelById(ouId);
                                 dataObject = idDataObjectMap[dxId];
-                                period = new api.data.Period({
-                                    id: peId,
-                                    name: response.getNameById(peId)
-                                });
+                                numeratorTotal = dataObject.getNumeratorTotal(response, idComb);
+                                denominatorTotal = dataObject.getDenominatorTotal(response, idComb);
 
+                                // hide empty rows
+                                if (dataObject.doHide(layout)) {
+                                    continue;
+                                }
+
+                                ouLevel = response.getLevelById(ouId);
+                                period = new api.data.Period({id: peId, name: response.getNameById(peId)});
                                 period.generateDisplayProperties();
+                                value = response.getValueByIdComb(idComb);
+                                row = {};
 
-                                for (var j = 0, th, ouName = '', value; j < tableHeaders.length; j++) {
+                                for (var j = 0, th, ouName = ''; j < tableHeaders.length; j++) {
                                     th = tableHeaders[j];
 
                                     // ou
@@ -3101,7 +3156,7 @@ Ext.onReady( function() {
                                         if (th.id === 'pe-year') {
                                             row[th.id] = new api.data.TableCell({
                                                 name: period.year,
-                                                sortId: period.sortId + dataObject.groupName + dataObject.name,
+                                                sortId: period.year + period.typeSortId + period.sortId + dataObject.groupName + dataObject.name,
                                                 cls: 'pivot-value'
                                             });
                                         }
@@ -3132,10 +3187,17 @@ Ext.onReady( function() {
                                                 cls: 'pivot-value'
                                             });
                                         }
+                                        else if (th.id === 'dx-datatype') {
+                                            row[th.id] = new api.data.TableCell({
+                                                name: dataObject.dataTypeDisplayName,
+                                                sortId: dataObject.dataTypeSortId,
+                                                cls: 'pivot-value'
+                                            });
+                                        }
                                         else if (th.id === 'dx-type') {
                                             row[th.id] = new api.data.TableCell({
                                                 name: dataObject.typeName,
-                                                sortId: dataObject.typeName,
+                                                sortId: dataObject.typeName + dataObject.groupName + dataObject.name + period.typeSortId + period.sortId,
                                                 cls: 'pivot-value' + (dataObject.type.length === 1 ? ' td-nobreak' : '')
                                             });
                                         }
@@ -3147,8 +3209,6 @@ Ext.onReady( function() {
                                             });
                                         }
                                         else if (th.id === 'dx-numerator') {
-                                            var numeratorTotal = dataObject.getNumeratorTotal(response, idComb);
-
                                             row[th.id] = new api.data.TableCell({
                                                 name: numeratorTotal || '',
                                                 sortId: numeratorTotal || 0,
@@ -3156,17 +3216,13 @@ Ext.onReady( function() {
                                             });
                                         }
                                         else if (th.id === 'dx-denominator') {
-                                            var denominatorTotal = dataObject.getDenominatorTotal(response, idComb);
-
                                             row[th.id] = new api.data.TableCell({
                                                 name: denominatorTotal || '',
                                                 sortId: denominatorTotal || 0,
-                                                cls: 'pivot-value'
+                                                cls: 'pivot-value' + (dataObject.isDataElement ? ' dataelementdenom' : '')
                                             });
                                         }
                                         else if (th.id === 'dx-value') {
-                                            value = response.getValueByIdComb(idComb);
-
                                             row[th.id] = new api.data.TableCell({
                                                 name: value || '',
                                                 sortId: parseFloat(value) || 0,

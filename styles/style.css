@@ -166,6 +166,10 @@ body,
 	color: #303038;
 }
 
+.dataelementdenom {
+    color: #888;
+}
+
 .align-left {
 	text-align: left !important;
 }

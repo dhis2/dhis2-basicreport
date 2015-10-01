@@ -108,6 +108,7 @@ Ext.onReady( function() {
 	// constructors
 	OptionsWindow = function() {
 		var showDataDescription,
+            hideEmptyRows,
             showHierarchy,
             displayDensity,
 			fontSize,
@@ -126,6 +127,11 @@ Ext.onReady( function() {
 
 		showDataDescription = Ext.create('Ext.form.field.Checkbox', {
 			boxLabel: NS.i18n.show_descriptions,
+			style: 'margin-bottom:' + checkboxBottomMargin + 'px'
+		});
+
+		hideEmptyRows = Ext.create('Ext.form.field.Checkbox', {
+			boxLabel: NS.i18n.hide_empty_rows,
 			style: 'margin-bottom:' + checkboxBottomMargin + 'px'
 		});
 
@@ -216,7 +222,8 @@ Ext.onReady( function() {
 			bodyStyle: 'border:0 none',
 			style: 'margin-left:14px',
 			items: [
-				showDataDescription
+				showDataDescription,
+                hideEmptyRows
 			]
 		};
 
@@ -250,6 +257,7 @@ Ext.onReady( function() {
 			getOptions: function() {
 				return {
                     showDataDescription: showDataDescription.getValue(),
+                    hideEmptyRows: hideEmptyRows.getValue(),
 					showHierarchy: showHierarchy.getValue(),
 					displayDensity: displayDensity.getValue(),
 					fontSize: fontSize.getValue(),
@@ -259,6 +267,7 @@ Ext.onReady( function() {
 			},
 			setOptions: function(layout) {
                 showDataDescription.setValue(Ext.isBoolean(layout.showDataDescription) ? layout.showDataDescription : false);
+                hideEmptyRows.setValue(Ext.isBoolean(layout.hideEmptyRows) ? layout.hideEmptyRows : false);
                 showHierarchy.setValue(Ext.isBoolean(layout.showHierarchy) ? layout.showHierarchy : false);
                 displayDensity.setValue(Ext.isString(layout.displayDensity) ? layout.displayDensity : 'NORMAL');
 				fontSize.setValue(Ext.isString(layout.fontSize) ? layout.fontSize : 'NORMAL');
@@ -331,6 +340,7 @@ Ext.onReady( function() {
 
 					// cmp
                     w.showDataDescription = showDataDescription;
+                    w.hideEmptyRows = hideEmptyRows;
 					w.showHierarchy = showHierarchy;
 					w.displayDensity = displayDensity;
 					w.fontSize = fontSize;
