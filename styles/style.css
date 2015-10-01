@@ -61,8 +61,9 @@ body,
 
 #init {
     display: table;
-    margin: 200px auto;
-    font-size: 15px;
+    margin: 300px auto;
+    font-size: 13px;
+    color: #444;
 }
 
 	/* Scrollbar Webkit */
@@ -166,6 +167,10 @@ body,
 	color: #303038;
 }
 
+.text-medium {
+    font-weight: 600;
+}
+
 .dataelementdenom {
     color: #888;
 }
@@ -175,6 +180,44 @@ body,
 }
 .align-right {
 	text-align: right !important;
+}
+
+
+/*----------------------------------------------------------------------------
+ * Spinner
+ *--------------------------------------------------------------------------*/
+
+.spinner {
+    width: 30px;
+    height: 30px;
+    margin: 50px auto;
+    background-color: #aaa;
+
+    border-radius: 100%;
+    -webkit-animation: sk-scaleout 0.8s infinite ease-in-out;
+    animation: sk-scaleout 0.8s infinite ease-in-out;
+}
+
+@-webkit-keyframes sk-scaleout {
+    0% {
+        -webkit-transform: scale(0)
+    }
+    100% {
+        -webkit-transform: scale(1.0);
+        opacity: 0;
+    }
+}
+
+@keyframes sk-scaleout {
+    0% {
+        -webkit-transform: scale(0);
+        transform: scale(0);
+    }
+    100% {
+        -webkit-transform: scale(1.0);
+        transform: scale(1.0);
+        opacity: 0;
+    }
 }
 
 /*----------------------------------------------------------------------------
