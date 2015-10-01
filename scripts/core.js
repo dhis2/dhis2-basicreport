@@ -1299,7 +1299,6 @@ Ext.onReady( function() {
                     var sorting = this.sorting;
 
                     this.tableRows.sort( function(a, b) {
-console.log(a[sorting.id]['sortId']);
                         a = a[sorting.id]['sortId'];
                         b = b[sorting.id]['sortId'];
 
@@ -3264,16 +3263,14 @@ console.log(a[sorting.id]['sortId']);
                                 value = response.getValueByIdComb(idComb);
 
                                 // create rows
-                                for (var j = 0, th, ouName, ouSortId; j < tableHeaders.length; j++) {
+                                for (var j = 0, th; j < tableHeaders.length; j++) {
                                     th = tableHeaders[j];
-                                    ouName = orgUnit.getParentNameByLevel(th.level);
-                                    ouSortId = orgUnit.getSortIdByLevel(th.level);
-console.log(ouName, ouSortId);
+
                                     // ou
                                     if (th.objectName === 'ou') {
                                         row[th.id] = new api.data.TableCell({
-                                            name: ouName,
-                                            sortId: ouSortId,
+                                            name: orgUnit.getParentNameByLevel(th.level),
+                                            sortId: orgUnit.getSortIdByLevel(th.level),
                                             cls: 'pivot-value'
                                         });
                                     }
