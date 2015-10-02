@@ -3854,10 +3854,6 @@ Ext.onReady( function() {
 					html += '<div>- ' + NS.i18n.example2 + '</div>';
 					html += '<div>- ' + NS.i18n.example3 + '</div>';
 					html += '<div>- ' + NS.i18n.example4 + '</div>';
-					html += '<h3 style="padding-top:20px">' + NS.i18n.example5 + '</h3>';
-					html += '<div>- ' + NS.i18n.example6 + '</div>';
-					html += '<div>- ' + NS.i18n.example7 + '</div>';
-					html += '<div>- ' + NS.i18n.example8 + '</div>';
 					html += '</div>';
 
 					p.update(html);
@@ -4369,16 +4365,6 @@ Ext.onReady( function() {
                                                     }
                                                 });
 
-                                                // authorization
-                                                requests.push({
-                                                    url: init.contextPath + '/api/me/authorization/F_VIEW_UNAPPROVED_DATA',
-                                                    success: function(r) {
-                                                        init.user = init.user || {};
-                                                        init.user.viewUnapprovedData = (r.responseText === 'true');
-                                                        fn();
-                                                    }
-                                                });
-
                                                 // root nodes
                                                 requests.push({
                                                     url: contextPath + '/api/organisationUnits.json?userDataViewFallback=true&paging=false&fields=id,' + namePropertyUrl + ',children[id,' + namePropertyUrl + ']',
@@ -4438,24 +4424,6 @@ Ext.onReady( function() {
                                                     url: contextPath + '/api/legendSets.json?fields=id,name,legends[id,name,startValue,endValue,color]&paging=false',
                                                     success: function(r) {
                                                         init.legendSets = Ext.decode(r.responseText).legendSets || [];
-                                                        fn();
-                                                    }
-                                                });
-
-                                                // dimensions
-                                                //requests.push({
-                                                    //url: contextPath + '/api/dimensions.json?fields=id,name&paging=false',
-                                                    //success: function(r) {
-                                                        //init.dimensions = Ext.decode(r.responseText).dimensions || [];
-                                                        //fn();
-                                                    //}
-                                                //});
-
-                                                // approval levels
-                                                requests.push({
-                                                    url: contextPath + '/api/dataApprovalLevels.json?fields=id,name&paging=false&order=level:asc',
-                                                    success: function(r) {
-                                                        init.dataApprovalLevels = Ext.decode(r.responseText).dataApprovalLevels || [];
                                                         fn();
                                                     }
                                                 });

@@ -1,21 +1,20 @@
 {
     "version": "0.1",
-    "name": "DHIS2 Basic Report",
-    "description": "DHIS2 Basic Report",
+    "name": "Basic Report",
+    "description": "Basic Report",
     "launch_path": "/index.html",
     "icons": {
-        "16": "/img/icons/mortar-16.png",
-        "48": "/img/icons/mortar-48.png",
-        "128": "/img/icons/mortar-128.png"
+        "48": "/images/icons/br-48.png",
+        "128": "/images/icons/br-128.png"
     },
     "developer": {
         "name": "Greg Rowles / Jan Henrik Øverland",
-        "url": "https://launchpad.net/~janhenrik-overland"
+        "url": "https://launchpad.net/~greg-rowles / https://launchpad.net/~janhenrik-overland"
     },
     "default_locale": "en",
     "activities": {
         "dhis": {
-            "href": "http://localhost:8080"
+            "href": "*"
         }
     }
 }
