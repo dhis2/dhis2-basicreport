@@ -3338,21 +3338,21 @@ Ext.onReady( function() {
                                             row[th.id] = new api.data.TableCell({
                                                 name: numeratorTotal || '',
                                                 sortId: numeratorTotal || 0,
-                                                cls: 'pivot-value'
+                                                cls: 'pivot-value align-right'
                                             });
                                         }
                                         else if (th.id === 'dx-denominator') {
                                             row[th.id] = new api.data.TableCell({
                                                 name: denominatorTotal || '',
                                                 sortId: denominatorTotal || 0,
-                                                cls: 'pivot-value' + (dataObject.isDataElement ? ' dataelementdenom' : '')
+                                                cls: 'pivot-value align-right' + (dataObject.isDataElement ? ' dataelementdenom' : '')
                                             });
                                         }
                                         else if (th.id === 'dx-value') {
                                             row[th.id] = new api.data.TableCell({
                                                 name: value || '',
                                                 sortId: parseFloat(value) || 0,
-                                                cls: 'pivot-value',
+                                                cls: 'pivot-value align-right',
                                                 style: 'background-color:' + dataObject.getBgColorByValue(parseFloat(value))
                                             });
                                         }
