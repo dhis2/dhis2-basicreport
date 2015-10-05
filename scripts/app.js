@@ -4207,6 +4207,7 @@ Ext.onReady( function() {
             cors,
             ajax,
             updateInitDiv,
+            pathCommons,
             fn;
 
 		fn = function() {
@@ -4245,16 +4246,28 @@ Ext.onReady( function() {
             Ext.Ajax.request(requestConfig);
         };
 
-		// requests
+		// manifest
         Ext.Ajax.request({
-            url: 'conf/cors.conf',
-            callback: function(options, success, r) {
-                cors = success ? Ext.decode(r.responseText) : {};
+            url: 'manifest.webapp',
+            success: function(r) {
+                init.contextPath = Ext.decode(r.responseText).activities.dhis.href;
+                pathCommons = init.contextPath + '/dhis-web-commons/javascripts';
 
+                // cors
                 Ext.Ajax.request({
-                    url: 'manifest.webapp',
-                    success: function(r) {
-                        init.contextPath = Ext.decode(r.responseText).activities.dhis.href;
+                    url: 'conf/cors.conf',
+                    callback: function(options, success, r) {
+                        cors = success ? Ext.decode(r.responseText) : {};
+
+                        // files
+                        Ext.Loader.injectScriptElement(pathCommons + '/ext-ux/layout/component/form/MultiSelect.js', function() {
+                        Ext.Loader.injectScriptElement(pathCommons + '/ext-ux/form/MultiSelect.js', function() {
+                        Ext.Loader.injectScriptElement(pathCommons + '/jQuery/jquery.min.js', function() {
+                        Ext.Loader.injectScriptElement(pathCommons + '/jQuery/calendars/jquery.calendars.min.js', function() {
+                        Ext.Loader.injectScriptElement(pathCommons + '/jQuery/calendars/jquery.calendars.plus.min.js', function() {
+                        Ext.Loader.injectScriptElement(pathCommons + '/jQuery/calendars/jquery.calendars.picker.min.js', function() {
+                        Ext.Loader.injectScriptElement(pathCommons + '/dhis2/dhis2.util.js', function() {
+                        Ext.Loader.injectScriptElement(pathCommons + '/date.js', function() {
 
                         // system info
                         ajax({
@@ -4436,6 +4449,15 @@ Ext.onReady( function() {
                                     }
                                 });
                             }
+                        });
+
+                        });
+                        });
+                        });
+                        });
+                        });
+                        });
+                        });
                         });
                     }
                 });
