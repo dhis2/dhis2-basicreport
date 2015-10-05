@@ -1257,18 +1257,26 @@ Ext.onReady( function() {
 
 		indicatorGroupStore = Ext.create('Ext.data.Store', {
 			fields: ['id', 'name', 'index'],
-			proxy: {
-				type: 'ajax',
-				url: ns.core.init.contextPath + '/api/indicatorGroups.json?fields=id,name&paging=false',
-                headers: {'Authorization': 'Basic ' + ns.ajax(null, null, true)},
-				reader: {
-					type: 'json',
-					root: 'indicatorGroups'
-				},
-				pageParam: false,
-				startParam: false,
-				limitParam: false
-			},
+			proxy: function() {
+                var auth = ns.ajax(null, null, true),
+                    proxy = {
+                        type: 'ajax',
+                        url: ns.core.init.contextPath + '/api/indicatorGroups.json?fields=id,name&paging=false',
+                        reader: {
+                            type: 'json',
+                            root: 'indicatorGroups'
+                        },
+                        pageParam: false,
+                        startParam: false,
+                        limitParam: false
+                    };
+
+                if (auth) {
+                    proxy.headers = {'Authorization': 'Basic ' + auth};
+                }
+
+                return proxy;
+            }(),
 			listeners: {
 				load: function(s) {
 					s.add({
@@ -1472,18 +1480,26 @@ Ext.onReady( function() {
 
 		dataElementGroupStore = Ext.create('Ext.data.Store', {
 			fields: ['id', 'name', 'index'],
-			proxy: {
-				type: 'ajax',
-				url: ns.core.init.contextPath + '/api/dataElementGroups.json?fields=id,' + ns.core.init.namePropertyUrl + '&paging=false',
-                headers: {'Authorization': 'Basic ' + ns.ajax(null, null, true)},
-				reader: {
-					type: 'json',
-					root: 'dataElementGroups'
-				},
-				pageParam: false,
-				startParam: false,
-				limitParam: false
-			},
+			proxy: function() {
+                var auth = ns.ajax(null, null, true),
+                    proxy = {
+                        type: 'ajax',
+                        url: ns.core.init.contextPath + '/api/dataElementGroups.json?fields=id,' + ns.core.init.namePropertyUrl + '&paging=false',
+                        reader: {
+                            type: 'json',
+                            root: 'dataElementGroups'
+                        },
+                        pageParam: false,
+                        startParam: false,
+                        limitParam: false
+                    };
+
+                if (auth) {
+                    proxy.headers = {'Authorization': 'Basic ' + auth};
+                }
+
+                return proxy;
+            }(),
 			listeners: {
 				load: function(s) {
                     s.add({
@@ -1741,18 +1757,26 @@ Ext.onReady( function() {
 
 		organisationUnitGroupStore = Ext.create('Ext.data.Store', {
 			fields: ['id', 'name'],
-			proxy: {
-				type: 'ajax',
-				url: ns.core.init.contextPath + '/api/organisationUnitGroups.json?fields=id,' + ns.core.init.namePropertyUrl + '&paging=false',
-                headers: {'Authorization': 'Basic ' + ns.ajax(null, null, true)},
-				reader: {
-					type: 'json',
-					root: 'organisationUnitGroups'
-				},
-				pageParam: false,
-				startParam: false,
-				limitParam: false
-			}
+			proxy: function() {
+                var auth = ns.ajax(null, null, true),
+                    proxy = {
+                        type: 'ajax',
+                        url: ns.core.init.contextPath + '/api/organisationUnitGroups.json?fields=id,' + ns.core.init.namePropertyUrl + '&paging=false',
+                        reader: {
+                            type: 'json',
+                            root: 'organisationUnitGroups'
+                        },
+                        pageParam: false,
+                        startParam: false,
+                        limitParam: false
+                    };
+
+                if (auth) {
+                    proxy.headers = {'Authorization': 'Basic ' + auth};
+                }
+
+                return proxy;
+            }()
 		});
 		ns.app.stores.organisationUnitGroup = organisationUnitGroupStore;
 
@@ -3251,21 +3275,30 @@ Ext.onReady( function() {
 			},
 			store: Ext.create('Ext.data.TreeStore', {
 				fields: ['id', 'name', 'hasChildren'],
-				proxy: {
-					type: 'rest',
-					format: 'json',
-					noCache: false,
-					extraParams: {
-						fields: 'children[id,' + ns.core.init.namePropertyUrl + ',children::isNotEmpty|rename(hasChildren)&paging=false'
-					},
-					url: ns.core.init.contextPath + '/api/organisationUnits',
-                    headers: {'Authorization': 'Basic ' + ns.ajax(null, null, true)},
-					reader: {
-						type: 'json',
-						root: 'children'
-					},
-					sortParam: false
-				},
+				proxy: function() {
+                    var auth = ns.ajax(null, null, true),
+                        proxy = {
+                            type: 'ajax',
+                            type: 'rest',
+                            format: 'json',
+                            noCache: false,
+                            extraParams: {
+                                fields: 'children[id,' + ns.core.init.namePropertyUrl + ',children::isNotEmpty|rename(hasChildren)&paging=false'
+                            },
+                            url: ns.core.init.contextPath + '/api/organisationUnits',
+                            reader: {
+                                type: 'json',
+                                root: 'children'
+                            },
+                            sortParam: false
+                        };
+
+                    if (auth) {
+                        proxy.headers = {'Authorization': 'Basic ' + auth};
+                    }
+
+                    return proxy;
+                }(),
 				sorters: [{
 					property: 'name',
 					direction: 'ASC'
@@ -4240,7 +4273,7 @@ Ext.onReady( function() {
             }
 
             if (skipRequest) {
-                return btoa(authConfig.username + ':' + authConfig.password);
+                return authConfig.crossDomain ? btoa(authConfig.username + ':' + authConfig.password) : null;
             }
 
             Ext.Ajax.request(requestConfig);
