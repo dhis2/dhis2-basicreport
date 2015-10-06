@@ -1234,6 +1234,7 @@ Ext.onReady( function() {
                 var C = api.data.TableCell = function(config) {
                     var c = this;
 
+                    c.elementId = Ext.data.IdGenerator.get('uuid').generate();
                     c.name = config.name;
                     c.sortId = config.sortId;
                     c.cls = config.cls;
@@ -1245,40 +1246,91 @@ Ext.onReady( function() {
 
                 C.prototype.generateHtml = function() {
                     this.html = '<td';
+                    this.html += this.elementId ? (' id="' + this.elementId + '"') : '';
                     this.html += this.cls ? (' class="' + this.cls + '"') : '';
                     this.html += this.style ? (' style="' + this.style + '"') : '';
                     this.html += '>' + this.name + '</td>';
 
                     return this.html;
                 };
+
+                // Ou table cell
+                C.Ou = function(config) {
+                    var c = this,
+                        s = new C(config);
+
+                    Ext.apply(this, s);
+
+                    this.organisationUnit = config.organisationUnit;
+                };
+
+                C.Ou.prototype.showContextMenu = function(layout, dataFn, menuFn) {
+                    var c = this,
+                        menu = menuFn({
+                            items: [
+                                {
+                                    text: 'Show level 3',
+                                    handler: function() {
+                                        layout.rows[1] = {
+                                            dimension: 'ou',
+                                            items: [
+                                                {
+                                                    id: 'LEVEL-3'
+                                                }
+                                            ]
+                                        };
+
+                                        dataFn(layout, true);
+                                    }
+                                },
+                                {
+                                    text: 'Show level 4',
+                                    handler: function() {
+                                        //console.log("level 4");
+                                    }
+                                }
+                            ]
+                        });
+
+                    menu.showAt(function() {
+                        var el = Ext.get(c.elementId),
+                            xy = el.getXY();
+
+                        xy[0] += el.getWidth() - 5;
+                        xy[1] += el.getHeight() - 5;
+
+                        return xy;
+                    }());
+
+                };
             })();
 
             // Table
             (function() {
-                var D = api.data.Table = function(config) {
-                    var d = this;
+                var T = api.data.Table = function(config) {
+                    var t = this;
 
-                    d.tableHeaders = config.tableHeaders;
-                    d.tableRows = config.tableRows;
-                    d.cls = config.cls;
+                    t.tableHeaders = config.tableHeaders;
+                    t.tableRows = config.tableRows;
+                    t.cls = config.cls;
 
-                    d.sorting = {
+                    t.sorting = {
                         id: 'pe',
                         direction: 'ASC'
                     };
 
                     // transient
-                    d.lastSorting = {
+                    t.lastSorting = {
                         id: 'pe',
                         direction: 'ASC'
                     };
 
-                    d.html;
+                    t.html;
 
-                    d.update;
+                    t.update;
                 };
 
-                D.prototype.getSortDirection = function(id) {
+                T.prototype.getSortDirection = function(id) {
                     if (id === this.lastSorting.id) {
                         return this.lastSorting.direction === 'ASC' ? 'DESC' : 'ASC';
                     }
@@ -1286,7 +1338,7 @@ Ext.onReady( function() {
                     return 'ASC';
                 };
 
-                D.prototype.sortData = function() {
+                T.prototype.sortData = function() {
                     var sorting = this.sorting;
 
                     this.tableRows.sort( function(a, b) {
@@ -1323,7 +1375,7 @@ Ext.onReady( function() {
                     });
                 };
 
-                D.prototype.addOptionsCls = function(config) {
+                T.prototype.addOptionsCls = function(config) {
 
                     // display density
                     this.cls += ' displaydensity-' + (config.displayDensity || 'NORMAL').toLowerCase();
@@ -1334,7 +1386,7 @@ Ext.onReady( function() {
                     return this.cls;
                 };
 
-                D.prototype.generateHtml = function() {
+                T.prototype.generateHtml = function() {
                     var html = '<table class="pivot ' + this.cls + '">';
 
                     html += '<tr>';
@@ -1362,8 +1414,33 @@ Ext.onReady( function() {
                     return this.html = html;
                 };
 
-                D.prototype.addHeaderClickListeners = function() {
-                    var d = this;
+                T.prototype.getContextMenu = function(config) {
+                    config = config || {};
+
+                    config.shadow = true;
+                    config.showSeparator = false;
+
+                    return Ext.create('Ext.menu.Menu', config);
+                };
+
+                T.prototype.getTableCellsByInstance = function(type) {
+                    var cells = [];
+
+                    for (var i = 0, row; i < this.tableRows.length; i++) {
+                        row = this.tableRows[i];
+
+                        for (var key in row) {
+                            if (row.hasOwnProperty(key) && row[key] instanceof type) {
+                                cells.push(row[key]);
+                            }
+                        }
+                    }
+
+                    return cells;
+                };
+
+                T.prototype.addHeaderClickListeners = function() {
+                    var t = this;
 
                     for (var i = 0, th, el; i < this.tableHeaders.length; i++) {
                         th = this.tableHeaders[i];
@@ -1371,14 +1448,30 @@ Ext.onReady( function() {
                         el.tableHeaderId = th.id;
 
                         el.on('click', function() {
-                        	d.sorting.id = this.tableHeaderId;
-                            d.sorting.direction = d.getSortDirection(this.tableHeaderId);
+                        	t.sorting.id = this.tableHeaderId;
+                            t.sorting.direction = t.getSortDirection(this.tableHeaderId);
 
-                            d.sortData();
-                            d.update();
+                            t.sortData();
+                            t.update();
 
-                            d.lastSorting.id = d.sorting.id;
-                            d.lastSorting.direction = d.sorting.direction;
+                            t.lastSorting.id = t.sorting.id;
+                            t.lastSorting.direction = t.sorting.direction;
+                        });
+                    }
+                };
+
+                T.prototype.addOuClickListeners = function(layout, dataFn) {
+                    var t = this,
+                        cells = this.getTableCellsByInstance(api.data.TableCell.Ou);
+
+                    for (var i = 0, cell, el; i < cells.length; i++) {
+                        cell = cells[i];
+
+                        el = Ext.get(cell.elementId);
+                        el.cell = cell;
+
+                        el.on('click', function(event) {
+                            this.cell.showContextMenu(layout, dataFn, t.getContextMenu);
                         });
                     }
                 };
@@ -3225,7 +3318,7 @@ Ext.onReady( function() {
 
                     (function() {
 
-                        for (var i = 0, idComb, dxId, peId, ouId, row, dataObject, xOuSortId, numeratorTotal, denominatorTotal, period, orgUnit, value; i < idCombinations.length; i++) {
+                        for (var i = 0, idComb, dxId, peId, ouId, row, dataObject, allOuSortId, numeratorTotal, denominatorTotal, period, orgUnit, value; i < idCombinations.length; i++) {
                             idComb = idCombinations[i];
                             dxId = response.getIdByIdComb(idComb, 'dx');
                             peId = response.getIdByIdComb(idComb, 'pe');
@@ -3257,7 +3350,7 @@ Ext.onReady( function() {
                                 metaData: response.metaData
                             });
 
-                            xOuSortId = orgUnit.getParentNameByLevel(startOuLevel);
+                            allOuSortId = orgUnit.getParentNameByLevel(startOuLevel);
 
                             // value
                             value = response.getValueByIdComb(idComb);
@@ -3269,10 +3362,11 @@ Ext.onReady( function() {
 
                                 // ou
                                 if (th.objectName === 'ou') {
-                                    row[th.id] = new api.data.TableCell({
+                                    row[th.id] = new api.data.TableCell.Ou({
                                         name: orgUnit.getParentNameByLevel(th.level),
                                         sortId: ouSortId + period.typeSortId + period.sortId + dataObject.groupName + dataObject.name,
-                                        cls: 'pivot-value'
+                                        cls: 'pivot-value clickable',
+                                        organisationUnit: orgUnit
                                     });
                                 }
 
@@ -3281,7 +3375,7 @@ Ext.onReady( function() {
                                     if (th.id === 'pe-type') {
                                         row[th.id] = new api.data.TableCell({
                                             name: period.typeName,
-                                            sortId: period.typeSortId + period.sortId + dataObject.groupName + dataObject.name + xOuSortId,
+                                            sortId: period.typeSortId + period.sortId + dataObject.groupName + dataObject.name + allOuSortId,
                                             cls: 'pivot-value'
                                         });
                                     }
@@ -3289,7 +3383,7 @@ Ext.onReady( function() {
                                     if (th.id === 'pe-year') {
                                         row[th.id] = new api.data.TableCell({
                                             name: period.year,
-                                            sortId: period.year + period.typeSortId + period.sortId + dataObject.groupName + dataObject.name + xOuSortId,
+                                            sortId: period.year + period.typeSortId + period.sortId + dataObject.groupName + dataObject.name + allOuSortId,
                                             cls: 'pivot-value'
                                         });
                                     }
@@ -3297,7 +3391,7 @@ Ext.onReady( function() {
                                     else if (th.id === 'pe') {
                                         row[th.id] = new api.data.TableCell({
                                             name: period.displayName,
-                                            sortId: period.typeSortId + period.sortId + dataObject.groupName + dataObject.name + xOuSortId,
+                                            sortId: period.typeSortId + period.sortId + dataObject.groupName + dataObject.name + allOuSortId,
                                             cls: 'pivot-value'
                                         });
                                     }
@@ -3309,35 +3403,35 @@ Ext.onReady( function() {
                                     if (th.id === 'dx-group') {
                                         row[th.id] = new api.data.TableCell({
                                             name: dataObject.groupName,
-                                            sortId: dataObject.groupName + dataObject.name + xOuSortId + period.typeSortId + period.sortId,
+                                            sortId: dataObject.groupName + dataObject.name + allOuSortId + period.typeSortId + period.sortId,
                                             cls: 'pivot-value'
                                         });
                                     }
                                     else if (th.id === 'dx') {
                                         row[th.id] = new api.data.TableCell({
                                             name: dataObject.name,
-                                            sortId: dataObject.name + xOuSortId + period.typeSortId + period.sortId,
+                                            sortId: dataObject.name + allOuSortId + period.typeSortId + period.sortId,
                                             cls: 'pivot-value'
                                         });
                                     }
                                     else if (th.id === 'dx-datatype') {
                                         row[th.id] = new api.data.TableCell({
                                             name: dataObject.dataTypeDisplayName,
-                                            sortId: dataObject.dataTypeSortId + dataObject.groupName + dataObject.name + xOuSortId + period.typeSortId + period.sortId,
+                                            sortId: dataObject.dataTypeSortId + dataObject.groupName + dataObject.name + allOuSortId + period.typeSortId + period.sortId,
                                             cls: 'pivot-value'
                                         });
                                     }
                                     else if (th.id === 'dx-type') {
                                         row[th.id] = new api.data.TableCell({
                                             name: dataObject.typeName,
-                                            sortId: dataObject.typeName + dataObject.groupName + dataObject.name + xOuSortId + period.typeSortId + period.sortId,
+                                            sortId: dataObject.typeName + dataObject.groupName + dataObject.name + allOuSortId + period.typeSortId + period.sortId,
                                             cls: 'pivot-value' + (dataObject.type.length === 1 ? ' td-nobreak' : '')
                                         });
                                     }
                                     else if (th.id === 'dx-description') {
                                         row[th.id] = new api.data.TableCell({
                                             name: dataObject.description,
-                                            sortId: dataObject.description + dataObject.groupName + dataObject.name + xOuSortId + period.typeSortId + period.sortId,
+                                            sortId: dataObject.description + dataObject.groupName + dataObject.name + allOuSortId + period.typeSortId + period.sortId,
                                             cls: 'pivot-value'
                                         });
                                     }

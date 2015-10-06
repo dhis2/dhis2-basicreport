@@ -303,6 +303,10 @@ table.pivot.fontsize-small td {
 .pivot-value.highlighted {
 	background-color: #f3f3f3;
 }
+.pivot-value.clickable:hover {
+    background-color: #f3f3f3;
+    cursor: pointer;
+}
 
 .pivot-value-subtotal {
 	background-color: #f4f4f4;

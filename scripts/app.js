@@ -1019,6 +1019,7 @@ Ext.onReady( function() {
                         ns.app.dateTotal = new Date();
 
                         table.addHeaderClickListeners();
+                        table.addOuClickListeners(layout, web.report.createReport);
                     };
 
                     table.update();
