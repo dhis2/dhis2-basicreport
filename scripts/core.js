@@ -3096,297 +3096,295 @@ Ext.onReady( function() {
                     }).done(function(analyticsData) {
                         getTable(analyticsData);
                     });
+                };
 
-                    getTable = function(analyticsData) {
-                        var response = new api.data.Response(analyticsData),
-                            aDxResIds = aDxReqIds,
-                            aPeResIds = response.metaData.pe,
-                            aOuResIds = response.metaData.ou,
-                            idCombinations = response.generateIdCombinations(aDxResIds, aPeResIds, aOuResIds),
-                            tableHeaders = [],
-                            tableRows = [],
-                            maxOuLevel = response.getMaxLevel(),
-                            minOuLevel = response.getMinLevel(),
-                            startOuLevel = layout.showHierarchy ? (maxOuLevel > 1 ? 1 : 0) : minOuLevel - 1;
+                getTable = function(analyticsData) {
+                    var response = new api.data.Response(analyticsData),
+                        aDxResIds = aDxReqIds,
+                        aPeResIds = response.metaData.pe,
+                        aOuResIds = response.metaData.ou,
+                        idCombinations = response.generateIdCombinations(aDxResIds, aPeResIds, aOuResIds),
+                        tableHeaders = [],
+                        tableRows = [],
+                        maxOuLevel = response.getMaxLevel(),
+                        minOuLevel = response.getMinLevel(),
+                        startOuLevel = layout.showHierarchy ? (maxOuLevel > 1 ? 1 : 0) : minOuLevel - 1;
 
-                        response.generateIdValueMap();
+                    response.generateIdValueMap();
 
-                        // table headers
+                    // table headers
 
+                    (function() {
+                        var index = 0;
+
+                        // ou headers
                         (function() {
-                            var index = 0;
+                            for (var level; startOuLevel < maxOuLevel; startOuLevel++) {
+                                level = Ext.clone(init.organisationUnitLevels[startOuLevel]);
+                                level.objectName = 'ou';
+                                level.cls = 'pivot-dim';
+                                level.index = index++;
 
-                            // ou headers
-                            (function() {
-                                for (var level; startOuLevel < maxOuLevel; startOuLevel++) {
-                                    level = Ext.clone(init.organisationUnitLevels[startOuLevel]);
-                                    level.objectName = 'ou';
-                                    level.cls = 'pivot-dim';
-                                    level.index = index++;
-
-                                    tableHeaders.push(new api.data.TableHeader(level));
-                                }
-                            })();
-
-                            // pe headers
-                            tableHeaders.push(new api.data.TableHeader({
-                                id: 'pe-type',
-                                name: 'Period type',
-                                objectName: 'pe',
-                                cls: 'pivot-dim',
-                                index: index++
-                            }));
-
-                            tableHeaders.push(new api.data.TableHeader({
-                                id: 'pe-year',
-                                name: 'Year',
-                                objectName: 'pe',
-                                cls: 'pivot-dim',
-                                index: index++
-                            }));
-
-                            tableHeaders.push(new api.data.TableHeader({
-                                id: 'pe',
-                                name: 'Period',
-                                objectName: 'pe',
-                                cls: 'pivot-dim',
-                                index: index++
-                            }));
-
-                            // dx headers
-                            tableHeaders.push(new api.data.TableHeader({
-                                id: 'dx-group',
-                                name: 'Data group',
-                                objectName: 'dx',
-                                cls: 'pivot-dim',
-                                index: index++
-                            }));
-
-                            tableHeaders.push(new api.data.TableHeader({
-                                id: 'dx',
-                                name: 'Data',
-                                objectName: 'dx',
-                                cls: 'pivot-dim',
-                                index: index++
-                            }));
-
-                            if (layout.showDataDescription) {
-                                tableHeaders.push(new api.data.TableHeader({
-                                    id: 'dx-datatype',
-                                    name: 'Data type',
-                                    objectName: 'dx',
-                                    cls: 'pivot-dim'
-                                }));
+                                tableHeaders.push(new api.data.TableHeader(level));
                             }
+                        })();
 
+                        // pe headers
+                        tableHeaders.push(new api.data.TableHeader({
+                            id: 'pe-type',
+                            name: 'Period type',
+                            objectName: 'pe',
+                            cls: 'pivot-dim',
+                            index: index++
+                        }));
+
+                        tableHeaders.push(new api.data.TableHeader({
+                            id: 'pe-year',
+                            name: 'Year',
+                            objectName: 'pe',
+                            cls: 'pivot-dim',
+                            index: index++
+                        }));
+
+                        tableHeaders.push(new api.data.TableHeader({
+                            id: 'pe',
+                            name: 'Period',
+                            objectName: 'pe',
+                            cls: 'pivot-dim',
+                            index: index++
+                        }));
+
+                        // dx headers
+                        tableHeaders.push(new api.data.TableHeader({
+                            id: 'dx-group',
+                            name: 'Data group',
+                            objectName: 'dx',
+                            cls: 'pivot-dim',
+                            index: index++
+                        }));
+
+                        tableHeaders.push(new api.data.TableHeader({
+                            id: 'dx',
+                            name: 'Data',
+                            objectName: 'dx',
+                            cls: 'pivot-dim',
+                            index: index++
+                        }));
+
+                        if (layout.showDataDescription) {
                             tableHeaders.push(new api.data.TableHeader({
-                                id: 'dx-type',
-                                name: 'Type',
+                                id: 'dx-datatype',
+                                name: 'Data type',
                                 objectName: 'dx',
                                 cls: 'pivot-dim'
                             }));
+                        }
 
-                            if (layout.showDataDescription) {
-                                tableHeaders.push(new api.data.TableHeader({
-                                    id: 'dx-description',
-                                    name: 'Description',
-                                    objectName: 'dx',
-                                    cls: 'pivot-dim'
-                                }));
+                        tableHeaders.push(new api.data.TableHeader({
+                            id: 'dx-type',
+                            name: 'Type',
+                            objectName: 'dx',
+                            cls: 'pivot-dim'
+                        }));
+
+                        if (layout.showDataDescription) {
+                            tableHeaders.push(new api.data.TableHeader({
+                                id: 'dx-description',
+                                name: 'Description',
+                                objectName: 'dx',
+                                cls: 'pivot-dim'
+                            }));
+                        }
+
+                        tableHeaders.push(new api.data.TableHeader({
+                            id: 'dx-numerator',
+                            name: 'Numerator',
+                            objectName: 'dx',
+                            cls: 'pivot-dim',
+                            index: index++
+                        }));
+
+                        tableHeaders.push(new api.data.TableHeader({
+                            id: 'dx-denominator',
+                            name: 'Denominator',
+                            objectName: 'dx',
+                            cls: 'pivot-dim',
+                            index: index++
+                        }));
+
+                        tableHeaders.push(new api.data.TableHeader({
+                            id: 'dx-value',
+                            name: 'Value',
+                            objectName: 'dx',
+                            cls: 'pivot-dim',
+                            index: index++
+                        }));
+                    })();
+
+                    // table rows
+
+                    (function() {
+
+                        for (var i = 0, idComb, dxId, peId, ouId, row, dataObject, xOuSortId, numeratorTotal, denominatorTotal, period, orgUnit, value; i < idCombinations.length; i++) {
+                            idComb = idCombinations[i];
+                            dxId = response.getIdByIdComb(idComb, 'dx');
+                            peId = response.getIdByIdComb(idComb, 'pe');
+                            ouId = response.getIdByIdComb(idComb, 'ou');
+                            row = {};
+
+                            // data object
+                            dataObject = idDataObjectMap[dxId];
+                            numeratorTotal = response.getNumeratorTotal(idComb, dataObject);
+                            denominatorTotal = response.getDenominatorTotal(idComb, dataObject);
+
+                            if (response.isHideRow(dataObject, layout, numeratorTotal, denominatorTotal)) {
+                                continue;
                             }
 
-                            tableHeaders.push(new api.data.TableHeader({
-                                id: 'dx-numerator',
-                                name: 'Numerator',
-                                objectName: 'dx',
-                                cls: 'pivot-dim',
-                                index: index++
-                            }));
+                            // period
+                            period = new api.data.Period({
+                                id: peId,
+                                name: response.getNameById(peId)
+                            });
 
-                            tableHeaders.push(new api.data.TableHeader({
-                                id: 'dx-denominator',
-                                name: 'Denominator',
-                                objectName: 'dx',
-                                cls: 'pivot-dim',
-                                index: index++
-                            }));
+                            period.generateDisplayProperties();
 
-                            tableHeaders.push(new api.data.TableHeader({
-                                id: 'dx-value',
-                                name: 'Value',
-                                objectName: 'dx',
-                                cls: 'pivot-dim',
-                                index: index++
-                            }));
-                        })();
+                            // organisation unit
+                            orgUnit = new api.data.OrganisationUnit({
+                                id: ouId,
+                                name: response.getNameById(ouId),
+                                level: response.getLevelById(ouId),
+                                metaData: response.metaData
+                            });
 
-                        // table rows
+                            xOuSortId = orgUnit.getParentNameByLevel(startOuLevel);
 
-                        (function() {
+                            // value
+                            value = response.getValueByIdComb(idComb);
 
-                            for (var i = 0, idComb, dxId, peId, ouId, row, dataObject, xOuSortId, numeratorTotal, denominatorTotal, period, orgUnit, value; i < idCombinations.length; i++) {
-                                idComb = idCombinations[i];
-                                dxId = response.getIdByIdComb(idComb, 'dx');
-                                peId = response.getIdByIdComb(idComb, 'pe');
-                                ouId = response.getIdByIdComb(idComb, 'ou');
-                                row = {};
+                            // create rows
+                            for (var j = 0, th, ouSortId; j < tableHeaders.length; j++) {
+                                th = tableHeaders[j];
+                                ouSortId = orgUnit.getSortIdByLevel(th.level);
 
-                                // data object
-                                dataObject = idDataObjectMap[dxId];
-                                numeratorTotal = response.getNumeratorTotal(idComb, dataObject);
-                                denominatorTotal = response.getDenominatorTotal(idComb, dataObject);
-
-                                if (response.isHideRow(dataObject, layout, numeratorTotal, denominatorTotal)) {
-                                    continue;
+                                // ou
+                                if (th.objectName === 'ou') {
+                                    row[th.id] = new api.data.TableCell({
+                                        name: orgUnit.getParentNameByLevel(th.level),
+                                        sortId: ouSortId + period.typeSortId + period.sortId + dataObject.groupName + dataObject.name,
+                                        cls: 'pivot-value'
+                                    });
                                 }
 
-                                // period
-                                period = new api.data.Period({
-                                    id: peId,
-                                    name: response.getNameById(peId)
-                                });
-
-                                period.generateDisplayProperties();
-
-                                // organisation unit
-                                orgUnit = new api.data.OrganisationUnit({
-                                    id: ouId,
-                                    name: response.getNameById(ouId),
-                                    level: response.getLevelById(ouId),
-                                    metaData: response.metaData
-                                });
-
-                                xOuSortId = orgUnit.getParentNameByLevel(startOuLevel);
-
-                                // value
-                                value = response.getValueByIdComb(idComb);
-
-                                // create rows
-                                for (var j = 0, th, ouSortId; j < tableHeaders.length; j++) {
-                                    th = tableHeaders[j];
-                                    ouSortId = orgUnit.getSortIdByLevel(th.level);
-
-                                    // ou
-                                    if (th.objectName === 'ou') {
+                                // pe
+                                else if (th.objectName === 'pe') {
+                                    if (th.id === 'pe-type') {
                                         row[th.id] = new api.data.TableCell({
-                                            name: orgUnit.getParentNameByLevel(th.level),
-                                            sortId: ouSortId + period.typeSortId + period.sortId + dataObject.groupName + dataObject.name,
+                                            name: period.typeName,
+                                            sortId: period.typeSortId + period.sortId + dataObject.groupName + dataObject.name + xOuSortId,
                                             cls: 'pivot-value'
                                         });
                                     }
 
-                                    // pe
-                                    else if (th.objectName === 'pe') {
-                                        if (th.id === 'pe-type') {
-                                            row[th.id] = new api.data.TableCell({
-                                                name: period.typeName,
-                                                sortId: period.typeSortId + period.sortId + dataObject.groupName + dataObject.name + xOuSortId,
-                                                cls: 'pivot-value'
-                                            });
-                                        }
-
-                                        if (th.id === 'pe-year') {
-                                            row[th.id] = new api.data.TableCell({
-                                                name: period.year,
-                                                sortId: period.year + period.typeSortId + period.sortId + dataObject.groupName + dataObject.name + xOuSortId,
-                                                cls: 'pivot-value'
-                                            });
-                                        }
-
-                                        else if (th.id === 'pe') {
-                                            row[th.id] = new api.data.TableCell({
-                                                name: period.displayName,
-                                                sortId: period.typeSortId + period.sortId + dataObject.groupName + dataObject.name + xOuSortId,
-                                                cls: 'pivot-value'
-                                            });
-                                        }
+                                    if (th.id === 'pe-year') {
+                                        row[th.id] = new api.data.TableCell({
+                                            name: period.year,
+                                            sortId: period.year + period.typeSortId + period.sortId + dataObject.groupName + dataObject.name + xOuSortId,
+                                            cls: 'pivot-value'
+                                        });
                                     }
 
-                                    // dx
-                                    else if (th.objectName === 'dx') {
-
-                                        if (th.id === 'dx-group') {
-                                            row[th.id] = new api.data.TableCell({
-                                                name: dataObject.groupName,
-                                                sortId: dataObject.groupName + dataObject.name + xOuSortId + period.typeSortId + period.sortId,
-                                                cls: 'pivot-value'
-                                            });
-                                        }
-                                        else if (th.id === 'dx') {
-                                            row[th.id] = new api.data.TableCell({
-                                                name: dataObject.name,
-                                                sortId: dataObject.name + xOuSortId + period.typeSortId + period.sortId,
-                                                cls: 'pivot-value'
-                                            });
-                                        }
-                                        else if (th.id === 'dx-datatype') {
-                                            row[th.id] = new api.data.TableCell({
-                                                name: dataObject.dataTypeDisplayName,
-                                                sortId: dataObject.dataTypeSortId + dataObject.groupName + dataObject.name + xOuSortId + period.typeSortId + period.sortId,
-                                                cls: 'pivot-value'
-                                            });
-                                        }
-                                        else if (th.id === 'dx-type') {
-                                            row[th.id] = new api.data.TableCell({
-                                                name: dataObject.typeName,
-                                                sortId: dataObject.typeName + dataObject.groupName + dataObject.name + xOuSortId + period.typeSortId + period.sortId,
-                                                cls: 'pivot-value' + (dataObject.type.length === 1 ? ' td-nobreak' : '')
-                                            });
-                                        }
-                                        else if (th.id === 'dx-description') {
-                                            row[th.id] = new api.data.TableCell({
-                                                name: dataObject.description,
-                                                sortId: dataObject.description + dataObject.groupName + dataObject.name + xOuSortId + period.typeSortId + period.sortId,
-                                                cls: 'pivot-value'
-                                            });
-                                        }
-                                        else if (th.id === 'dx-numerator') {
-                                            row[th.id] = new api.data.TableCell({
-                                                name: numeratorTotal || '',
-                                                sortId: numeratorTotal || 0,
-                                                cls: 'pivot-value align-right'
-                                            });
-                                        }
-                                        else if (th.id === 'dx-denominator') {
-                                            row[th.id] = new api.data.TableCell({
-                                                name: denominatorTotal || '',
-                                                sortId: denominatorTotal || 0,
-                                                cls: 'pivot-value align-right' + (dataObject.isDataElement ? ' dataelementdenom' : '')
-                                            });
-                                        }
-                                        else if (th.id === 'dx-value') {
-                                            row[th.id] = new api.data.TableCell({
-                                                name: value || '',
-                                                sortId: parseFloat(value) || 0,
-                                                cls: 'pivot-value align-right',
-                                                style: 'background-color:' + dataObject.getBgColorByValue(parseFloat(value))
-                                            });
-                                        }
+                                    else if (th.id === 'pe') {
+                                        row[th.id] = new api.data.TableCell({
+                                            name: period.displayName,
+                                            sortId: period.typeSortId + period.sortId + dataObject.groupName + dataObject.name + xOuSortId,
+                                            cls: 'pivot-value'
+                                        });
                                     }
                                 }
 
-                                tableRows.push(row);
+                                // dx
+                                else if (th.objectName === 'dx') {
+
+                                    if (th.id === 'dx-group') {
+                                        row[th.id] = new api.data.TableCell({
+                                            name: dataObject.groupName,
+                                            sortId: dataObject.groupName + dataObject.name + xOuSortId + period.typeSortId + period.sortId,
+                                            cls: 'pivot-value'
+                                        });
+                                    }
+                                    else if (th.id === 'dx') {
+                                        row[th.id] = new api.data.TableCell({
+                                            name: dataObject.name,
+                                            sortId: dataObject.name + xOuSortId + period.typeSortId + period.sortId,
+                                            cls: 'pivot-value'
+                                        });
+                                    }
+                                    else if (th.id === 'dx-datatype') {
+                                        row[th.id] = new api.data.TableCell({
+                                            name: dataObject.dataTypeDisplayName,
+                                            sortId: dataObject.dataTypeSortId + dataObject.groupName + dataObject.name + xOuSortId + period.typeSortId + period.sortId,
+                                            cls: 'pivot-value'
+                                        });
+                                    }
+                                    else if (th.id === 'dx-type') {
+                                        row[th.id] = new api.data.TableCell({
+                                            name: dataObject.typeName,
+                                            sortId: dataObject.typeName + dataObject.groupName + dataObject.name + xOuSortId + period.typeSortId + period.sortId,
+                                            cls: 'pivot-value' + (dataObject.type.length === 1 ? ' td-nobreak' : '')
+                                        });
+                                    }
+                                    else if (th.id === 'dx-description') {
+                                        row[th.id] = new api.data.TableCell({
+                                            name: dataObject.description,
+                                            sortId: dataObject.description + dataObject.groupName + dataObject.name + xOuSortId + period.typeSortId + period.sortId,
+                                            cls: 'pivot-value'
+                                        });
+                                    }
+                                    else if (th.id === 'dx-numerator') {
+                                        row[th.id] = new api.data.TableCell({
+                                            name: numeratorTotal || '',
+                                            sortId: numeratorTotal || 0,
+                                            cls: 'pivot-value align-right'
+                                        });
+                                    }
+                                    else if (th.id === 'dx-denominator') {
+                                        row[th.id] = new api.data.TableCell({
+                                            name: denominatorTotal || '',
+                                            sortId: denominatorTotal || 0,
+                                            cls: 'pivot-value align-right' + (dataObject.isDataElement ? ' dataelementdenom' : '')
+                                        });
+                                    }
+                                    else if (th.id === 'dx-value') {
+                                        row[th.id] = new api.data.TableCell({
+                                            name: value || '',
+                                            sortId: parseFloat(value) || 0,
+                                            cls: 'pivot-value align-right',
+                                            style: 'background-color:' + dataObject.getBgColorByValue(parseFloat(value))
+                                        });
+                                    }
+                                }
                             }
-                        })();
 
-                        table = new api.data.Table({
-                            tableHeaders: tableHeaders,
-                            tableRows: tableRows
-                        });
-
-                        table.addOptionsCls(layout);
-                        table.sortData();
-
-                        if (fCallback) {
-                            fCallback(table);
+                            tableRows.push(row);
                         }
+                    })();
 
-                        if (NS.isDebug) {
-                            console.log('response', response);
-                        }
-                    };
+                    table = new api.data.Table({
+                        tableHeaders: tableHeaders,
+                        tableRows: tableRows
+                    });
 
-                // end of indicator "done"
+                    table.addOptionsCls(layout);
+                    table.sortData();
+
+                    if (fCallback) {
+                        fCallback(table);
+                    }
+
+                    if (NS.isDebug) {
+                        console.log('response', response);
+                    }
                 };
 
                 getIndicators();
