@@ -1010,18 +1010,18 @@ Ext.onReady( function() {
 			web.report.createReport = function(layout) {
                 web.mask.show(ns.app.centerRegion);
 
-                web.report.getHtml(layout, function(data) {
-                    data.update = function(isSorting) {
+                web.report.getHtml(layout, function(table) {
+                    table.update = function(isSorting) {
                         ns.app.centerRegion.removeAll(true);
 
                         ns.app.dateRender = new Date();
-                        ns.app.centerRegion.update(data.generateHtml());
+                        ns.app.centerRegion.update(table.generateHtml());
                         ns.app.dateTotal = new Date();
 
-                        data.addHeaderClickListeners();
+                        table.addHeaderClickListeners();
                     };
 
-                    data.update();
+                    table.update();
 
                     // after render
                     ns.app.layout = layout;
@@ -1029,7 +1029,7 @@ Ext.onReady( function() {
                     if (NS.isDebug) {
                         console.log("RENDER", (ns.app.dateTotal - ns.app.dateRender) / 1000);
                         console.log("layout", ns.app.layout);
-                        console.log("data", data);
+                        console.log("table", table);
                     }
 
                     web.mask.hide(ns.app.centerRegion);

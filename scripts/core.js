@@ -1253,9 +1253,9 @@ Ext.onReady( function() {
                 };
             })();
 
-            // Data
+            // Table
             (function() {
-                var D = api.data.Data = function(config) {
+                var D = api.data.Table = function(config) {
                     var d = this;
 
                     d.tableHeaders = config.tableHeaders;
@@ -3369,16 +3369,16 @@ Ext.onReady( function() {
                             }
                         })();
 
-                        data = new api.data.Data({
+                        table = new api.data.Table({
                             tableHeaders: tableHeaders,
                             tableRows: tableRows
                         });
 
-                        data.addOptionsCls(layout);
-                        data.sortData();
+                        table.addOptionsCls(layout);
+                        table.sortData();
 
                         if (fCallback) {
-                            fCallback(data);
+                            fCallback(table);
                         }
 
                         if (NS.isDebug) {
