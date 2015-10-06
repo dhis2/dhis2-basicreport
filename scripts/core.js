@@ -2889,6 +2889,7 @@ Ext.onReady( function() {
                     aDeReqItems = [],
                     aDsReqIds = [],
                     aDsReqItems = [],
+                    aDxReqIds = [],
                     aPeReqIds = [],
                     aOuReqIds = [],
                     oDimNameReqItemArrayMap = {},
@@ -2961,6 +2962,7 @@ Ext.onReady( function() {
                     getDataElements,
                     getDataSets,
                     getData,
+                    getTable,
                     idDataObjectMap = {};
 
                 getIndicators = function() {
@@ -3027,8 +3029,8 @@ Ext.onReady( function() {
                 };
 
                 getData = function() {
+                    var aDxReqItems = [].concat(aInReqItems || [], aDeReqItems || [], aDsReqItems || []);
                     aDxReqIds = [].concat(aInReqIds || [], aDeReqIds || [], aDsReqIds || []);
-                    aDxReqItems = [].concat(aInReqItems || [], aDeReqItems || [], aDsReqItems || []);
 
                     for (var i = 0, oDxItem; i < aDxReqItems.length; i++) {
                         oDxItem = aDxReqItems[i];
@@ -3092,6 +3094,10 @@ Ext.onReady( function() {
                         url: init.contextPath + '/api/analytics.json?dimension=pe:' + aPeReqIds.join(';') + '&dimension=dx:' + sLookupSubElements + aDxReqIds.join(';') + '&dimension=ou:' + aOuReqIds.join(';') + '&hierarchyMeta=true&displayProperty=NAME&showHierarchy=true',
                         headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
                     }).done(function(analyticsData) {
+                        getTable(analyticsData);
+                    });
+
+                    getTable = function(analyticsData) {
                         var response = new api.data.Response(analyticsData),
                             aDxResIds = aDxReqIds,
                             aPeResIds = response.metaData.pe,
@@ -3378,7 +3384,7 @@ Ext.onReady( function() {
                         if (NS.isDebug) {
                             console.log('response', response);
                         }
-                    });
+                    };
 
                 // end of indicator "done"
                 };
