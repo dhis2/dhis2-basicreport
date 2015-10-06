@@ -1132,7 +1132,7 @@ Ext.onReady( function() {
                     o.metaData = config.metaData;
 
                     // transient
-                    o.parentGraph = o.metaData[o.id];
+                    o.parentGraph = o.metaData.ouHierarchy[o.id];
 
                     // uninitialized
                     o.parentIdArray;
@@ -1152,7 +1152,7 @@ Ext.onReady( function() {
                         return this.parentIdArray;
                     }
 
-                    return this.parentIdArray = Ext.Array.clean(parentGraph.split('/'));
+                    return this.parentIdArray = Ext.Array.clean(this.parentGraph.split('/'));
                 };
 
                 O.prototype.getParentNameArray = function() {
@@ -1195,6 +1195,47 @@ Ext.onReady( function() {
 
                 O.prototype.getSortIdByLevel = function(level) {
                     return this.getParentNameArrayByLevel(level).join('');
+                };
+
+                O.prototype.getContextMenuItemsConfig = function(level) {
+                    var items = [],
+                        levels = init.organisationUnitLevels,
+                        ouId = this.getParentIdByLevel(level) || this.id,
+                        ouName = this.getParentNameByLevel(level) || this.name;
+
+                    if (level > 1) {
+                        items.push({
+                            subtitle: true,
+                            text: ouName,
+                            style: 'padding: 7px 5px 5px 7px; font-weight: 600'
+                        });
+
+                        items.push({
+                            id: 'LEVEL-' + level,
+                            text: 'Show all <i>' + levels[level - 1].name + '</i> units'
+                        });
+                    }
+
+                    if (level < levels.length) {
+                        items.push({
+                            xtype: 'label',
+                            subtitle: true,
+                            text: 'Drill down',
+                            style: 'padding: 7px 5px 5px 7px; font-weight: 600'
+                        });
+
+                        items.push({
+                            id: 'LEVEL-' + (level + 1),
+                            text: 'Show all <i>' + levels[level].name + '</i> units'
+                        });
+
+                        items.push({
+                            id: ouId + ';LEVEL-' + (level + 1),
+                            text: 'Show all <i>' + levels[level].name + '</i> units in ' + ouName
+                        });
+                    }
+
+                    return items;
                 };
             })();
 
@@ -1261,43 +1302,46 @@ Ext.onReady( function() {
 
                     Ext.apply(this, s);
 
+                    this.level = config.level;
                     this.organisationUnit = config.organisationUnit;
                 };
 
                 C.Ou.prototype.showContextMenu = function(layout, dataFn, menuFn) {
                     var c = this,
-                        menu = menuFn({
-                            items: [
-                                {
-                                    text: 'Show level 3',
-                                    handler: function() {
-                                        layout.rows[1] = {
-                                            dimension: 'ou',
-                                            items: [
-                                                {
-                                                    id: 'LEVEL-3'
-                                                }
-                                            ]
-                                        };
+                        itemsConfig = this.organisationUnit.getContextMenuItemsConfig(this.level),
+                        items = [];
 
-                                        dataFn(layout, true);
-                                    }
-                                },
-                                {
-                                    text: 'Show level 4',
-                                    handler: function() {
-                                        //console.log("level 4");
-                                    }
-                                }
-                            ]
+                    for (var i = 0, conf; i < itemsConfig.length; i++) {
+                        conf = itemsConfig[i];
+
+                        items.push(conf.subtitle ? {
+                            xtype: 'label',
+                            text: conf.text,
+                            style: conf.style
+                        } : {
+                            text: conf.text,
+                            iconCls: 'ns-menu-item-drill',
+                            handler: function() {
+                                layout.rows[1] = {
+                                    dimension: 'ou',
+                                    items: [{id: conf.id}]
+                                };
+
+                                dataFn(layout, true);
+                            }
                         });
+                    }
+
+                    menu = menuFn({
+                        items: items
+                    });
 
                     menu.showAt(function() {
                         var el = Ext.get(c.elementId),
                             xy = el.getXY();
 
-                        xy[0] += el.getWidth() - 5;
-                        xy[1] += el.getHeight() - 5;
+                        xy[0] += el.getWidth() - 7;
+                        xy[1] += el.getHeight() - 7;
 
                         return xy;
                     }());
@@ -3366,6 +3410,7 @@ Ext.onReady( function() {
                                         name: orgUnit.getParentNameByLevel(th.level),
                                         sortId: ouSortId + period.typeSortId + period.sortId + dataObject.groupName + dataObject.name,
                                         cls: 'pivot-value clickable',
+                                        level: th.level,
                                         organisationUnit: orgUnit
                                     });
                                 }

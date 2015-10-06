@@ -722,6 +722,10 @@ table.pivot.fontsize-small td {
     background-image:url('../images/check-un.png');
 }
 
+.ns-menu-item-drill {
+    background-image:url('../images/drill_16.png');
+}
+
 
 	/* Menu align */
 .ns-btn-menu {
