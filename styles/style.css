@@ -684,6 +684,26 @@ table.pivot.fontsize-small td {
  * BR Menu
  *--------------------------------------------------------------------------*/
 
+/* custom shadow instead of shadow */
+.ns-floatmenu.x-menu {
+    box-shadow: 0 0 2px 2px #ddd;
+    border: 1px solid #bbb;
+    border-radius: 1px;
+}
+
+.ns-floatmenu .x-box-inner,
+.ns-floatmenu .x-menu-item {
+    background-color: #fff;
+}
+
+.ns-floatmenu label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #222;
+    padding: 8px;
+}
+
+
 	/* Menu item icon */
 .ns-menu-item-noicon .x-menu-item-link {
 	padding-left: 10px;
@@ -724,6 +744,12 @@ table.pivot.fontsize-small td {
 
 .ns-menu-item-drill {
     background-image:url('../images/drill_16.png');
+}
+.ns-menu-item-float {
+    background-image:url('../images/float_16.png');
+}
+.ns-menu-item-expand {
+    background-image:url('../images/expand_16.png');
 }
 
 

@@ -1205,34 +1205,36 @@ Ext.onReady( function() {
 
                     if (level > 1) {
                         items.push({
-                            subtitle: true,
-                            text: ouName,
-                            style: 'padding: 7px 5px 5px 7px; font-weight: 600'
+                            isSubtitle: true,
+                            text: ouName
                         });
 
                         items.push({
                             id: 'LEVEL-' + level,
-                            text: 'Show all <i>' + levels[level - 1].name + '</i> units'
+                            text: 'Show all ' + levels[level - 1].name + ' units',
+                            iconCls: 'ns-menu-item-expand'
                         });
                     }
 
                     if (level < levels.length) {
                         items.push({
-                            xtype: 'label',
-                            subtitle: true,
-                            text: 'Drill down',
-                            style: 'padding: 7px 5px 5px 7px; font-weight: 600'
-                        });
-
-                        items.push({
-                            id: 'LEVEL-' + (level + 1),
-                            text: 'Show all <i>' + levels[level].name + '</i> units'
+                            isSubtitle: true,
+                            text: 'Drill down to ' + levels[level].name + ' level'
                         });
 
                         items.push({
                             id: ouId + ';LEVEL-' + (level + 1),
-                            text: 'Show all <i>' + levels[level].name + '</i> units in ' + ouName
+                            text: 'Show all ' + levels[level].name + ' units in ' + ouName,
+                            iconCls: 'ns-menu-item-drill'
                         });
+
+                        if (level > 1) {
+                            items.push({
+                                id: 'LEVEL-' + (level + 1),
+                                text: 'Show all ' + levels[level].name + ' units',
+                                iconCls: 'ns-menu-item-drill'
+                            });
+                        }
                     }
 
                     return items;
@@ -1314,17 +1316,18 @@ Ext.onReady( function() {
                     for (var i = 0, conf; i < itemsConfig.length; i++) {
                         conf = itemsConfig[i];
 
-                        items.push(conf.subtitle ? {
+                        items.push(conf.isSubtitle ? {
                             xtype: 'label',
-                            text: conf.text,
+                            html: conf.text,
                             style: conf.style
                         } : {
                             text: conf.text,
-                            iconCls: 'ns-menu-item-drill',
+                            iconCls: conf.iconCls,
+                            ouReqId: conf.id,
                             handler: function() {
                                 layout.rows[1] = {
                                     dimension: 'ou',
-                                    items: [{id: conf.id}]
+                                    items: [{id: this.ouReqId}]
                                 };
 
                                 dataFn(layout, true);
@@ -1340,8 +1343,8 @@ Ext.onReady( function() {
                         var el = Ext.get(c.elementId),
                             xy = el.getXY();
 
-                        xy[0] += el.getWidth() - 7;
-                        xy[1] += el.getHeight() - 7;
+                        xy[0] += (el.getWidth() * 0.75);
+                        xy[1] += (el.getHeight() * 0.5);
 
                         return xy;
                     }());
@@ -1461,8 +1464,9 @@ Ext.onReady( function() {
                 T.prototype.getContextMenu = function(config) {
                     config = config || {};
 
-                    config.shadow = true;
+                    config.shadow = false;
                     config.showSeparator = false;
+                    config.baseCls = 'ns-floatmenu';
 
                     return Ext.create('Ext.menu.Menu', config);
                 };

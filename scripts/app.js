@@ -766,8 +766,8 @@ Ext.onReady( function() {
 					var el = Ext.get(uuid),
 						xy = el.getXY();
 
-					xy[0] += el.getWidth() - 5;
-					xy[1] += el.getHeight() - 5;
+					xy[0] += (el.getWidth() * 0.75);
+					xy[1] += (el.getHeight() * 0.5);
 
 					return xy;
 				}());
