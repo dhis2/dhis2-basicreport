@@ -1214,13 +1214,15 @@ Ext.onReady( function() {
                         pOuName = this.getParentNameByLevel(level - 1) || this.name;
                         pLevelName = levels[level - 2].name;
 
-                        // float
+                        // up
                         items.push({
                             isSubtitle: true,
-                            text: 'Float up to ' + pLevelName + ' level'
+                            text: 'Drill up to ' + pLevelName + ' level'
                         });
 
                         if (level === 2) {
+
+                            // show root
                             items.push({
                                 id: pOuId,
                                 text: 'Show <span class="name">' + pOuName + '</span>',
@@ -1228,6 +1230,14 @@ Ext.onReady( function() {
                             });
                         }
                         else {
+
+                            // show parent only
+                            items.push({
+                                id: pOuId,
+                                text: 'Show <span class="name">' + pOuName + '</span> only',
+                                iconCls: 'ns-menu-item-float'
+                            });
+
                             if (level > 3) {
                                 gpOuName = this.getParentNameByLevel(level - 2) || this.name;
 
@@ -1248,7 +1258,7 @@ Ext.onReady( function() {
                         // expand
                         items.push({
                             isSubtitle: true,
-                            text: ouName
+                            text: levelName + ' level'
                         });
 
                         items.push({
@@ -1275,7 +1285,7 @@ Ext.onReady( function() {
                     if (level < levels.length) {
                         cLevelName = levels[level].name;
 
-                        // drill
+                        // down
                         items.push({
                             isSubtitle: true,
                             text: 'Drill down to <span class="name">' + cLevelName + '</span> level'
@@ -1400,10 +1410,12 @@ Ext.onReady( function() {
 
                     menu.showAt(function() {
                         var el = Ext.get(c.elementId),
+                            height = el.getHeight(),
+                            width = el.getWidth(),
                             xy = el.getXY();
 
-                        xy[0] += (el.getWidth() * 0.75);
-                        xy[1] += (el.getHeight() * 0.75);
+                        xy[0] += width - (height / 2);
+                        xy[1] += height - (height / 2);
 
                         return xy;
                     }());
