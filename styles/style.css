@@ -703,6 +703,13 @@ table.pivot.fontsize-small td {
     padding: 8px;
 }
 
+.ns-floatmenu .x-menu-item-active .x-menu-item-link {
+	border-radius: 0;
+	border-color: #e8e8e8;
+	background-color: #e8e8e8;
+	background-image: none;
+}
+
 
 	/* Menu item icon */
 .ns-menu-item-noicon .x-menu-item-link {

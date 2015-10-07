@@ -3888,6 +3888,7 @@ Ext.onReady( function() {
 					html += '<div>- ' + NS.i18n.example2 + '</div>';
 					html += '<div>- ' + NS.i18n.example3 + '</div>';
 					html += '<div>- ' + NS.i18n.example4 + '</div>';
+					html += '<div>- ' + NS.i18n.example5 + '</div>';
 					html += '</div>';
 
 					p.update(html);

@@ -1201,9 +1201,46 @@ Ext.onReady( function() {
                     var items = [],
                         levels = init.organisationUnitLevels,
                         ouId = this.getParentIdByLevel(level) || this.id,
-                        ouName = this.getParentNameByLevel(level) || this.name;
+                        ouName = this.getParentNameByLevel(level) || this.name,
+                        levelName = levels[level - 1].name,
+                        pOuId,
+                        pOuName,
+                        pLevelName,
+                        cLevelName;
 
                     if (level > 1) {
+                        pOuId = this.getParentIdByLevel(level - 1) || this.id;
+                        pOuName = this.getParentNameByLevel(level - 1) || this.name;
+                        pLevelName = levels[level - 2].name;
+
+                        // float
+                        items.push({
+                            isSubtitle: true,
+                            text: 'Float up to ' + pLevelName + ' level'
+                        });
+
+                        if (level === 2) {
+                            items.push({
+                                id: pOuId,
+                                text: 'Show ' + pOuName,
+                                iconCls: 'ns-menu-item-float'
+                            });
+                        }
+                        else {
+                            items.push({
+                                id: pOuId + ';LEVEL-' + (level - 1),
+                                text: 'Show all ' + pLevelName + ' units in ' + pOuName,
+                                iconCls: 'ns-menu-item-float'
+                            });
+
+                            items.push({
+                                id: 'LEVEL-' + (level - 1),
+                                text: 'Show all ' + pLevelName + ' units',
+                                iconCls: 'ns-menu-item-float'
+                            });
+                        }
+
+                        // expand
                         items.push({
                             isSubtitle: true,
                             text: ouName
@@ -1211,27 +1248,30 @@ Ext.onReady( function() {
 
                         items.push({
                             id: 'LEVEL-' + level,
-                            text: 'Show all ' + levels[level - 1].name + ' units',
+                            text: 'Show all other ' + levelName + ' units',
                             iconCls: 'ns-menu-item-expand'
                         });
                     }
 
                     if (level < levels.length) {
+                        cLevelName = levels[level].name;
+
+                        // drill
                         items.push({
                             isSubtitle: true,
-                            text: 'Drill down to ' + levels[level].name + ' level'
+                            text: 'Drill down to ' + cLevelName + ' level'
                         });
 
                         items.push({
                             id: ouId + ';LEVEL-' + (level + 1),
-                            text: 'Show all ' + levels[level].name + ' units in ' + ouName,
+                            text: 'Show all ' + cLevelName + ' units in ' + ouName,
                             iconCls: 'ns-menu-item-drill'
                         });
 
                         if (level > 1) {
                             items.push({
                                 id: 'LEVEL-' + (level + 1),
-                                text: 'Show all ' + levels[level].name + ' units',
+                                text: 'Show all ' + cLevelName + ' units',
                                 iconCls: 'ns-menu-item-drill'
                             });
                         }
