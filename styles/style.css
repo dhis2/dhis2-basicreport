@@ -710,6 +710,17 @@ table.pivot.fontsize-small td {
 	background-image: none;
 }
 
+.ns-floatmenu .x-menu-item-text {
+    color: #444;
+}
+.ns-floatmenu .x-menu-item-text .name {
+    color: #000;
+}
+
+.ns-floatmenu .x-menu-item-icon {
+    left: 6px;
+}
+
 
 	/* Menu item icon */
 .ns-menu-item-noicon .x-menu-item-link {

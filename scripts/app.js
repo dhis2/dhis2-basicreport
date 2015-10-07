@@ -767,7 +767,7 @@ Ext.onReady( function() {
 						xy = el.getXY();
 
 					xy[0] += (el.getWidth() * 0.75);
-					xy[1] += (el.getHeight() * 0.5);
+					xy[1] += (el.getHeight() * 0.75);
 
 					return xy;
 				}());

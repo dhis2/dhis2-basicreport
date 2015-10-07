@@ -1205,6 +1205,7 @@ Ext.onReady( function() {
                         levelName = levels[level - 1].name,
                         pOuId,
                         pOuName,
+                        gpOuName,
                         pLevelName,
                         cLevelName;
 
@@ -1222,20 +1223,24 @@ Ext.onReady( function() {
                         if (level === 2) {
                             items.push({
                                 id: pOuId,
-                                text: 'Show ' + pOuName,
+                                text: 'Show <span class="name">' + pOuName + '</span>',
                                 iconCls: 'ns-menu-item-float'
                             });
                         }
                         else {
-                            items.push({
-                                id: pOuId + ';LEVEL-' + (level - 1),
-                                text: 'Show all ' + pLevelName + ' units in ' + pOuName,
-                                iconCls: 'ns-menu-item-float'
-                            });
+                            if (level > 3) {
+                                gpOuName = this.getParentNameByLevel(level - 2) || this.name;
+
+                                items.push({
+                                    id: pOuId + ';LEVEL-' + (level - 1),
+                                    text: 'Show all <span class="name">' + pLevelName + '</span> units in <span class="name">' + gpOuName + '</span>',
+                                    iconCls: 'ns-menu-item-float'
+                                });
+                            }
 
                             items.push({
                                 id: 'LEVEL-' + (level - 1),
-                                text: 'Show all ' + pLevelName + ' units',
+                                text: 'Show all <span class="name">' + pLevelName + '</span> units',
                                 iconCls: 'ns-menu-item-float'
                             });
                         }
@@ -1247,8 +1252,22 @@ Ext.onReady( function() {
                         });
 
                         items.push({
+                            id: ouId,
+                            text: 'Show <span class="name">' + ouName + '</span> only',
+                            iconCls: 'ns-menu-item-expand'
+                        });
+
+                        if (level > 2) {
+                            items.push({
+                                id: pOuId + ';LEVEL-' + level,
+                                text: 'Show all <span class="name">' + levelName + '</span> units in <span class="name">' + pOuName + '</span>',
+                                iconCls: 'ns-menu-item-expand'
+                            });
+                        }
+
+                        items.push({
                             id: 'LEVEL-' + level,
-                            text: 'Show all other ' + levelName + ' units',
+                            text: 'Show all <span class="name">' + levelName + '</span> units',
                             iconCls: 'ns-menu-item-expand'
                         });
                     }
@@ -1259,19 +1278,19 @@ Ext.onReady( function() {
                         // drill
                         items.push({
                             isSubtitle: true,
-                            text: 'Drill down to ' + cLevelName + ' level'
+                            text: 'Drill down to <span class="name">' + cLevelName + '</span> level'
                         });
 
                         items.push({
                             id: ouId + ';LEVEL-' + (level + 1),
-                            text: 'Show all ' + cLevelName + ' units in ' + ouName,
+                            text: 'Show all <span class="name">' + cLevelName + '</span> units in <span class="name">' + ouName + '</span>',
                             iconCls: 'ns-menu-item-drill'
                         });
 
                         if (level > 1) {
                             items.push({
                                 id: 'LEVEL-' + (level + 1),
-                                text: 'Show all ' + cLevelName + ' units',
+                                text: 'Show all <span class="name">' + cLevelName + '</span> units',
                                 iconCls: 'ns-menu-item-drill'
                             });
                         }
@@ -1384,7 +1403,7 @@ Ext.onReady( function() {
                             xy = el.getXY();
 
                         xy[0] += (el.getWidth() * 0.75);
-                        xy[1] += (el.getHeight() * 0.5);
+                        xy[1] += (el.getHeight() * 0.75);
 
                         return xy;
                     }());
