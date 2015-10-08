@@ -262,6 +262,9 @@ table.pivot.fontsize-small td {
 	background-color: #dae6f8;
 	text-align: center;
 }
+.pivot-dim.td-sortable:hover {
+	background-color: #c5d8f6;
+}
 .pivot-dim.highlighted {
 	background-color: #c5d8f6;
 }
