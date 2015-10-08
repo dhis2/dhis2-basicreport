@@ -1007,7 +1007,7 @@ Ext.onReady( function() {
                 });
 			};
 
-			web.report.createReport = function(layout) {
+			web.report.createReport = function(layout, isUpdateOuGui) {
                 web.mask.show(ns.app.centerRegion);
 
                 web.report.getHtml(layout, function(table) {
@@ -1025,6 +1025,10 @@ Ext.onReady( function() {
                     table.update();
 
                     // after render
+                    if (isUpdateOuGui) {
+                        ns.app.viewport.setOuGui(layout);
+                    }
+
                     ns.app.layout = layout;
 
                     if (NS.isDebug) {
@@ -3192,13 +3196,17 @@ Ext.onReady( function() {
 				this.expandPath(rootNode.getPath());
 				this.getSelectionModel().select(rootNode);
 			},
-			selectRootIf: function() {
+            selectRoot: function() {
+                var node = this.getRootNode().findChild('id', ns.core.init.rootNodes[0].id);
+
+                if (this.rendered) {
+                    this.getSelectionModel().select(node);
+                }
+                return node;
+            },
+            selectRootIf: function() {
 				if (this.getSelectionModel().getSelection().length < 1) {
-					var node = this.getRootNode().findChild('id', ns.core.init.rootNodes[0].id);
-					if (this.rendered) {
-						this.getSelectionModel().select(node);
-					}
-					return node;
+                    this.selectRoot();
 				}
 			},
 			isPending: false,
@@ -3263,6 +3271,7 @@ Ext.onReady( function() {
 			},
 			selectGraphMap: function(map, update) {
 				if (!ns.core.support.prototype.object.getLength(map)) {
+                    this.selectRootIf();
 					return;
 				}
 
@@ -4131,11 +4140,77 @@ Ext.onReady( function() {
 			}
 		};
 
+        setOuGui = function(layout) {
+            var dimensions = Ext.Array.clean([].concat(layout.columns || [], layout.rows || [], layout.filters || [])),
+				recMap = ns.core.service.layout.getObjectNameDimensionItemsMapFromDimensionArray(dimensions),
+				graphMap = layout.parentGraphMap,
+				isOu = false,
+				isOuc = false,
+				isOugc = false,
+				levels = [],
+				groups = [],
+				orgunits = [];
+
+            // organisation units
+			if (recMap[dimConf.organisationUnit.objectName]) {
+				for (var i = 0, ouRecords = recMap[dimConf.organisationUnit.objectName]; i < ouRecords.length; i++) {
+console.log("record " + i + ": " + ouRecords[i].id);
+					if (ouRecords[i].id === 'USER_ORGUNIT') {
+						isOu = true;
+					}
+					else if (ouRecords[i].id === 'USER_ORGUNIT_CHILDREN') {
+						isOuc = true;
+					}
+					else if (ouRecords[i].id === 'USER_ORGUNIT_GRANDCHILDREN') {
+						isOugc = true;
+					}
+					else if (ouRecords[i].id.indexOf('LEVEL') != -1) {
+						levels.push(parseInt(ouRecords[i].id.split('-')[1]));
+					}
+					else if (ouRecords[i].id.indexOf('OU_GROUP') != -1) {
+						groups.push(ouRecords[i].id.split('-')[1]);
+					}
+					else {
+						orgunits.push(ouRecords[i].id);
+					}
+				}
+
+				if (levels.length) {
+console.log(levels);
+					toolMenu.clickHandler('level');
+					organisationUnitLevel.setValue(levels);
+				}
+				else if (groups.length) {
+					toolMenu.clickHandler('group');
+					organisationUnitGroup.setValue(groups);
+				}
+				else {
+					toolMenu.clickHandler('orgunit');
+					userOrganisationUnit.setValue(isOu);
+					userOrganisationUnitChildren.setValue(isOuc);
+					userOrganisationUnitGrandChildren.setValue(isOugc);
+				}
+console.log("graphMap", graphMap);
+				if (!(isOu || isOuc || isOugc)) {
+					if (Ext.isObject(graphMap)) {
+						treePanel.selectGraphMap(graphMap);
+					}
+                    else {
+                        treePanel.selectRoot();
+                    }
+				}
+			}
+			else {
+				treePanel.reset();
+			}
+		};
+
 		viewport = Ext.create('Ext.container.Viewport', {
 			layout: 'border',
 			period: period,
 			treePanel: treePanel,
 			setGui: setGui,
+            setOuGui: setOuGui,
             westRegion: westRegion,
             centerRegion: centerRegion,
 			items: [

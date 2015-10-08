@@ -848,16 +848,16 @@ Ext.onReady( function() {
                     // constructor
                     d.dataType = dataType;
                     d.id = config.id;
-                    d.name = config.name;
-                    d.displayName = config.displayName;
-                    d.displayShortName = config.displayShortName;
+                    d.name = config.name || '';
+                    d.displayName = config.displayName || '';
+                    d.displayShortName = config.displayShortName || '';
                     d.groups = config.indicatorGroups || config.dataElementGroups || [];
 
                     d.numerator = config.numerator;
                     d.numeratorDescription = config.numeratorDescription;
                     d.denominator = config.denominator;
                     d.denominatorDescription = config.denominatorDescription;
-                    d.description = config.description;
+                    d.description = config.description || '';
                     d.annualized = config.annualized;
 
                     d.type = config.indicatorType ? config.indicatorType.name : (config.aggregationType ? config.aggregationType : '');
@@ -1163,7 +1163,11 @@ Ext.onReady( function() {
                     return this.parentNameArray = Ext.Array.clean((this.metaData.ouNameHierarchy[this.name] || '').split('/'));
                 };
 
-                // dynamic
+                O.prototype.getParentGraphById = function(id) {
+                    return this.parentGraph.split(id)[0];
+                };
+
+                // dep 1
 
                 O.prototype.getParentIdByLevel = function(level) {
                     var parentIdArray = this.getParentIdArray(),
@@ -1172,11 +1176,11 @@ Ext.onReady( function() {
                     return parentIdArray[i];
                 };
 
-                O.prototype.getParentIdArrayByLevel = function(level) {
+                O.prototype.getParentIdArrayByLevels = function(startLevel, endLevel) {
                     var parentIdArray = this.getParentIdArray(),
-                        i = this.getValidLevel(level) - 1;
+                        i = this.getValidLevel(startLevel) - 1;
 
-                    return parentIdArray.slice(i);
+                    return parentIdArray.slice(i, endLevel || parentIdArray.length);
                 };
 
                 O.prototype.getParentNameByLevel = function(level) {
@@ -1186,16 +1190,27 @@ Ext.onReady( function() {
                     return parentNameArray[i];
                 };
 
-                O.prototype.getParentNameArrayByLevel = function(level) {
+                O.prototype.getParentNameArrayByLevels = function(startLevel, endLevel) {
                     var parentNameArray = this.getParentNameArray(),
-                        i = this.getValidLevel(level) - 1;
+                        i = this.getValidLevel(startLevel) - 1;
 
-                    return parentNameArray.slice(i);
+                    return parentNameArray.slice(startLevel, endLevel || parentNameArray.length);
                 };
+
+                O.prototype.getParentGraphMapById = function(id) {
+                    var map = {};
+                    map[id] = this.getParentGraphById(id);
+
+                    return map;
+                };
+
+                // dep 2
 
                 O.prototype.getSortIdByLevel = function(level) {
-                    return this.getParentNameArrayByLevel(level).join('');
+                    return this.getParentNameArrayByLevels(level).join('');
                 };
+
+                // dep 3
 
                 O.prototype.getContextMenuItemsConfig = function(level) {
                     var items = [],
@@ -1205,6 +1220,7 @@ Ext.onReady( function() {
                         levelName = levels[level - 1].name,
                         pOuId,
                         pOuName,
+                        gpOuId,
                         gpOuName,
                         pLevelName,
                         cLevelName;
@@ -1235,16 +1251,19 @@ Ext.onReady( function() {
                             items.push({
                                 id: pOuId,
                                 text: 'Show <span class="name">' + pOuName + '</span> only',
-                                iconCls: 'ns-menu-item-float'
+                                iconCls: 'ns-menu-item-float',
+                                parentGraphMap: this.getParentGraphMapById(pOuId)
                             });
 
                             if (level > 3) {
+                                gpOuId = this.getParentIdByLevel(level - 2) || this.id;
                                 gpOuName = this.getParentNameByLevel(level - 2) || this.name;
 
                                 items.push({
-                                    id: pOuId + ';LEVEL-' + (level - 1),
+                                    id: gpOuId + ';LEVEL-' + (level - 1),
                                     text: 'Show all <span class="name">' + pLevelName + '</span> units in <span class="name">' + gpOuName + '</span>',
-                                    iconCls: 'ns-menu-item-float'
+                                    iconCls: 'ns-menu-item-float',
+                                    parentGraphMap: this.getParentGraphMapById(gpOuId)
                                 });
                             }
 
@@ -1264,14 +1283,16 @@ Ext.onReady( function() {
                         items.push({
                             id: ouId,
                             text: 'Show <span class="name">' + ouName + '</span> only',
-                            iconCls: 'ns-menu-item-expand'
+                            iconCls: 'ns-menu-item-expand',
+                            parentGraphMap: this.getParentGraphMapById(ouId)
                         });
 
                         if (level > 2) {
                             items.push({
                                 id: pOuId + ';LEVEL-' + level,
                                 text: 'Show all <span class="name">' + levelName + '</span> units in <span class="name">' + pOuName + '</span>',
-                                iconCls: 'ns-menu-item-expand'
+                                iconCls: 'ns-menu-item-expand',
+                                parentGraphMap: this.getParentGraphMapById(pOuId)
                             });
                         }
 
@@ -1294,7 +1315,8 @@ Ext.onReady( function() {
                         items.push({
                             id: ouId + ';LEVEL-' + (level + 1),
                             text: 'Show all <span class="name">' + cLevelName + '</span> units in <span class="name">' + ouName + '</span>',
-                            iconCls: 'ns-menu-item-drill'
+                            iconCls: 'ns-menu-item-drill',
+                            parentGraphMap: this.getParentGraphMapById(ouId)
                         });
 
                         if (level > 1) {
@@ -1390,7 +1412,7 @@ Ext.onReady( function() {
                     this.organisationUnit = config.organisationUnit;
                 };
 
-                C.Ou.prototype.showContextMenu = function(layout, dataFn, menuFn) {
+                C.Ou.prototype.showContextMenu = function(layout, tableFn, menuFn) {
                     var c = this,
                         itemsConfig = this.organisationUnit.getContextMenuItemsConfig(this.level),
                         items = [];
@@ -1406,13 +1428,16 @@ Ext.onReady( function() {
                             text: conf.text,
                             iconCls: conf.iconCls,
                             ouReqId: conf.id,
+                            parentGraphMap: conf.parentGraphMap,
                             handler: function() {
+                                layout.parentGraphMap = this.parentGraphMap;
+
                                 layout.rows[1] = {
                                     dimension: 'ou',
                                     items: [{id: this.ouReqId}]
                                 };
 
-                                dataFn(layout, true);
+                                tableFn(layout, true);
                             }
                         });
                     }
@@ -1592,7 +1617,7 @@ Ext.onReady( function() {
                     }
                 };
 
-                T.prototype.addOuClickListeners = function(layout, dataFn) {
+                T.prototype.addOuClickListeners = function(layout, tableFn) {
                     var t = this,
                         cells = this.getTableCellsByInstance(api.data.TableCell.Ou);
 
@@ -1607,7 +1632,7 @@ Ext.onReady( function() {
                         el.cell = cell;
 
                         el.on('click', function(event) {
-                            this.cell.showContextMenu(layout, dataFn, t.getContextMenu);
+                            this.cell.showContextMenu(layout, tableFn, t.getContextMenu);
                         });
                     }
                 };
