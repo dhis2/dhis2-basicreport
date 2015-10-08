@@ -1351,12 +1351,25 @@ Ext.onReady( function() {
                     c.sortId = config.sortId;
                     c.cls = config.cls;
                     c.style = config.style;
+                    c.isEmpty = !!config.isEmpty;
+
+                    // auto
+                    if (c.isEmpty) {
+                        c.name = '';
+                        c.sortId = '';
+                        c.cls = 'empty';
+                        c.style = '';
+                    }
 
                     // transient
                     c.html;
                 };
 
                 C.prototype.generateHtml = function() {
+                    if (this.html) {
+                        return this.html;
+                    }
+
                     this.html = '<td';
                     this.html += this.elementId ? (' id="' + this.elementId + '"') : '';
                     this.html += this.cls ? (' class="' + this.cls + '"') : '';
@@ -1585,6 +1598,10 @@ Ext.onReady( function() {
 
                     for (var i = 0, cell, el; i < cells.length; i++) {
                         cell = cells[i];
+
+                        if (cell.isEmpty) {
+                            continue;
+                        }
 
                         el = Ext.get(cell.elementId);
                         el.cell = cell;
@@ -3481,7 +3498,9 @@ Ext.onReady( function() {
 
                                 // ou
                                 if (th.objectName === 'ou') {
-                                    row[th.id] = new api.data.TableCell.Ou({
+                                    row[th.id] = new api.data.TableCell.Ou(th.level > orgUnit.level ? {
+                                        isEmpty: true
+                                    } : {
                                         name: orgUnit.getParentNameByLevel(th.level),
                                         sortId: ouSortId + period.typeSortId + period.sortId + dataObject.groupName + dataObject.name,
                                         cls: 'pivot-value clickable',
