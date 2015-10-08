@@ -4154,7 +4154,7 @@ Ext.onReady( function() {
             // organisation units
 			if (recMap[dimConf.organisationUnit.objectName]) {
 				for (var i = 0, ouRecords = recMap[dimConf.organisationUnit.objectName]; i < ouRecords.length; i++) {
-console.log("record " + i + ": " + ouRecords[i].id);
+
 					if (ouRecords[i].id === 'USER_ORGUNIT') {
 						isOu = true;
 					}
@@ -4176,7 +4176,6 @@ console.log("record " + i + ": " + ouRecords[i].id);
 				}
 
 				if (levels.length) {
-console.log(levels);
 					toolMenu.clickHandler('level');
 					organisationUnitLevel.setValue(levels);
 				}
@@ -4190,7 +4189,7 @@ console.log(levels);
 					userOrganisationUnitChildren.setValue(isOuc);
 					userOrganisationUnitGrandChildren.setValue(isOugc);
 				}
-console.log("graphMap", graphMap);
+
 				if (!(isOu || isOuc || isOugc)) {
 					if (Ext.isObject(graphMap)) {
 						treePanel.selectGraphMap(graphMap);
