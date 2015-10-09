@@ -1489,6 +1489,16 @@ Ext.onReady( function() {
                                     items: [{id: this.ouReqId}]
                                 });
 
+                                layout.dataDimensionItems = function() {
+                                    var obj = {};
+
+                                    obj[row.dataObject.dataType] = {
+                                        id: row.dataObject.id
+                                    };
+
+                                    return [obj];
+                                }();
+
                                 layout.parentGraphMap = this.parentGraphMap;
 
                                 tableFn(layout, true);
