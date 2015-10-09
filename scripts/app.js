@@ -1026,7 +1026,7 @@ Ext.onReady( function() {
 
                     // after render
                     if (isUpdateOuGui) {
-                        ns.app.viewport.setOuGui(layout);
+                        ns.app.viewport.setGui(layout);
                     }
 
                     ns.app.layout = layout;
@@ -2332,7 +2332,7 @@ Ext.onReady( function() {
 		dataElementGroup = Ext.create('Ext.form.field.ComboBox', {
 			cls: 'ns-combo',
 			style: 'margin:0 1px 1px 0',
-			width: ns.core.conf.layout.west_fieldset_width - ns.core.conf.layout.west_width_padding - 90,
+            width: ns.core.conf.layout.west_fieldset_width - ns.core.conf.layout.west_width_padding,
 			valueField: 'id',
 			displayField: 'name',
 			emptyText: NS.i18n.select_data_element_group,
@@ -2394,14 +2394,7 @@ Ext.onReady( function() {
             bodyStyle: 'border:0 none',
             dimension: dimConf.dataElement.objectName,
 			items: [
-				{
-					xtype: 'container',
-					layout: 'column',
-					items: [
-						dataElementGroup,
-						dataElementDetailLevel
-					]
-				},
+				dataElementGroup,
 				{
 					xtype: 'panel',
 					layout: 'column',
@@ -2619,7 +2612,7 @@ Ext.onReady( function() {
             updateStoreFilters: function() {
                 indicatorAvailableStore.updateFilter();
                 dataElementAvailableStore.updateFilter();
-                dataSetAvailableStore.updateFilter();
+                //dataSetAvailableStore.updateFilter();
                 //eventDataItemAvailableStore.updateFilter();
                 //programIndicatorAvailableStore.updateFilter();
             },
@@ -2652,15 +2645,15 @@ Ext.onReady( function() {
 
 				ns.core.web.multiSelect.setHeight([indicatorAvailable, indicatorSelected], this, conf.west_fill_accordion_indicator);
                 ns.core.web.multiSelect.setHeight([dataElementAvailable, dataElementSelected], this, conf.west_fill_accordion_dataelement);
-                ns.core.web.multiSelect.setHeight([dataSetAvailable, dataSetSelected], this, conf.west_fill_accordion_dataset);
+                //ns.core.web.multiSelect.setHeight([dataSetAvailable, dataSetSelected], this, conf.west_fill_accordion_dataset);
                 //ns.core.web.multiSelect.setHeight([eventDataItemAvailable, eventDataItemSelected], this, conf.west_fill_accordion_eventdataitem);
                 //ns.core.web.multiSelect.setHeight([programIndicatorAvailable, programIndicatorSelected], this, conf.west_fill_accordion_programindicator);
 			},
 			items: [
                 dataType,
                 indicator,
-                dataElement,
-                dataSet
+                dataElement
+                //dataSet
                 //eventDataItem,
                 //programIndicator
 			],
@@ -3917,30 +3910,19 @@ Ext.onReady( function() {
 			}
 		});
 
-		setGui = function(layout, xLayout, updateGui) {
-			var dimensions = Ext.Array.clean([].concat(layout.columns || [], layout.rows || [], layout.filters || [])),
+        setGui = function(layout) {
+            var dimensions = Ext.Array.clean([].concat(layout.columns || [], layout.rows || [], layout.filters || [])),
 				dimMap = ns.core.service.layout.getObjectNameDimensionMapFromDimensionArray(dimensions),
 				recMap = ns.core.service.layout.getObjectNameDimensionItemsMapFromDimensionArray(dimensions),
 				graphMap = layout.parentGraphMap,
-				objectName,
 				periodRecords,
 				fixedPeriodRecords = [],
-				dimNames = [],
 				isOu = false,
 				isOuc = false,
 				isOugc = false,
 				levels = [],
 				groups = [],
 				orgunits = [];
-
-			// state
-			downloadButton.enable();
-            shareButton.enable();
-
-			// set gui
-			if (!updateGui) {
-				return;
-			}
 
             // dx
             dataSelectedStore.removeAll();
@@ -3950,23 +3932,13 @@ Ext.onReady( function() {
 
 			dataElementAvailableStore.removeAll();
             dataElementGroup.clearValue();
-            dataElementDetailLevel.reset();
 
-			dataSetAvailableStore.removeAll();
-
-			//eventDataItemAvailableStore.removeAll();
-			//programIndicatorAvailableStore.removeAll();
-
-            //if (Ext.isObject(xLayout.program) && Ext.isString(xLayout.program.id)) {
-                //eventDataItemProgram.setValue(xLayout.program.id);
-                //onEventDataItemProgramSelect(xLayout.program.id)
-            //}
 
             if (dimMap['dx']) {
                 dataSelectedStore.addRecords(recMap['dx']);
             }
 
-			// periods
+			// pe
 			fixedPeriodSelectedStore.removeAll();
 			period.resetRelativePeriods();
 			periodRecords = recMap[dimConf.period.objectName] || [];
@@ -3983,175 +3955,7 @@ Ext.onReady( function() {
 			fixedPeriodSelectedStore.add(fixedPeriodRecords);
 			ns.core.web.multiSelect.filterAvailable({store: fixedPeriodAvailableStore}, {store: fixedPeriodSelectedStore});
 
-			// group sets
-			for (var key in dimensionPanelMap) {
-				if (dimensionPanelMap.hasOwnProperty(key)) {
-					var panel = dimensionPanelMap[key],
-                        a = panel.availableStore,
-						s = panel.selectedStore;
-
-                    // reset
-                    a.reset();
-                    s.removeAll();
-                    panel.selectedAll.setValue(false);
-
-                    // add
-                    if (Ext.Array.contains(xLayout.objectNames, key)) {
-                        if (recMap[key]) {
-                            s.add(recMap[key]);
-                            ns.core.web.multiSelect.filterAvailable({store: a}, {store: s});
-                        }
-                        else {
-                            panel.selectedAll.setValue(true);
-                        }
-                    }
-				}
-			}
-
-			// layout
-			ns.app.stores.dimension.removeAll();
-			ns.app.stores.col.removeAll();
-			ns.app.stores.row.removeAll();
-			ns.app.stores.filter.removeAll();
-
-			if (layout.columns) {
-				dimNames = [];
-
-				for (var i = 0, dim; i < layout.columns.length; i++) {
-					dim = dimConf.objectNameMap[layout.columns[i].dimension];
-
-					if (!Ext.Array.contains(dimNames, dim.dimensionName)) {
-						ns.app.stores.col.add({
-							id: dim.dimensionName,
-							name: dimConf.objectNameMap[dim.dimensionName].name
-						});
-
-						dimNames.push(dim.dimensionName);
-					}
-
-					ns.app.stores.dimension.remove(ns.app.stores.dimension.getById(dim.dimensionName));
-				}
-			}
-
-			if (layout.rows) {
-				dimNames = [];
-
-				for (var i = 0, dim; i < layout.rows.length; i++) {
-					dim = dimConf.objectNameMap[layout.rows[i].dimension];
-
-					if (!Ext.Array.contains(dimNames, dim.dimensionName)) {
-						ns.app.stores.row.add({
-							id: dim.dimensionName,
-							name: dimConf.objectNameMap[dim.dimensionName].name
-						});
-
-						dimNames.push(dim.dimensionName);
-					}
-
-					ns.app.stores.dimension.remove(ns.app.stores.dimension.getById(dim.dimensionName));
-				}
-			}
-
-			if (layout.filters) {
-				dimNames = [];
-
-				for (var i = 0, dim; i < layout.filters.length; i++) {
-					dim = dimConf.objectNameMap[layout.filters[i].dimension];
-
-					if (!Ext.Array.contains(dimNames, dim.dimensionName)) {
-						ns.app.stores.filter.add({
-							id: dim.dimensionName,
-							name: dimConf.objectNameMap[dim.dimensionName].name
-						});
-
-						dimNames.push(dim.dimensionName);
-					}
-
-					ns.app.stores.dimension.remove(ns.app.stores.dimension.getById(dim.dimensionName));
-				}
-			}
-
-            // add assigned categories as dimension
-            if (!ns.app.layoutWindow.hasDimension(dimConf.category.dimensionName)) {
-                ns.app.stores.dimension.add({id: dimConf.category.dimensionName, name: dimConf.category.name});
-            }
-
-            // add data as dimension
-            if (!ns.app.layoutWindow.hasDimension(dimConf.data.dimensionName)) {
-                ns.app.stores.dimension.add({id: dimConf.data.dimensionName, name: dimConf.data.name});
-            }
-
-            // add orgunit as dimension
-            if (!ns.app.layoutWindow.hasDimension(dimConf.organisationUnit.dimensionName)) {
-                ns.app.stores.dimension.add({id: dimConf.organisationUnit.dimensionName, name: dimConf.organisationUnit.name});
-            }
-
-			// options
-			if (ns.app.optionsWindow) {
-				ns.app.optionsWindow.setOptions(layout);
-			}
-
-			// organisation units
-			if (recMap[dimConf.organisationUnit.objectName]) {
-				for (var i = 0, ouRecords = recMap[dimConf.organisationUnit.objectName]; i < ouRecords.length; i++) {
-					if (ouRecords[i].id === 'USER_ORGUNIT') {
-						isOu = true;
-					}
-					else if (ouRecords[i].id === 'USER_ORGUNIT_CHILDREN') {
-						isOuc = true;
-					}
-					else if (ouRecords[i].id === 'USER_ORGUNIT_GRANDCHILDREN') {
-						isOugc = true;
-					}
-					else if (ouRecords[i].id.substr(0,5) === 'LEVEL') {
-						levels.push(parseInt(ouRecords[i].id.split('-')[1]));
-					}
-					else if (ouRecords[i].id.substr(0,8) === 'OU_GROUP') {
-						groups.push(ouRecords[i].id.split('-')[1]);
-					}
-					else {
-						orgunits.push(ouRecords[i].id);
-					}
-				}
-
-				if (levels.length) {
-					toolMenu.clickHandler('level');
-					organisationUnitLevel.setValue(levels);
-				}
-				else if (groups.length) {
-					toolMenu.clickHandler('group');
-					organisationUnitGroup.setValue(groups);
-				}
-				else {
-					toolMenu.clickHandler('orgunit');
-					userOrganisationUnit.setValue(isOu);
-					userOrganisationUnitChildren.setValue(isOuc);
-					userOrganisationUnitGrandChildren.setValue(isOugc);
-				}
-
-				if (!(isOu || isOuc || isOugc)) {
-					if (Ext.isObject(graphMap)) {
-						treePanel.selectGraphMap(graphMap);
-					}
-				}
-			}
-			else {
-				treePanel.reset();
-			}
-		};
-
-        setOuGui = function(layout) {
-            var dimensions = Ext.Array.clean([].concat(layout.columns || [], layout.rows || [], layout.filters || [])),
-				recMap = ns.core.service.layout.getObjectNameDimensionItemsMapFromDimensionArray(dimensions),
-				graphMap = layout.parentGraphMap,
-				isOu = false,
-				isOuc = false,
-				isOugc = false,
-				levels = [],
-				groups = [],
-				orgunits = [];
-
-            // organisation units
+            // ou
 			if (recMap[dimConf.organisationUnit.objectName]) {
 				for (var i = 0, ouRecords = recMap[dimConf.organisationUnit.objectName]; i < ouRecords.length; i++) {
 
@@ -4209,7 +4013,6 @@ Ext.onReady( function() {
 			period: period,
 			treePanel: treePanel,
 			setGui: setGui,
-            setOuGui: setOuGui,
             westRegion: westRegion,
             centerRegion: centerRegion,
 			items: [
