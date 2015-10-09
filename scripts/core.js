@@ -1363,6 +1363,25 @@ Ext.onReady( function() {
                 };
             })();
 
+            // Table row
+            (function() {
+                var R = api.data.TableRow = function(config) {
+                    var r = this;
+
+                    r.cellMap = {};
+                };
+
+                // base
+
+                R.prototype.addCell = function(thId, cell) {
+                    this.cellMap[thId] = cell;
+                };
+
+                R.prototype.getCellById = function(thId) {
+                    return this.cellMap[thId];
+                };
+            })();
+
             // Table cell
             (function() {
                 var C = api.data.TableCell = function(config) {
@@ -1432,6 +1451,9 @@ Ext.onReady( function() {
                             handler: function() {
                                 layout.parentGraphMap = this.parentGraphMap;
 
+                                //layout
+
+
                                 layout.rows[1] = {
                                     dimension: 'ou',
                                     items: [{id: this.ouReqId}]
@@ -1498,8 +1520,8 @@ Ext.onReady( function() {
                     var sorting = this.sorting;
 
                     this.tableRows.sort( function(a, b) {
-                        a = a[sorting.id]['sortId'];
-                        b = b[sorting.id]['sortId'];
+                        a = a.getCellById(sorting.id)['sortId'];
+                        b = b.getCellById(sorting.id)['sortId'];
 
                         // string
                         if (Ext.isString(a) && Ext.isString(b)) {
@@ -1559,7 +1581,7 @@ Ext.onReady( function() {
 
                         for (var k = 0, th; k < this.tableHeaders.length; k++) {
                             th = this.tableHeaders[k];
-                            html += row[th.id].generateHtml();
+                            html += row.getCellById(th.id).generateHtml();
                         }
 
                         html += '</tr>';
@@ -1584,7 +1606,7 @@ Ext.onReady( function() {
                     var cells = [];
 
                     for (var i = 0, row; i < this.tableRows.length; i++) {
-                        row = this.tableRows[i];
+                        row = this.tableRows[i].cellMap;
 
                         for (var key in row) {
                             if (row.hasOwnProperty(key) && row[key] instanceof type) {
@@ -3484,7 +3506,7 @@ Ext.onReady( function() {
                             dxId = response.getIdByIdComb(idComb, 'dx');
                             peId = response.getIdByIdComb(idComb, 'pe');
                             ouId = response.getIdByIdComb(idComb, 'ou');
-                            row = {};
+                            row = new api.data.TableRow();
 
                             // data object
                             dataObject = idDataObjectMap[dxId];
@@ -3523,7 +3545,7 @@ Ext.onReady( function() {
 
                                 // ou
                                 if (th.objectName === 'ou') {
-                                    row[th.id] = new api.data.TableCell.Ou(th.level > orgUnit.level ? {
+                                    row.addCell(th.id, new api.data.TableCell.Ou(th.level > orgUnit.level ? {
                                         isEmpty: true
                                     } : {
                                         name: orgUnit.getParentNameByLevel(th.level),
@@ -3531,33 +3553,33 @@ Ext.onReady( function() {
                                         cls: 'pivot-value clickable',
                                         level: th.level,
                                         organisationUnit: orgUnit
-                                    });
+                                    }));
                                 }
 
                                 // pe
                                 else if (th.objectName === 'pe') {
                                     if (th.id === 'pe-type') {
-                                        row[th.id] = new api.data.TableCell({
+                                        row.addCell(th.id, new api.data.TableCell({
                                             name: period.typeName,
                                             sortId: period.typeSortId + period.sortId + dataObject.groupName + dataObject.name + allOuSortId,
                                             cls: 'pivot-value'
-                                        });
+                                        }));
                                     }
 
                                     if (th.id === 'pe-year') {
-                                        row[th.id] = new api.data.TableCell({
+                                        row.addCell(th.id, new api.data.TableCell({
                                             name: period.year,
                                             sortId: period.year + period.typeSortId + period.sortId + dataObject.groupName + dataObject.name + allOuSortId,
                                             cls: 'pivot-value'
-                                        });
+                                        }));
                                     }
 
                                     else if (th.id === 'pe') {
-                                        row[th.id] = new api.data.TableCell({
+                                        row.addCell(th.id, new api.data.TableCell({
                                             name: period.displayName,
                                             sortId: period.typeSortId + period.sortId + dataObject.groupName + dataObject.name + allOuSortId,
                                             cls: 'pivot-value'
-                                        });
+                                        }));
                                     }
                                 }
 
@@ -3565,61 +3587,61 @@ Ext.onReady( function() {
                                 else if (th.objectName === 'dx') {
 
                                     if (th.id === 'dx-group') {
-                                        row[th.id] = new api.data.TableCell({
+                                        row.addCell(th.id, new api.data.TableCell({
                                             name: dataObject.groupName,
                                             sortId: dataObject.groupName + dataObject.name + allOuSortId + period.typeSortId + period.sortId,
                                             cls: 'pivot-value'
-                                        });
+                                        }));
                                     }
                                     else if (th.id === 'dx') {
-                                        row[th.id] = new api.data.TableCell({
+                                        row.addCell(th.id, new api.data.TableCell({
                                             name: dataObject.name,
                                             sortId: dataObject.name + allOuSortId + period.typeSortId + period.sortId,
                                             cls: 'pivot-value'
-                                        });
+                                        }));
                                     }
                                     else if (th.id === 'dx-datatype') {
-                                        row[th.id] = new api.data.TableCell({
+                                        row.addCell(th.id, new api.data.TableCell({
                                             name: dataObject.dataTypeDisplayName,
                                             sortId: dataObject.dataTypeSortId + dataObject.groupName + dataObject.name + allOuSortId + period.typeSortId + period.sortId,
                                             cls: 'pivot-value'
-                                        });
+                                        }));
                                     }
                                     else if (th.id === 'dx-type') {
-                                        row[th.id] = new api.data.TableCell({
+                                        row.addCell(th.id, new api.data.TableCell({
                                             name: dataObject.typeName,
                                             sortId: dataObject.typeName + dataObject.groupName + dataObject.name + allOuSortId + period.typeSortId + period.sortId,
                                             cls: 'pivot-value' + (dataObject.type.length === 1 ? ' td-nobreak' : '')
-                                        });
+                                        }));
                                     }
                                     else if (th.id === 'dx-description') {
-                                        row[th.id] = new api.data.TableCell({
+                                        row.addCell(th.id, new api.data.TableCell({
                                             name: dataObject.description,
                                             sortId: dataObject.description + dataObject.groupName + dataObject.name + allOuSortId + period.typeSortId + period.sortId,
                                             cls: 'pivot-value'
-                                        });
+                                        }));
                                     }
                                     else if (th.id === 'dx-numerator') {
-                                        row[th.id] = new api.data.TableCell({
+                                        row.addCell(th.id, new api.data.TableCell({
                                             name: numeratorTotal || '',
                                             sortId: numeratorTotal || 0,
                                             cls: 'pivot-value align-right'
-                                        });
+                                        }));
                                     }
                                     else if (th.id === 'dx-denominator') {
-                                        row[th.id] = new api.data.TableCell({
+                                        row.addCell(th.id, new api.data.TableCell({
                                             name: denominatorTotal || '',
                                             sortId: denominatorTotal || 0,
                                             cls: 'pivot-value align-right' + (dataObject.isDataElement ? ' dataelementdenom' : '')
-                                        });
+                                        }));
                                     }
                                     else if (th.id === 'dx-value') {
-                                        row[th.id] = new api.data.TableCell({
+                                        row.addCell(th.id, new api.data.TableCell({
                                             name: value || '',
                                             sortId: parseFloat(value) || 0,
                                             cls: 'pivot-value align-right',
                                             style: 'background-color:' + dataObject.getBgColorByValue(parseFloat(value))
-                                        });
+                                        }));
                                     }
                                 }
                             }
