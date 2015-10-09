@@ -830,12 +830,14 @@ Ext.onReady( function() {
                     var d = this,
                         indicator = {
                             id: 'indicator',
+                            objectName: 'in',
                             name: NS.i18n.indicator,
                             sortId: 1,
                             isIndicator: true
                         },
                         dataElement = {
                             id: 'dataElement',
+                            objectName: 'de',
                             name: NS.i18n.data_element,
                             sortId: 2,
                             isDataElement: true
@@ -865,6 +867,7 @@ Ext.onReady( function() {
                     d.legendSet = config.legendSet || null;
 
                     // transient
+                    d.objectName = map[dataType].objectName;
                     d.dataTypeDisplayName = map[dataType].name;
                     d.dataTypeSortId = map[dataType].sortId;
                     d.isIndicator = !!map[dataType].isIndicator;
@@ -1368,6 +1371,12 @@ Ext.onReady( function() {
                 var R = api.data.TableRow = function(config) {
                     var r = this;
 
+                    r.dataObject = config.dataObject;
+                    r.period = config.period;
+                    r.organisationUnit = config.organisationUnit;
+
+                    // transient
+
                     r.cellMap = {};
                 };
 
@@ -1385,9 +1394,11 @@ Ext.onReady( function() {
             // Table cell
             (function() {
                 var C = api.data.TableCell = function(config) {
-                    var c = this;
+                    var c = this,
+                        id = Ext.data.IdGenerator.get('uuid').generate();
 
-                    c.elementId = Ext.data.IdGenerator.get('uuid').generate();
+                    c.id = id;
+                    c.elementId = id;
                     c.name = config.name;
                     c.sortId = config.sortId;
                     c.cls = config.cls;
@@ -1431,7 +1442,7 @@ Ext.onReady( function() {
                     this.organisationUnit = config.organisationUnit;
                 };
 
-                C.Ou.prototype.showContextMenu = function(layout, tableFn, menuFn) {
+                C.Ou.prototype.showContextMenu = function(layout, row, tableFn, menuFn) {
                     var c = this,
                         itemsConfig = this.organisationUnit.getContextMenuItemsConfig(this.level),
                         items = [];
@@ -1446,18 +1457,39 @@ Ext.onReady( function() {
                         } : {
                             text: conf.text,
                             iconCls: conf.iconCls,
+                            dxReqId: row.dataObject.id,
+                            dxObjectName: row.dataObject.objectName,
+                            peReqId: row.period.id,
                             ouReqId: conf.id,
                             parentGraphMap: conf.parentGraphMap,
                             handler: function() {
-                                layout.parentGraphMap = this.parentGraphMap;
+                                layout.columns = [];
+                                layout.rows = [];
 
-                                //layout
+                                // dx
+                                layout.columns.push({
+                                    dimension: 'dx',
+                                    items: [{
+                                        id: this.dxReqId,
+                                        objectName: this.dxObjectName
+                                    }]
+                                });
 
+                                // pe
+                                layout.rows.push({
+                                    dimension: 'pe',
+                                    items: [{
+                                        id: this.peReqId
+                                    }]
+                                })
 
-                                layout.rows[1] = {
+                                // ou
+                                layout.rows.push({
                                     dimension: 'ou',
                                     items: [{id: this.ouReqId}]
-                                };
+                                });
+
+                                layout.parentGraphMap = this.parentGraphMap;
 
                                 tableFn(layout, true);
                             }
@@ -1498,6 +1530,8 @@ Ext.onReady( function() {
                     };
 
                     // transient
+                    t.cellIdRowMap;
+
                     t.lastSorting = {
                         id: 'pe',
                         direction: 'ASC'
@@ -1506,6 +1540,28 @@ Ext.onReady( function() {
                     t.html;
 
                     t.update;
+                };
+
+                // base
+
+                T.prototype.getCellIdRowMap = function() {
+                    if (this.cellIdRowMap) {
+                        return this.cellIdRowMap;
+                    }
+
+                    this.cellIdRowMap = {};
+
+                    for (var i = 0, row; i < this.tableRows.length; i++) {
+                        row = this.tableRows[i];
+
+                        for (var key in row.cellMap) {
+                            if (row.cellMap.hasOwnProperty(key)) {
+                                this.cellIdRowMap[row.cellMap[key].id] = row;
+                            }
+                        }
+                    }
+
+                    return this.cellIdRowMap;
                 };
 
                 T.prototype.getSortDirection = function(id) {
@@ -1621,8 +1677,8 @@ Ext.onReady( function() {
                 T.prototype.addHeaderClickListeners = function() {
                     var t = this;
 
-                    for (var i = 0, th, el; i < this.tableHeaders.length; i++) {
-                        th = this.tableHeaders[i];
+                    for (var i = 0, th, el; i < t.tableHeaders.length; i++) {
+                        th = t.tableHeaders[i];
                         el = Ext.get(th.elementId);
                         el.tableHeaderId = th.id;
 
@@ -1639,6 +1695,12 @@ Ext.onReady( function() {
                     }
                 };
 
+                // dep 1
+                T.prototype.getRowByCellId = function(cellId) {
+                    return this.getCellIdRowMap()[cellId];
+                };
+
+                // dep 2
                 T.prototype.addOuClickListeners = function(layout, tableFn) {
                     var t = this,
                         cells = this.getTableCellsByInstance(api.data.TableCell.Ou);
@@ -1652,9 +1714,10 @@ Ext.onReady( function() {
 
                         el = Ext.get(cell.elementId);
                         el.cell = cell;
+                        el.row = t.getRowByCellId(cell.id);
 
                         el.on('click', function(event) {
-                            this.cell.showContextMenu(layout, tableFn, t.getContextMenu);
+                            this.cell.showContextMenu(layout, this.row, tableFn, t.getContextMenu);
                         });
                     }
                 };
@@ -3506,7 +3569,6 @@ Ext.onReady( function() {
                             dxId = response.getIdByIdComb(idComb, 'dx');
                             peId = response.getIdByIdComb(idComb, 'pe');
                             ouId = response.getIdByIdComb(idComb, 'ou');
-                            row = new api.data.TableRow();
 
                             // data object
                             dataObject = idDataObjectMap[dxId];
@@ -3537,6 +3599,13 @@ Ext.onReady( function() {
 
                             // value
                             value = response.getValueByIdComb(idComb);
+
+                            // row
+                            row = new api.data.TableRow({
+                                dataObject: dataObject,
+                                period: period,
+                                organisationUnit: orgUnit
+                            });
 
                             // create rows
                             for (var j = 0, th, ouSortId; j < tableHeaders.length; j++) {
