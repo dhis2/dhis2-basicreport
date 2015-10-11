@@ -1458,8 +1458,10 @@ Ext.onReady( function() {
                             text: conf.text,
                             iconCls: conf.iconCls,
                             dxReqId: row.dataObject.id,
+                            dxReqName: row.dataObject.name,
                             dxObjectName: row.dataObject.objectName,
                             peReqId: row.period.id,
+                            peReqName: row.period.name,
                             ouReqId: conf.id,
                             parentGraphMap: conf.parentGraphMap,
                             handler: function() {
@@ -1471,6 +1473,7 @@ Ext.onReady( function() {
                                     dimension: 'dx',
                                     items: [{
                                         id: this.dxReqId,
+                                        name: this.dxReqName,
                                         objectName: this.dxObjectName
                                     }]
                                 });
@@ -1479,7 +1482,8 @@ Ext.onReady( function() {
                                 layout.rows.push({
                                     dimension: 'pe',
                                     items: [{
-                                        id: this.peReqId
+                                        id: this.peReqId,
+                                        name: this.peReqName
                                     }]
                                 })
 
