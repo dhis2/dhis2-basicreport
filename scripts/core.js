@@ -1197,7 +1197,7 @@ Ext.onReady( function() {
                     var parentNameArray = this.getParentNameArray(),
                         i = this.getValidLevel(startLevel) - 1;
 
-                    return parentNameArray.slice(startLevel, endLevel || parentNameArray.length);
+                    return parentNameArray.slice(i, endLevel || parentNameArray.length);
                 };
 
                 O.prototype.getParentGraphMapById = function(id) {
