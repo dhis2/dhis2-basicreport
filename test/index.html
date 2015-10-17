@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <link rel="stylesheet" type="text/css" href="http://dhis2-cdn.org/v220/ext/resources/css/ext-plugin-gray.css"/>
+  <script src="https://dhis2-cdn.org/v220/ext/ext-all.js"></script>
+  <script src="chart.js"></script>
+<!--
+  <script src="http://localhost:8080/dhis-web-commons/javascripts/plugin/chart.js"></script>
+-->
+</head>
+
+<body>
+  <div id="chart1"></div>
+
+  <script>
+    var url = "http://localhost:8080",
+        username = "admin",
+        password = "district";
+
+    Ext.onReady(function() {
+
+        DHIS.getChart({
+            url: url,
+            el: "chart1",
+            id: "gnROK20DfAA",
+            crossDomain: true,
+            username: username,
+            password: password
+        });
+
+    });
+  </script>
+</body>
+
+</html>

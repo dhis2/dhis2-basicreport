@@ -3706,8 +3706,8 @@ Ext.onReady( function() {
                                     }
                                     else if (th.id === 'dx-numerator') {
                                         row.addCell(th.id, new api.data.TableCell({
-                                            name: numeratorTotal || '',
-                                            sortId: numeratorTotal || 0,
+                                            name: Ext.isNumeric(numeratorTotal) ? parseFloat(numeratorTotal) : '',
+                                            sortId: Ext.isNumeric(numeratorTotal) ? parseFloat(numeratorTotal) : 0,
                                             cls: 'pivot-value align-right'
                                         }));
                                     }
