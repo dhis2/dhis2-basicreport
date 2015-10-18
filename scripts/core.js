@@ -999,8 +999,7 @@ Ext.onReady( function() {
 
                     p.displayName;
 
-                    p.getPeriodUp;
-                    p.getPeriodDown;
+                    p.getContextMenuItemsConfig;
                 };
 
                 P.prototype.generateDisplayProperties = function() {
@@ -1027,33 +1026,73 @@ Ext.onReady( function() {
                             this.typeSortId = '03';
                             this.typeName = 'Monthly';
                             this.displayName = this.name.split(' ')[0];
+                            this.getContextMenuItemsConfig = function() {
+                                var items = [];
 
-                            this.getPeriodUp = function() {
-                                var month = parseInt(id.slice(4, 6)),
-                                    biMonth = (month % 2) ? ((month + 1) / 2) : (month / 2);
+                                // up
+                                items.push({
+                                    isSubtitle: true,
+                                    text: 'Drill up'
+                                });
 
-                                return p.year + '0' + biMonth + 'B';
-                            };
+                                // bi-monthly
+                                (function() {
+                                    var month = parseInt(id.slice(4, 6)),
+                                        biMonth = (month % 2) ? ((month + 1) / 2) : (month / 2),
+                                        pId = p.year + '0' + biMonth + 'B';
 
-                            this.getPeriodDown = function() {
-                                var offset = parseInt(p.year) - (new Date()).getFullYear(),
-                                    generator = init.periodGenerator,
-                                    allPeriods = generator.generateReversedPeriods('Weekly', offset),
-                                    periods = '';
+                                    items.push({
+                                        id: iId,
+                                        text: 'Show parent <span class="name">bi-month</span>',
+                                        iconCls: 'ns-menu-item-float'
+                                    });
+                                })();
 
-                                for (var i = 0, sd, ed; i < allPeriods.length; i++) {
-                                    sd = allPeriods[i].startDate;
-                                    ed = allPeriods[i].endDate;
+                                // same level
+                                items.push({
+                                    isSubtitle: true,
+                                    text: 'Monthly'
+                                });
 
-                                    if ((sd.slice(0, 4) === p.year && sd.slice(5, 7) === id.slice(4, 6)) || (sd.slice(0, 4) === p.year && sd.slice(5, 7) === id.slice(4, 6))) {
-                                        periods += (periods.length ? ';' : '') + allPeriods[i].iso;
+                                items.push({
+                                    id: id,
+                                    text: 'Show <span class="name">' + p.name + '</span> only',
+                                    iconCls: 'ns-menu-item-float'
+                                });
+
+
+
+
+
+
+
+                                this.getPeriodUp = function() {
+                                    var month = parseInt(id.slice(4, 6)),
+                                        biMonth = (month % 2) ? ((month + 1) / 2) : (month / 2);
+
+                                    return p.year + '0' + biMonth + 'B';
+                                };
+
+                                this.getPeriodDown = function() {
+                                    var offset = parseInt(p.year) - (new Date()).getFullYear(),
+                                        generator = init.periodGenerator,
+                                        allPeriods = generator.generateReversedPeriods('Weekly', offset),
+                                        periods = '';
+
+                                    for (var i = 0, sd, ed; i < allPeriods.length; i++) {
+                                        sd = allPeriods[i].startDate;
+                                        ed = allPeriods[i].endDate;
+
+                                        if ((sd.slice(0, 4) === p.year && sd.slice(5, 7) === id.slice(4, 6)) || (sd.slice(0, 4) === p.year && sd.slice(5, 7) === id.slice(4, 6))) {
+                                            periods += (periods.length ? ';' : '') + allPeriods[i].iso;
+                                        }
                                     }
-                                }
 
-                                return periods;
+                                    return periods;
+                                };
                             };
 
-                            return;
+                            //return;
                         }
 
                         // daily
@@ -1149,7 +1188,6 @@ Ext.onReady( function() {
                         this.displayName = this.name;
                         //return;
                     }
-console.log(this);
                 };
 
                 P.prototype.getContextMenuItemsConfig = function() {
