@@ -1002,6 +1002,22 @@ Ext.onReady( function() {
                     p.getContextMenuItemsConfig;
                 };
 
+                P.prototype.getPrefixedNumber = function(number) {
+                    return parseInt(number) < 10 ? '0' + number : number;
+                };
+
+                // dep 1
+
+                P.prototype.createAllMonthIdsInYear = function(year) {
+                    var ids = '';
+
+                    for (var i = 1; i <= 12; i++) {
+                        ids += (ids.length ? ';' : '') + year + this.getPrefixedNumber(i);
+                    }
+
+                    return ids;
+                };
+
                 P.prototype.generateDisplayProperties = function() {
                     var p = this,
                         id = this.id,
@@ -1026,10 +1042,11 @@ Ext.onReady( function() {
                             this.typeSortId = '03';
                             this.typeName = 'Monthly';
                             this.displayName = this.name.split(' ')[0];
+
                             this.getContextMenuItemsConfig = function() {
                                 var items = [];
 
-                                // up
+                                // drill up
                                 items.push({
                                     isSubtitle: true,
                                     text: 'Drill up'
@@ -1042,7 +1059,7 @@ Ext.onReady( function() {
                                         pId = p.year + '0' + biMonth + 'B';
 
                                     items.push({
-                                        id: iId,
+                                        id: pId,
                                         text: 'Show parent <span class="name">bi-month</span>',
                                         iconCls: 'ns-menu-item-float'
                                     });
@@ -1051,7 +1068,7 @@ Ext.onReady( function() {
                                 // same level
                                 items.push({
                                     isSubtitle: true,
-                                    text: 'Monthly'
+                                    text: 'Related months'
                                 });
 
                                 items.push({
@@ -1060,36 +1077,85 @@ Ext.onReady( function() {
                                     iconCls: 'ns-menu-item-float'
                                 });
 
+                                items.push({
+                                    id: p.createAllMonthIdsInYear(p.year),
+                                    text: 'Show all <span class="name">months</span> in <span class="name">' + p.year + '</span>',
+                                    iconCls: 'ns-menu-item-float'
+                                });
 
+                                // same level relative
+                                items.push({
+                                    isSubtitle: true,
+                                    text: 'Relative months'
+                                });
 
+                                items.push({
+                                    id: 'THIS_MONTH',
+                                    text: 'Show <span class="name">current</span> month',
+                                    iconCls: 'ns-menu-item-float'
+                                });
 
+                                items.push({
+                                    id: 'LAST_MONTH',
+                                    text: 'Show <span class="name">last</span> month',
+                                    iconCls: 'ns-menu-item-float'
+                                });
 
+                                items.push({
+                                    id: 'LAST_3_MONTHS',
+                                    text: 'Show <span class="name">last 3</span> months',
+                                    iconCls: 'ns-menu-item-float'
+                                });
 
+                                items.push({
+                                    id: 'THIS_MONTH',
+                                    text: 'Show <span class="name">last 6</span> months',
+                                    iconCls: 'ns-menu-item-float'
+                                });
 
-                                this.getPeriodUp = function() {
-                                    var month = parseInt(id.slice(4, 6)),
-                                        biMonth = (month % 2) ? ((month + 1) / 2) : (month / 2);
+                                items.push({
+                                    id: 'THIS_MONTH',
+                                    text: 'Show <span class="name">last 12</span> months',
+                                    iconCls: 'ns-menu-item-float'
+                                });
 
-                                    return p.year + '0' + biMonth + 'B';
-                                };
+                                // drill down
+                                items.push({
+                                    isSubtitle: true,
+                                    text: 'Drill down'
+                                });
 
-                                this.getPeriodDown = function() {
+                                // weekly
+                                (function() {
                                     var offset = parseInt(p.year) - (new Date()).getFullYear(),
                                         generator = init.periodGenerator,
                                         allPeriods = generator.generateReversedPeriods('Weekly', offset),
-                                        periods = '';
+                                        weekIds = '';
 
+                                    // get weeks in month
                                     for (var i = 0, sd, ed; i < allPeriods.length; i++) {
                                         sd = allPeriods[i].startDate;
                                         ed = allPeriods[i].endDate;
 
                                         if ((sd.slice(0, 4) === p.year && sd.slice(5, 7) === id.slice(4, 6)) || (sd.slice(0, 4) === p.year && sd.slice(5, 7) === id.slice(4, 6))) {
-                                            periods += (periods.length ? ';' : '') + allPeriods[i].iso;
+                                            weekIds += (weekIds.length ? ';' : '') + allPeriods[i].iso;
                                         }
                                     }
 
-                                    return periods;
-                                };
+                                    items.push({
+                                        id: weekIds,
+                                        text: 'Show all <span class="name">weeks</span> in <span class="name">' + p.name + '</span>',
+                                        iconCls: 'ns-menu-item-float'
+                                    });
+
+                                    items.push({
+                                        id: Ext.Array.pluck(allPeriods, 'iso').join(';'),
+                                        text: 'Show all <span class="name">weeks</span> in <span class="name">' + p.year + '</span>',
+                                        iconCls: 'ns-menu-item-float'
+                                    });
+                                })();
+
+                                return items;
                             };
 
                             //return;
@@ -1188,10 +1254,6 @@ Ext.onReady( function() {
                         this.displayName = this.name;
                         //return;
                     }
-                };
-
-                P.prototype.getContextMenuItemsConfig = function() {
-                    console.log(this);
                 };
             })();
 
@@ -1518,7 +1580,80 @@ Ext.onReady( function() {
                         itemsConfig = this.period.getContextMenuItemsConfig(),
                         items = [];
 
-                    console.log(itemsConfig);
+                    for (var i = 0, conf; i < itemsConfig.length; i++) {
+                        conf = itemsConfig[i];
+
+                        items.push(conf.isSubtitle ? {
+                            xtype: 'label',
+                            html: conf.text,
+                            style: conf.style
+                        } : {
+                            text: conf.text,
+                            iconCls: conf.iconCls,
+                            dxReqId: row.dataObject.id,
+                            dxReqName: row.dataObject.name,
+                            dxObjectName: row.dataObject.objectName,
+                            peReqId: conf.id,
+                            peReqName: row.period.name,
+                            ouReqId: conf.id,
+                            parentGraphMap: conf.parentGraphMap,
+                            handler: function() {
+                                layout.columns = [];
+
+                                // dx
+                                layout.columns.push({
+                                    dimension: 'dx',
+                                    items: [{
+                                        id: this.dxReqId,
+                                        name: this.dxReqName,
+                                        objectName: this.dxObjectName
+                                    }]
+                                });
+
+                                // pe
+                                layout.rows[0] = {
+                                    dimension: 'pe',
+                                    items: [{id: this.peReqId}]
+                                };
+
+                                // ou
+                                //layout.rows.push({
+                                    //dimension: 'ou',
+                                    //items: [{id: this.ouReqId}]
+                                //});
+
+                                layout.dataDimensionItems = function() {
+                                    var obj = {};
+
+                                    obj[row.dataObject.dataType] = {
+                                        id: row.dataObject.id
+                                    };
+
+                                    return [obj];
+                                }();
+
+                                //layout.parentGraphMap = this.parentGraphMap;
+
+                                tableFn(layout, true);
+                            }
+                        });
+                    }
+
+                    menu = menuFn({
+                        items: items
+                    });
+
+                    menu.showAt(function() {
+                        var el = Ext.get(c.elementId),
+                            height = el.getHeight(),
+                            width = el.getWidth(),
+                            xy = el.getXY();
+
+                        xy[0] += width - (height / 2);
+                        xy[1] += height - (height / 2);
+
+                        return xy;
+                    }());
                 };
 
                 // Ou table cell
@@ -1615,7 +1750,6 @@ Ext.onReady( function() {
 
                         return xy;
                     }());
-
                 };
             })();
 
@@ -3757,7 +3891,7 @@ Ext.onReady( function() {
                                         row.addCell(th.id, new api.data.TableCell({
                                             name: period.typeName,
                                             sortId: period.typeSortId + period.sortId + dataObject.groupName + dataObject.name + allOuSortId,
-                                            cls: 'pivot-value'
+                                            cls: 'pivot-value td-nobreak'
                                         }));
                                     }
 
