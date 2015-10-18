@@ -1020,6 +1020,7 @@ Ext.onReady( function() {
 
                         table.addHeaderClickListeners();
                         table.addOuClickListeners(layout, web.report.createReport);
+                        table.addPeClickListeners(layout, web.report.createReport);
                     };
 
                     table.update();

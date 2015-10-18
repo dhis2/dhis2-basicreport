@@ -989,7 +989,7 @@ Ext.onReady( function() {
                     p.id = '' + config.id;
                     p.name = config.name;
 
-                    // transient
+                    // uninitialized
                     p.sortId;
 
                     p.year;
@@ -998,10 +998,14 @@ Ext.onReady( function() {
                     p.typeName;
 
                     p.displayName;
+
+                    p.getPeriodUp;
+                    p.getPeriodDown;
                 };
 
                 P.prototype.generateDisplayProperties = function() {
-                    var id = this.id,
+                    var p = this,
+                        id = this.id,
                         months = 'Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec'.split('|');
 
                     this.year = id.slice(0, 4);
@@ -1014,15 +1018,41 @@ Ext.onReady( function() {
                             this.typeSortId = '08';
                             this.typeName = 'Yearly';
                             this.displayName = this.name;
-                            return;
+                            //return;
                         }
 
                         // monthly
                         if (id.length === 6) {
-                            this.sortId = id.slice(0, 4) + '00' + id.slice(4,6);
+                            this.sortId = this.year + '00' + id.slice(4,6);
                             this.typeSortId = '03';
                             this.typeName = 'Monthly';
                             this.displayName = this.name.split(' ')[0];
+
+                            this.getPeriodUp = function() {
+                                var month = parseInt(id.slice(4, 6)),
+                                    biMonth = (month % 2) ? ((month + 1) / 2) : (month / 2);
+
+                                return p.year + '0' + biMonth + 'B';
+                            };
+
+                            this.getPeriodDown = function() {
+                                var offset = parseInt(p.year) - (new Date()).getFullYear(),
+                                    generator = init.periodGenerator,
+                                    allPeriods = generator.generateReversedPeriods('Weekly', offset),
+                                    periods = '';
+
+                                for (var i = 0, sd, ed; i < allPeriods.length; i++) {
+                                    sd = allPeriods[i].startDate;
+                                    ed = allPeriods[i].endDate;
+
+                                    if ((sd.slice(0, 4) === p.year && sd.slice(5, 7) === id.slice(4, 6)) || (sd.slice(0, 4) === p.year && sd.slice(5, 7) === id.slice(4, 6))) {
+                                        periods += (periods.length ? ';' : '') + allPeriods[i].iso;
+                                    }
+                                }
+
+                                return periods;
+                            };
+
                             return;
                         }
 
@@ -1032,9 +1062,8 @@ Ext.onReady( function() {
                             this.typeSortId = '01';
                             this.typeName = 'Daily';
                             this.displayName = months[(new Date(this.name)).getMonth()] + ' ' + parseInt(this.name.split('-')[2]);
-                            return;
+                            //return;
                         }
-
                     }
 
                     // weekly
@@ -1046,7 +1075,7 @@ Ext.onReady( function() {
                         this.typeSortId = '02';
                         this.typeName = 'Weekly';
                         this.displayName = 'Week ' + id.split('W')[1];
-                        return;
+                        //return;
                     }
 
                     // bi-monthly
@@ -1055,7 +1084,7 @@ Ext.onReady( function() {
                         this.typeSortId = '04';
                         this.typeName = 'Bi-monthly';
                         this.displayName = Ext.String.trim(this.name.split(this.year)[0]);
-                        return;
+                        //return;
                     }
 
                     // quarterly
@@ -1067,7 +1096,7 @@ Ext.onReady( function() {
                         this.typeSortId = '05';
                         this.typeName = 'Quarterly';
                         this.displayName = Ext.String.trim(this.name.split(this.year)[0]);
-                        return;
+                        //return;
                     }
 
                     // six-monthly
@@ -1079,7 +1108,7 @@ Ext.onReady( function() {
                         this.typeSortId = '06';
                         this.typeName = 'Six-monthly';
                         this.displayName = Ext.String.trim(this.name.split(this.year)[0]);
-                        return;
+                        //return;
                     }
 
                     // six-monthly april
@@ -1091,7 +1120,7 @@ Ext.onReady( function() {
                         this.typeSortId = '07';
                         this.typeName = 'Six-monthly April';
                         this.displayName = Ext.String.trim(this.name.split(this.year)[0]);
-                        return;
+                        //return;
                     }
 
                     // financial april
@@ -1100,7 +1129,7 @@ Ext.onReady( function() {
                         this.typeSortId = '09';
                         this.typeName = 'Financial April';
                         this.displayName = this.name;
-                        return;
+                        //return;
                     }
 
                     // financial july
@@ -1109,7 +1138,7 @@ Ext.onReady( function() {
                         this.typeSortId = '10';
                         this.typeName = 'Financial July';
                         this.displayName = this.name;
-                        return;
+                        //return;
                     }
 
                     // financial october
@@ -1118,8 +1147,13 @@ Ext.onReady( function() {
                         this.typeSortId = '11';
                         this.typeName = 'Financial October';
                         this.displayName = this.name;
-                        return;
+                        //return;
                     }
+console.log(this);
+                };
+
+                P.prototype.getContextMenuItemsConfig = function() {
+                    console.log(this);
                 };
             })();
 
@@ -1431,6 +1465,24 @@ Ext.onReady( function() {
                     return this.html;
                 };
 
+                // Pe table cell
+                C.Pe = function(config) {
+                    var c = this,
+                        s = new C(config);
+
+                    Ext.apply(this, s);
+
+                    this.period = config.period;
+                };
+
+                C.Pe.prototype.showContextMenu = function(layout, row, tableFn, menuFn) {
+                    var c = this,
+                        itemsConfig = this.period.getContextMenuItemsConfig(),
+                        items = [];
+
+                    console.log(itemsConfig);
+                };
+
                 // Ou table cell
                 C.Ou = function(config) {
                     var c = this,
@@ -1735,6 +1787,27 @@ Ext.onReady( function() {
                         });
                     }
                 };
+
+                T.prototype.addPeClickListeners = function(layout, tableFn) {
+                    var t = this,
+                        cells = this.getTableCellsByInstance(api.data.TableCell.Pe);
+
+                    for (var i = 0, cell, el; i < cells.length; i++) {
+                        cell = cells[i];
+
+                        if (cell.isEmpty) {
+                            continue;
+                        }
+
+                        el = Ext.get(cell.elementId);
+                        el.cell = cell;
+                        el.row = t.getRowByCellId(cell.id);
+
+                        el.on('click', function(event) {
+                            this.cell.showContextMenu(layout, this.row, tableFn, t.getContextMenu);
+                        });
+                    }
+                };
             })();
         })();
 
@@ -1956,6 +2029,7 @@ Ext.onReady( function() {
                 Ext.Ajax.request(requestConfig);
             };
 		}());
+
 
 		// service
 		(function() {
@@ -3658,10 +3732,11 @@ Ext.onReady( function() {
                                     }
 
                                     else if (th.id === 'pe') {
-                                        row.addCell(th.id, new api.data.TableCell({
+                                        row.addCell(th.id, new api.data.TableCell.Pe({
                                             name: period.displayName,
                                             sortId: period.typeSortId + period.sortId + dataObject.groupName + dataObject.name + allOuSortId,
-                                            cls: 'pivot-value'
+                                            cls: 'pivot-value clickable',
+                                            period: period
                                         }));
                                     }
                                 }
