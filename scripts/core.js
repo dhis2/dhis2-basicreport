@@ -1037,7 +1037,7 @@ Ext.onReady( function() {
 
                 // dep 1
 
-                P.prototype.getItemsByYearByType = function(type) {
+                P.prototype.getItemsByTypeByYear = function(type) {
                     if (type === 'FinancialOct') {
                         return this.getItemifiedPeriods(this.generator.generateReversedPeriods(type, this.offset - 5).slice(0, 2));
                     }
@@ -1115,7 +1115,7 @@ Ext.onReady( function() {
                                 // financial october
                                 (function() {
                                     items.push({
-                                        items: p.getItemsByYearByType('FinancialOct'),
+                                        items: p.getItemsByTypeByYear('FinancialOct'),
                                         text: 'Show parent <span class="name">financial Octobers</span>',
                                         iconCls: 'ns-menu-item-float'
                                     });
@@ -1124,7 +1124,7 @@ Ext.onReady( function() {
                                 // financial july
                                 (function() {
                                     items.push({
-                                        items: p.getItemsByYearByType('FinancialJuly'),
+                                        items: p.getItemsByTypeByYear('FinancialJuly'),
                                         text: 'Show parent <span class="name">financial Julys</span>',
                                         iconCls: 'ns-menu-item-float'
                                     });
@@ -1133,7 +1133,7 @@ Ext.onReady( function() {
                                 // financial april
                                 (function() {
                                     items.push({
-                                        items: p.getItemsByYearByType('FinancialApril'),
+                                        items: p.getItemsByTypeByYear('FinancialApril'),
                                         text: 'Show parent <span class="name">financial Aprils</span>',
                                         iconCls: 'ns-menu-item-float'
                                     });
@@ -1146,7 +1146,7 @@ Ext.onReady( function() {
                                 });
 
                                 items.push({
-                                    items: p.getItemsByYearByType('Yearly'),
+                                    items: p.getItemsByTypeByYear('Yearly'),
                                     text: 'Show <span class="name">' + p.displayName + '</span> only',
                                     iconCls: 'ns-menu-item-float'
                                 });
@@ -1160,7 +1160,7 @@ Ext.onReady( function() {
                                 // six-monthly april
                                 (function() {
                                     items.push({
-                                        items: p.getItemsByYearByType('SixMonthlyApril'),
+                                        items: p.getItemsByTypeByYear('SixMonthlyApril'),
                                         text: 'Show <span class="name">six-month Aprils</span> in <span class="name">' + p.displayName + '</span>',
                                         iconCls: 'ns-menu-item-float'
                                     });
@@ -1169,7 +1169,7 @@ Ext.onReady( function() {
                                 // six-monthly
                                 (function() {
                                     items.push({
-                                        items: p.getItemsByYearByType('SixMonthly'),
+                                        items: p.getItemsByTypeByYear('SixMonthly'),
                                         text: 'Show <span class="name">six-months</span> in <span class="name">' + p.displayName + '</span>',
                                         iconCls: 'ns-menu-item-float'
                                     });
@@ -1178,7 +1178,7 @@ Ext.onReady( function() {
                                 // quarterly
                                 (function() {
                                     items.push({
-                                        items: p.getItemsByYearByType('Quarterly'),
+                                        items: p.getItemsByTypeByYear('Quarterly'),
                                         text: 'Show <span class="name">quarters</span> in <span class="name">' + p.displayName + '</span>',
                                         iconCls: 'ns-menu-item-float'
                                     });
@@ -1187,7 +1187,7 @@ Ext.onReady( function() {
                                 // bi-monthly
                                 (function() {
                                     items.push({
-                                        items: p.getItemsByYearByType('BiMonthly'),
+                                        items: p.getItemsByTypeByYear('BiMonthly'),
                                         text: 'Show <span class="name">bi-months</span> in <span class="name">' + p.displayName + '</span>',
                                         iconCls: 'ns-menu-item-float'
                                     });
@@ -1196,7 +1196,7 @@ Ext.onReady( function() {
                                 // monthly
                                 (function() {
                                     items.push({
-                                        items: p.getItemsByYearByType('Monthly'),
+                                        items: p.getItemsByTypeByYear('Monthly'),
                                         text: 'Show <span class="name">months</span> in <span class="name">' + p.displayName + '</span>',
                                         iconCls: 'ns-menu-item-float'
                                     });
@@ -1205,7 +1205,7 @@ Ext.onReady( function() {
                                 // weekly
                                 (function() {
                                     items.push({
-                                        items: p.getItemsByYearByType('Weekly'),
+                                        items: p.getItemsByTypeByYear('Weekly'),
                                         text: 'Show <span class="name">weeks</span> in <span class="name">' + p.displayName + '</span>',
                                         iconCls: 'ns-menu-item-float'
                                     });
@@ -1214,7 +1214,7 @@ Ext.onReady( function() {
                                 // daily
                                 (function() {
                                     items.push({
-                                        items: p.getItemsByYearByType('Daily'),
+                                        items: p.getItemsByTypeByYear('Daily'),
                                         text: 'Show <span class="name">days</span> in <span class="name">' + p.displayName + '</span>',
                                         iconCls: 'ns-menu-item-float'
                                     });
@@ -1222,12 +1222,6 @@ Ext.onReady( function() {
 
                                 return items;
                             };
-
-
-
-
-
-
 
                             //return;
                         }
