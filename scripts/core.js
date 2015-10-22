@@ -1180,7 +1180,7 @@ Ext.onReady( function() {
                                 // same level
                                 items.push({
                                     isSubtitle: true,
-                                    text: 'Related months'
+                                    text: 'Monthly'
                                 });
 
                                 items.push({
@@ -1192,42 +1192,6 @@ Ext.onReady( function() {
                                 items.push({
                                     id: p.createAllMonthIdsInYear(p.year),
                                     text: 'Show all <span class="name">months</span> in <span class="name">' + p.year + '</span>',
-                                    iconCls: 'ns-menu-item-float'
-                                });
-
-                                // same level relative
-                                items.push({
-                                    isSubtitle: true,
-                                    text: 'Relative months'
-                                });
-
-                                items.push({
-                                    id: 'THIS_MONTH',
-                                    text: 'Show <span class="name">current</span> month',
-                                    iconCls: 'ns-menu-item-float'
-                                });
-
-                                items.push({
-                                    id: 'LAST_MONTH',
-                                    text: 'Show <span class="name">last</span> month',
-                                    iconCls: 'ns-menu-item-float'
-                                });
-
-                                items.push({
-                                    id: 'LAST_3_MONTHS',
-                                    text: 'Show <span class="name">last 3</span> months',
-                                    iconCls: 'ns-menu-item-float'
-                                });
-
-                                items.push({
-                                    id: 'THIS_MONTH',
-                                    text: 'Show <span class="name">last 6</span> months',
-                                    iconCls: 'ns-menu-item-float'
-                                });
-
-                                items.push({
-                                    id: 'THIS_MONTH',
-                                    text: 'Show <span class="name">last 12</span> months',
                                     iconCls: 'ns-menu-item-float'
                                 });
 
