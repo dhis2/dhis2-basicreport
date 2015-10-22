@@ -1006,8 +1006,10 @@ Ext.onReady( function() {
                     return parseInt(number) < 10 ? '0' + number : number;
                 };
 
-                P.prototype.getNameByIdAndType = function(type, id) {
-                    var offset = parseInt(this.year) - (new Date()).getFullYear(),
+                P.prototype.getNameByIdAndType = function(type, id, year) {
+                    year = year || this.year;
+
+                    var offset = parseInt(year) - (new Date()).getFullYear(),
                         periods = init.periodGenerator.generateReversedPeriods(type, offset);
 
                     for (var i = 0; i < periods.length; i++) {
@@ -1065,6 +1067,73 @@ Ext.onReady( function() {
                                     isSubtitle: true,
                                     text: 'Drill up'
                                 });
+
+                                // financial october
+                                (function() {
+                                    var financialOctoberYear = month < 10 ? parseInt(p.year) - 1 : parseInt(p.year),
+                                        pId = financialOctoberYear + 'Oct',
+                                        pName = p.getNameByIdAndType('FinancialOct', pId, financialOctoberYear);
+
+                                    items.push({
+                                        id: pId,
+                                        name: pName,
+                                        text: 'Show parent <span class="name">financial October</span> (<span class="name">' + pName + '</span>)',
+                                        iconCls: 'ns-menu-item-float'
+                                    });
+                                })();
+
+                                // financial july
+                                (function() {
+                                    var financialJulyYear = month < 7 ? parseInt(p.year) - 1 : parseInt(p.year),
+                                        pId = financialJulyYear + 'July',
+                                        pName = p.getNameByIdAndType('FinancialJuly', pId, financialJulyYear);
+
+                                    items.push({
+                                        id: pId,
+                                        name: pName,
+                                        text: 'Show parent <span class="name">financial July</span> (<span class="name">' + pName + '</span>)',
+                                        iconCls: 'ns-menu-item-float'
+                                    });
+                                })();
+
+                                // financial april
+                                (function() {
+                                    var financialAprilYear = month < 4 ? parseInt(p.year) - 1 : parseInt(p.year),
+                                        pId = financialAprilYear + 'April',
+                                        pName = p.getNameByIdAndType('FinancialApril', pId, financialAprilYear);
+
+                                    items.push({
+                                        id: pId,
+                                        name: pName,
+                                        text: 'Show parent <span class="name">financial April</span> (<span class="name">' + pName + '</span>)',
+                                        iconCls: 'ns-menu-item-float'
+                                    });
+                                })();
+
+                                // yearly
+                                (function() {
+                                    items.push({
+                                        id: p.year,
+                                        name: p.year,
+                                        text: 'Show parent <span class="name">year</span> (<span class="name">' + p.year + '</span>)',
+                                        iconCls: 'ns-menu-item-float'
+                                    });
+                                })();
+
+                                // six-monthly april
+                                (function() {
+                                    var sixMonthAprilYear = (month < 4) ? (parseInt(p.year) - 1) : parseInt(p.year),
+                                        sixMonthApril = (month >= 4 && month <= 9) ? 1 : 2,
+                                        pId = sixMonthAprilYear + 'AprilS' + sixMonthApril,
+                                        pName = p.getNameByIdAndType('SixMonthlyApril', pId, sixMonthAprilYear);
+
+                                    items.push({
+                                        id: pId,
+                                        name: pName,
+                                        text: 'Show parent <span class="name">six-month April</span> (<span class="name">' + pName + '</span>)',
+                                        iconCls: 'ns-menu-item-float'
+                                    });
+                                })();
 
                                 // six-monthly
                                 (function() {
