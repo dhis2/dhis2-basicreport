@@ -1006,6 +1006,17 @@ Ext.onReady( function() {
                     return parseInt(number) < 10 ? '0' + number : number;
                 };
 
+                P.prototype.getNameByIdAndType = function(type, id) {
+                    var offset = parseInt(this.year) - (new Date()).getFullYear(),
+                        periods = init.periodGenerator.generateReversedPeriods(type, offset);
+
+                    for (var i = 0; i < periods.length; i++) {
+                        if (periods[i].iso === id) {
+                            return periods[i].name;
+                        }
+                    }
+                };
+
                 // dep 1
 
                 P.prototype.createAllMonthIdsInYear = function(year) {
@@ -1021,7 +1032,9 @@ Ext.onReady( function() {
                 P.prototype.generateDisplayProperties = function() {
                     var p = this,
                         id = this.id,
-                        months = 'Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec'.split('|');
+                        months = 'Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec'.split('|'),
+                        offset = parseInt(p.year) - (new Date()).getFullYear(),
+                        generator = init.periodGenerator;
 
                     this.year = id.slice(0, 4);
 
@@ -1044,7 +1057,8 @@ Ext.onReady( function() {
                             this.displayName = this.name.split(' ')[0];
 
                             this.getContextMenuItemsConfig = function() {
-                                var items = [];
+                                var month = parseInt(id.slice(4, 6)),
+                                    items = [];
 
                                 // drill up
                                 items.push({
@@ -1052,15 +1066,44 @@ Ext.onReady( function() {
                                     text: 'Drill up'
                                 });
 
-                                // bi-monthly
+                                // six-monthly
                                 (function() {
-                                    var month = parseInt(id.slice(4, 6)),
-                                        biMonth = (month % 2) ? ((month + 1) / 2) : (month / 2),
-                                        pId = p.year + '0' + biMonth + 'B';
+                                    var sixMonth = month <= 6 ? 1 : 2,
+                                        pId = p.year + 'S' + sixMonth,
+                                        pName = p.getNameByIdAndType('SixMonthly', pId);
 
                                     items.push({
                                         id: pId,
-                                        text: 'Show parent <span class="name">bi-month</span>',
+                                        name: pName,
+                                        text: 'Show parent <span class="name">six-month</span> (<span class="name">' + pName + '</span>)',
+                                        iconCls: 'ns-menu-item-float'
+                                    });
+                                })();
+
+                                // quarterly
+                                (function() {
+                                    var quarter = month <= 3 ? 1 : (month <= 6 ? 2 : (month <= 9 ? 3 : 4)),
+                                        pId = p.year + 'Q' + quarter,
+                                        pName = p.getNameByIdAndType('Quarterly', pId);
+
+                                    items.push({
+                                        id: pId,
+                                        name: pName,
+                                        text: 'Show parent <span class="name">quarter</span> (<span class="name">' + pName + '</span>)',
+                                        iconCls: 'ns-menu-item-float'
+                                    });
+                                })();
+
+                                // bi-monthly
+                                (function() {
+                                    var biMonth = (month % 2) ? ((month + 1) / 2) : (month / 2),
+                                        pId = p.year + '0' + biMonth + 'B',
+                                        pName = p.getNameByIdAndType('BiMonthly', pId);
+
+                                    items.push({
+                                        id: pId,
+                                        name: pName,
+                                        text: 'Show parent <span class="name">bi-month</span> (<span class="name">' + pName + '</span>)',
                                         iconCls: 'ns-menu-item-float'
                                     });
                                 })();
@@ -1127,9 +1170,7 @@ Ext.onReady( function() {
 
                                 // weekly
                                 (function() {
-                                    var offset = parseInt(p.year) - (new Date()).getFullYear(),
-                                        generator = init.periodGenerator,
-                                        allPeriods = generator.generateReversedPeriods('Weekly', offset),
+                                    var allPeriods = generator.generateReversedPeriods('Weekly', offset),
                                         weekIds = '';
 
                                     // get weeks in month
@@ -1590,49 +1631,15 @@ Ext.onReady( function() {
                         } : {
                             text: conf.text,
                             iconCls: conf.iconCls,
-                            dxReqId: row.dataObject.id,
-                            dxReqName: row.dataObject.name,
-                            dxObjectName: row.dataObject.objectName,
                             peReqId: conf.id,
-                            peReqName: row.period.name,
-                            ouReqId: conf.id,
-                            parentGraphMap: conf.parentGraphMap,
+                            peReqName: conf.name,
                             handler: function() {
-                                layout.columns = [];
-
-                                // dx
-                                layout.columns.push({
-                                    dimension: 'dx',
-                                    items: [{
-                                        id: this.dxReqId,
-                                        name: this.dxReqName,
-                                        objectName: this.dxObjectName
-                                    }]
-                                });
 
                                 // pe
                                 layout.rows[0] = {
                                     dimension: 'pe',
                                     items: [{id: this.peReqId}]
                                 };
-
-                                // ou
-                                //layout.rows.push({
-                                    //dimension: 'ou',
-                                    //items: [{id: this.ouReqId}]
-                                //});
-
-                                layout.dataDimensionItems = function() {
-                                    var obj = {};
-
-                                    obj[row.dataObject.dataType] = {
-                                        id: row.dataObject.id
-                                    };
-
-                                    return [obj];
-                                }();
-
-                                //layout.parentGraphMap = this.parentGraphMap;
 
                                 tableFn(layout, true);
                             }
@@ -2201,7 +2208,6 @@ Ext.onReady( function() {
                 Ext.Ajax.request(requestConfig);
             };
 		}());
-
 
 		// service
 		(function() {
