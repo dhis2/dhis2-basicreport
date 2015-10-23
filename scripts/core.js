@@ -1168,6 +1168,9 @@ Ext.onReady( function() {
                         offset = parseInt(p.year) - (new Date()).getFullYear(),
                         generator = init.periodGenerator;
 
+                    //tmp
+                    this.getContextMenuItemsConfig = function() {};
+
                     if (Ext.isNumeric(id)) {
 
                         // yearly
@@ -1856,6 +1859,10 @@ Ext.onReady( function() {
                     var c = this,
                         itemsConfig = this.period.getContextMenuItemsConfig(),
                         items = [];
+
+                    if (!itemsConfig || !itemsConfig.length) {
+                        return;
+                    }
 
                     for (var i = 0, conf; i < itemsConfig.length; i++) {
                         conf = itemsConfig[i];
