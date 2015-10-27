@@ -1169,7 +1169,7 @@ Ext.onReady( function() {
                     return [];
                 };
 
-                P.prototype.getItemsByTypeByMonth = function(type) {
+                P.prototype.getItemsByTypeByMonth = function(type, isAll) {
                     var monthStr = this.id.slice(4, 6),
                         month = parseInt(monthStr),
                         offset;
@@ -1214,6 +1214,10 @@ Ext.onReady( function() {
                         return this.getItemifiedPeriods(this.generator.generatePeriods(type, this.offset).slice(startIndex, endIndex));
                     }
                     else if (type === 'Monthly') {
+                        if (isAll) {
+                            return this.getItemifiedPeriods(this.generator.generatePeriods(type, this.offset));
+                        }
+
                         return this.getItemifiedPeriods(this.generator.generatePeriods(type, this.offset).slice(month - 1, month));
                     }
                     else if (type === 'Weekly') {
@@ -1502,12 +1506,11 @@ Ext.onReady( function() {
                                     iconCls: 'ns-menu-item-float'
                                 });
 
-                                //items.push({
-                                    //id: p.createAllMonthIdsInYear(p.year),
-                                    //name: p.year,
-                                    //text: 'Show all <span class="name">months</span> in <span class="name">' + p.year + '</span>',
-                                    //iconCls: 'ns-menu-item-float'
-                                //});
+                                items.push({
+                                    items: p.getItemsByTypeByMonth('Monthly', true),
+                                    text: 'Show all <span class="name">months</span> in <span class="name">' + p.year + '</span>',
+                                    iconCls: 'ns-menu-item-float'
+                                });
 
                                 // drill down
                                 items.push({
