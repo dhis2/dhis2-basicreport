@@ -993,7 +993,7 @@ Ext.onReady( function() {
                     p.year = p.id.slice(0, 4);
                     p.offset = parseInt(p.year) - (new Date()).getFullYear();
                     p.generator = init.periodGenerator;
-gen = p.generator;
+
                     // uninitialized
                     p.sortId;
 
@@ -1175,16 +1175,16 @@ gen = p.generator;
                         offset;
 
                     if (type === 'FinancialOct') {
-                        offset = month < 10 ? -1 : 0;
-                        return this.getItemifiedPeriods(this.generator.generateReversedPeriods(type, this.offset + offset - 5).slice(0, month < 10 ? 1 : 2));
+                        offset = month <= 9 ? 4 : 5;
+                        return this.getItemifiedPeriods(this.generator.generatePeriods(type, this.offset + offset).slice(0, 1));
                     }
                     else if (type === 'FinancialJuly') {
-                        offset = month < 7 ? -1 : 0;
-                        return this.getItemifiedPeriods(this.generator.generateReversedPeriods(type, this.offset + offset - 5).slice(0, month < 7 ? 1 : 2));
+                        offset = month <= 6 ? 4 : 5;
+                        return this.getItemifiedPeriods(this.generator.generatePeriods(type, this.offset + offset).slice(0, 1));
                     }
                     else if (type === 'FinancialApril') {
-                        offset = month < 4 ? -1 : 0;
-                        return this.getItemifiedPeriods(this.generator.generateReversedPeriods(type, this.offset + offset - 5).slice(0, month < 4 ? 1 : 2));
+                        offset = month <= 3 ? 4 : 5;
+                        return this.getItemifiedPeriods(this.generator.generatePeriods(type, this.offset + offset).slice(0, 1));
                     }
                     else if (type === 'Yearly') {
                         return this.getItemifiedPeriods(this.generator.generateReversedPeriods(type, this.offset - 5).slice(0, 1));
