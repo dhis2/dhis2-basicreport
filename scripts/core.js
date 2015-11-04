@@ -1281,33 +1281,61 @@ console.log("itemify", periods[0].iso, periods);
 
                         //return this.getItemifiedPeriods(this.generator.generateReversedPeriods(type, this.offset + offset).slice(0, index));
                     //}
-                    //else if (type === 'SixMonthly') {
-                        //var startIndex = (month <= 6) ? 0 : 1,
-                            //endIndex = startIndex + 1;
+                    if (type === 'SixMonthly') {
+                        var allSixmonths = this.generator.generatePeriods(type, this.offset),
+                            allWeeks = this.generator.generatePeriods('Weekly', this.offset),
+                            weekPeriod = allWeeks[week - 1],
+                            startDateMonth = parseInt(weekPeriod.startDate.substring(5, 7)),
+                            endDateMonth = parseInt(weekPeriod.endDate.substring(5, 7)),
+                            actualSixmonths = Ext.Array.unique([Math.ceil(startDateMonth / 6), Math.ceil(endDateMonth / 6)]),
+                            sixmonths = [];
 
-                        //return this.getItemifiedPeriods(this.generator.generatePeriods(type, this.offset).slice(startIndex, endIndex));
-                    //}
-                    //else if (type === 'Quarterly') {
-                        //var startIndex = (month <= 3) ? 0 : (month <= 6 ? 1 : (month <= 9 ? 2 : 3))
-                            //endIndex = startIndex + 1;
+                        for (var i = 0; i < actualSixmonths.length; i++) {
+                            sixmonths.push(allSixmonths[actualSixmonths[i] - 1]);
+                        }
 
-                        //return this.getItemifiedPeriods(this.generator.generatePeriods(type, this.offset).slice(startIndex, endIndex));
-                    //}
-                    //else if (type === 'BiMonthly') {
-                        //var startIndex = (month <= 2) ? 0 : (month <= 4 ? 1 : (month <= 6 ? 2 : (month <= 8 ? 3 : (month <= 10 ? 4 : 5))))
-                            //endIndex = startIndex + 1;
+                        return this.getItemifiedPeriods(sixmonths);
+                    }
+                    else if (type === 'Quarterly') {
+                        var allQuarters = this.generator.generatePeriods(type, this.offset),
+                            allWeeks = this.generator.generatePeriods('Weekly', this.offset),
+                            weekPeriod = allWeeks[week - 1],
+                            startDateMonth = parseInt(weekPeriod.startDate.substring(5, 7)),
+                            endDateMonth = parseInt(weekPeriod.endDate.substring(5, 7)),
+                            actualQuarters = Ext.Array.unique([Math.ceil(startDateMonth / 3), Math.ceil(endDateMonth / 3)]),
+                            quarters = [];
 
-                        //return this.getItemifiedPeriods(this.generator.generatePeriods(type, this.offset).slice(startIndex, endIndex));
-                    //}
-                        if (type === 'Monthly') {
+                        for (var i = 0; i < actualQuarters.length; i++) {
+                            quarters.push(allQuarters[actualQuarters[i] - 1]);
+                        }
+
+                        return this.getItemifiedPeriods(quarters);
+                    }
+                    else if (type === 'BiMonthly') {
+                        var allBimonths = this.generator.generatePeriods(type, this.offset),
+                            allWeeks = this.generator.generatePeriods('Weekly', this.offset),
+                            weekPeriod = allWeeks[week - 1],
+                            startDateMonth = parseInt(weekPeriod.startDate.substring(5, 7)),
+                            endDateMonth = parseInt(weekPeriod.endDate.substring(5, 7)),
+                            actualBimonths = Ext.Array.unique([Math.ceil(startDateMonth / 2), Math.ceil(endDateMonth / 2)]),
+                            bimonths = [];
+
+                        for (var i = 0; i < actualBimonths.length; i++) {
+                            bimonths.push(allBimonths[actualBimonths[i] - 1]);
+                        }
+
+                        return this.getItemifiedPeriods(bimonths);
+                    }
+                    else if (type === 'Monthly') {
                         var allMonths = this.generator.generatePeriods(type, this.offset),
                             allWeeks = this.generator.generatePeriods('Weekly', this.offset),
                             weekPeriod = allWeeks[week - 1],
-                            actualMonths = Ext.Array.unique([parseInt(weekPeriod.startDate.substring(5, 7)), parseInt(weekPeriod.endDate.substring(5, 7))]),
+                            startDateMonth = parseInt(weekPeriod.startDate.substring(5, 7)),
+                            endDateMonth = parseInt(weekPeriod.endDate.substring(5, 7)),
+                            actualMonths = Ext.Array.unique([startDateMonth, endDateMonth]),
                             months = [];
 
                         for (var i = 0; i < actualMonths.length; i++) {
-
                             months.push(allMonths[actualMonths[i] - 1]);
                         }
 
@@ -1474,7 +1502,10 @@ console.log("itemify", periods[0].iso, periods);
                         id = this.id,
                         months = 'Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec'.split('|'),
                         offset = parseInt(p.year) - (new Date()).getFullYear(),
-                        generator = init.periodGenerator;
+                        generator = init.periodGenerator,
+                        getSuffix = function(array) {
+                            return array.length > 1 ? 's' : '';
+                        };
 
                     //tmp
                     this.getContextMenuItemsConfig = function() {};
@@ -1901,9 +1932,11 @@ console.log("itemify", periods[0].iso, periods);
 
                             // financial october
                             (function() {
+                                var periods = p.getItemsByTypeByWeek('FinancialOct');
+
                                 items.push({
-                                    items: p.getItemsByTypeByWeek('FinancialOct'),
-                                    text: 'Show parent <span class="name">financial October</span>',
+                                    items: periods,
+                                    text: 'Show parent <span class="name">financial October' + getSuffix(periods) + '</span>',
                                     iconCls: 'ns-menu-item-float'
                                 });
                             })();
@@ -1973,9 +2006,11 @@ console.log("itemify", periods[0].iso, periods);
 
                             // monthly
                             (function() {
+                                var periods = p.getItemsByTypeByWeek('Monthly');
+
                                 items.push({
-                                    items: p.getItemsByTypeByWeek('Monthly'),
-                                    text: 'Show parent <span class="name">month</span>',
+                                    items: periods,
+                                    text: 'Show parent <span class="name">month' + getSuffix(periods) + '</span>',
                                     iconCls: 'ns-menu-item-float'
                                 });
                             })();
