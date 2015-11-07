@@ -1275,8 +1275,27 @@ console.log("itemify", periods[0].iso, periods);
                     //else if (type === 'Yearly') {
                         //return this.getItemifiedPeriods(this.generator.generateReversedPeriods(type, this.offset - 5).slice(0, 1));
                     //}
-                    else if (type === 'SixMonthlyApril') {
+                    if (type === 'SixMonthlyApril') {
+                        //var allSixMonthAprils = this.generator.generatePeriods(type, this.offset),
+                        var allWeeks = this.generator.generatePeriods('Weekly', this.offset),
+                            weekPeriod = allWeeks[week - 1],
+                            startDateMonth = parseInt(weekPeriod.startDate.substring(5, 7)),
+                            endDateMonth = parseInt(weekPeriod.endDate.substring(5, 7)),
+                            sixmonthaprils = [];
 
+                        if (startDateMonth < 4) {
+                            sixmonthaprils.push(this.generator.generatePeriods('SixMonthlyApril', this.offset - 1)[1]);
+                        }
+
+                        if (Ext.Number.constrain(startDateMonth, 4, 9) === startDateMonth || Ext.Number.constrain(endDateMonth, 4, 9) === endDateMonth) {
+                            sixmonthaprils.push(this.generator.generatePeriods('SixMonthlyApril', this.offset)[0]);
+                        }
+
+                        if (endDateMonth > 9) {
+                            sixmonthaprils.push(this.generator.generatePeriods('SixMonthlyApril', this.offset)[1]);
+                        }
+
+                        return this.getItemifiedPeriods(sixmonthaprils);
                     }
                     else if (type === 'SixMonthly') {
                         var allSixmonths = this.generator.generatePeriods(type, this.offset),
