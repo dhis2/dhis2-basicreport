@@ -304,10 +304,10 @@ table.pivot.fontsize-small td {
 	max-width: 700px;
 }
 .pivot-value.highlighted {
-	background-color: #f3f3f3;
+	background-color: #f1f1f1;
 }
 .pivot-value.clickable:hover {
-    background-color: #f3f3f3;
+    background-color: #f1f1f1;
     cursor: pointer;
 }
 

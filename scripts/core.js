@@ -1258,32 +1258,55 @@ console.log("itemify", periods[0].iso, periods);
                 P.prototype.getItemsByTypeByWeek = function(type, isAll) {
                     var weekStr = this.id.slice(5,7),
                         week = parseInt(weekStr),
+                        allWeeks = this.generator.generatePeriods('Weekly', this.offset),
+                        weekPeriod = allWeeks[week - 1],
+                        startDateMonth = parseInt(weekPeriod.startDate.substring(5, 7)),
+                        endDateMonth = parseInt(weekPeriod.endDate.substring(5, 7)),
+                        startDateYear = parseInt(weekPeriod.startDate.substring(0, 4)),
+                        endDateYear = parseInt(weekPeriod.endDate.substring(0, 4)),
                         offset;
 
-                    //if (type === 'FinancialOct') {
-                        //offset = month <= 9 ? 4 : 5;
-                        //return this.getItemifiedPeriods(this.generator.generatePeriods(type, this.offset + offset).slice(0, 1));
-                    //}
-                    //else if (type === 'FinancialJuly') {
-                        //offset = month <= 6 ? 4 : 5;
-                        //return this.getItemifiedPeriods(this.generator.generatePeriods(type, this.offset + offset).slice(0, 1));
-                    //}
-                    //else if (type === 'FinancialApril') {
-                        //offset = month <= 3 ? 4 : 5;
-                        //return this.getItemifiedPeriods(this.generator.generatePeriods(type, this.offset + offset).slice(0, 1));
-                    //}
-                    //else if (type === 'Yearly') {
-                        //return this.getItemifiedPeriods(this.generator.generateReversedPeriods(type, this.offset - 5).slice(0, 1));
-                    //}
-                    if (type === 'SixMonthlyApril') {
-                        //var allSixMonthAprils = this.generator.generatePeriods(type, this.offset),
-                        var allWeeks = this.generator.generatePeriods('Weekly', this.offset),
-                            weekPeriod = allWeeks[week - 1],
-                            startDateMonth = parseInt(weekPeriod.startDate.substring(5, 7)),
-                            endDateMonth = parseInt(weekPeriod.endDate.substring(5, 7)),
-                            sixmonthaprils = [];
+                    if (type === 'FinancialOct') {
+                        var yearOffset = 5,
+                            isPrev = startDateMonth < 10 || startDateYear < this.year,
+                            isThis = endDateMonth >= 10 || startDateYear > this.year,
+                            offset = isPrev ? -1 : 0,
+                            sliceEndIndex = 0 + (isPrev ? 1 : 0) + (isThis ? 1 : 0),
+                            financialaprils = [];
 
-                        if (startDateMonth < 4) {
+                        return this.getItemifiedPeriods(this.generator.generatePeriods('FinancialOct', this.offset + yearOffset + offset).slice(0, sliceEndIndex));
+                    }
+                    else if (type === 'FinancialJuly') {
+                        var yearOffset = 5,
+                            isPrev = startDateMonth < 7 || startDateYear < this.year,
+                            isThis = endDateMonth >= 7 || startDateYear > this.year,
+                            offset = isPrev ? -1 : 0,
+                            sliceEndIndex = 0 + (isPrev ? 1 : 0) + (isThis ? 1 : 0),
+                            financialaprils = [];
+
+                        return this.getItemifiedPeriods(this.generator.generatePeriods('FinancialJuly', this.offset + yearOffset + offset).slice(0, sliceEndIndex));
+                    }
+                    else if (type === 'FinancialApril') {
+                        var yearOffset = 5,
+                            isPrev = startDateMonth < 4 || startDateYear < this.year,
+                            isThis = endDateMonth >= 4 || startDateYear > this.year,
+                            offset = isPrev ? -1 : 0,
+                            sliceEndIndex = 0 + (isPrev ? 1 : 0) + (isThis ? 1 : 0),
+                            financialaprils = [];
+
+                        return this.getItemifiedPeriods(this.generator.generatePeriods('FinancialApril', this.offset + yearOffset + offset).slice(0, sliceEndIndex));
+                    }
+                    else if (type === 'Yearly') {
+                        var yearOffset = 5,
+                            offset = startDateYear < parseInt(this.year) ? -1 : 0,
+                            sliceEndIndex = 1 + (startDateYear !== endDateYear ? 1 : 0);
+
+                        return this.getItemifiedPeriods(this.generator.generatePeriods('Yearly', (this.offset + yearOffset + offset)).slice(0, sliceEndIndex));
+                    }
+                    else if (type === 'SixMonthlyApril') {
+                        var sixmonthaprils = [];
+
+                        if (startDateMonth < 4 || startDateYear < this.year) {
                             sixmonthaprils.push(this.generator.generatePeriods('SixMonthlyApril', this.offset - 1)[1]);
                         }
 
@@ -1291,7 +1314,7 @@ console.log("itemify", periods[0].iso, periods);
                             sixmonthaprils.push(this.generator.generatePeriods('SixMonthlyApril', this.offset)[0]);
                         }
 
-                        if (endDateMonth > 9) {
+                        if (endDateMonth > 9 || endDateYear > this.year) {
                             sixmonthaprils.push(this.generator.generatePeriods('SixMonthlyApril', this.offset)[1]);
                         }
 
@@ -1299,10 +1322,6 @@ console.log("itemify", periods[0].iso, periods);
                     }
                     else if (type === 'SixMonthly') {
                         var allSixmonths = this.generator.generatePeriods(type, this.offset),
-                            allWeeks = this.generator.generatePeriods('Weekly', this.offset),
-                            weekPeriod = allWeeks[week - 1],
-                            startDateMonth = parseInt(weekPeriod.startDate.substring(5, 7)),
-                            endDateMonth = parseInt(weekPeriod.endDate.substring(5, 7)),
                             actualSixmonthIndexes = Ext.Array.unique([Math.ceil(startDateMonth / 6), Math.ceil(endDateMonth / 6)]),
                             sixmonths = [];
 
@@ -1314,10 +1333,6 @@ console.log("itemify", periods[0].iso, periods);
                     }
                     else if (type === 'Quarterly') {
                         var allQuarters = this.generator.generatePeriods(type, this.offset),
-                            allWeeks = this.generator.generatePeriods('Weekly', this.offset),
-                            weekPeriod = allWeeks[week - 1],
-                            startDateMonth = parseInt(weekPeriod.startDate.substring(5, 7)),
-                            endDateMonth = parseInt(weekPeriod.endDate.substring(5, 7)),
                             actualQuarterIndexes = Ext.Array.unique([Math.ceil(startDateMonth / 3), Math.ceil(endDateMonth / 3)]),
                             quarters = [];
 
@@ -1329,10 +1344,6 @@ console.log("itemify", periods[0].iso, periods);
                     }
                     else if (type === 'BiMonthly') {
                         var allBimonths = this.generator.generatePeriods(type, this.offset),
-                            allWeeks = this.generator.generatePeriods('Weekly', this.offset),
-                            weekPeriod = allWeeks[week - 1],
-                            startDateMonth = parseInt(weekPeriod.startDate.substring(5, 7)),
-                            endDateMonth = parseInt(weekPeriod.endDate.substring(5, 7)),
                             actualBimonthIndexes = Ext.Array.unique([Math.ceil(startDateMonth / 2), Math.ceil(endDateMonth / 2)]),
                             bimonths = [];
 
@@ -1344,10 +1355,6 @@ console.log("itemify", periods[0].iso, periods);
                     }
                     else if (type === 'Monthly') {
                         var allMonths = this.generator.generatePeriods(type, this.offset),
-                            allWeeks = this.generator.generatePeriods('Weekly', this.offset),
-                            weekPeriod = allWeeks[week - 1],
-                            startDateMonth = parseInt(weekPeriod.startDate.substring(5, 7)),
-                            endDateMonth = parseInt(weekPeriod.endDate.substring(5, 7)),
                             actualMonthIndexes = Ext.Array.unique([startDateMonth, endDateMonth]),
                             months = [];
 
