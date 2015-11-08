@@ -1134,53 +1134,53 @@ console.log("itemify", periods[0].iso, periods);
 
                         return this.getItemifiedPeriods(this.generator.generatePeriods(type, this.offset).slice(sliceStartIndex, sliceEndIndex));
                     }
-                    //else if (type === 'BiMonthly') {
-                        //startIndex = (quarter === 1) ? 0 : (quarter === 2 ? 1 : (quarter === 3 ? 3 : 4));
-                        //endIndex = startIndex + 2;
+                    else if (type === 'BiMonthly') {
+                        var sliceStartIndex = sixmonth === 1 ? 0 : 3,
+                            sliceEndIndex = sixmonth === 1 ? 3 : 6;
 
-                        //return this.getItemifiedPeriods(this.generator.generatePeriods(type, this.offset).slice(startIndex, endIndex));
-                    //}
-                    //else if (type === 'Monthly') {
-                        //startIndex = (quarter === 1) ? 0 : (quarter === 2 ? 3 : (quarter === 3 ? 6 : 9));
-                        //endIndex = startIndex + 3;
+                        return this.getItemifiedPeriods(this.generator.generatePeriods(type, this.offset).slice(sliceStartIndex, sliceEndIndex));
+                    }
+                    else if (type === 'Monthly') {
+                        var sliceStartIndex = sixmonth === 1 ? 0 : 6,
+                            sliceEndIndex = sixmonth === 1 ? 6 : 12;
 
-                        //return this.getItemifiedPeriods(this.generator.generatePeriods(type, this.offset).slice(startIndex, endIndex));
-                    //}
-                    //else if (type === 'Weekly') {
-                        //var allWeeks = this.generator.generatePeriods(type, this.offset),
-                            //weeks = [];
+                        return this.getItemifiedPeriods(this.generator.generatePeriods(type, this.offset).slice(sliceStartIndex, sliceEndIndex));
+                    }
+                    else if (type === 'Weekly') {
+                        var allWeeks = this.generator.generatePeriods(type, this.offset),
+                            weeks = [];
 
-                        //for (var i = 0, sd, ed, sy, ey; i < allWeeks.length; i++) {
-                            //sd = parseInt(allWeeks[i].startDate.substring(5, 7));
-                            //ed = parseInt(allWeeks[i].endDate.substring(5, 7));
-                            //sy = allWeeks[i].startDate.substring(0, 4);
-                            //ey = allWeeks[i].endDate.substring(0, 4);
+                        for (var i = 0, sd, ed, sy, ey; i < allWeeks.length; i++) {
+                            sd = parseInt(allWeeks[i].startDate.substring(5, 7));
+                            ed = parseInt(allWeeks[i].endDate.substring(5, 7));
+                            sy = allWeeks[i].startDate.substring(0, 4);
+                            ey = allWeeks[i].endDate.substring(0, 4);
 
-                            //if ((sd >= firstMonth && sd <= lastMonth) || (ed >= firstMonth && ed <= lastMonth)) {
-                                //if ((quarter === 1 && ey !== this.year) || (quarter === 4 && sy !== this.year)) {
-                                    //continue;
-                                //}
+                            if ((sd >= firstMonth && sd <= lastMonth) || (ed >= firstMonth && ed <= lastMonth)) {
+                                if ((sixmonth === 1 && ey !== this.year) || (sixmonth === 2 && sy !== this.year)) {
+                                    continue;
+                                }
 
-                                //weeks.push(allWeeks[i]);
-                            //}
-                        //}
+                                weeks.push(allWeeks[i]);
+                            }
+                        }
 
-                        //return this.getItemifiedPeriods(weeks);
-                    //}
-                    //else if (type === 'Daily') {
-                        //var allDays = this.generator.generatePeriods(type, this.offset),
-                            //days = [];
+                        return this.getItemifiedPeriods(weeks);
+                    }
+                    else if (type === 'Daily') {
+                        var allDays = this.generator.generatePeriods(type, this.offset),
+                            days = [];
 
-                        //for (var i = 0, m; i < allDays.length; i++) {
-                            //m = parseInt(allDays[i].iso.substring(4, 6));
+                        for (var i = 0, m; i < allDays.length; i++) {
+                            m = parseInt(allDays[i].iso.substring(4, 6));
 
-                            //if (m >= firstMonth && m <= lastMonth) {
-                                //days.push(allDays[i]);
-                            //}
-                        //}
+                            if (m >= firstMonth && m <= lastMonth) {
+                                days.push(allDays[i]);
+                            }
+                        }
 
-                        //return this.getItemifiedPeriods(days);
-                    //}
+                        return this.getItemifiedPeriods(days);
+                    }
 
                     return [];
                 };
