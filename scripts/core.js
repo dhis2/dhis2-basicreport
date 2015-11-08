@@ -1259,7 +1259,7 @@ console.log("itemify", periods[0].iso, periods);
                         var sliceStartIndex = bimonth === 1 ? 0 : (bimonth === 2 ? 2 : (bimonth === 3 ? 4 : (bimonth === 4 ? 6: (bimonth === 5 ? 8 : 10)))),
                             sliceEndIndex = bimonth === 1 ? 2 : (bimonth === 2 ? 4 : (bimonth === 3 ? 6 : (bimonth === 4 ? 8 : (bimonth === 5 ? 10 : 12))));
 
-                        return this.getItemifiedPeriods(this.generator.generatePeriods(type, this.offset).slice(startIndex, endIndex));
+                        return this.getItemifiedPeriods(this.generator.generatePeriods(type, this.offset).slice(sliceStartIndex, sliceEndIndex));
                     }
                     else if (type === 'Weekly') {
                         var allWeeks = this.generator.generatePeriods(type, this.offset),
@@ -2343,11 +2343,20 @@ console.log("itemify", periods[0].iso, periods);
                                 text: 'Drill down'
                             });
 
+                            // monthly
+                            (function() {
+                                items.push({
+                                    items: p.getItemsByTypeByBimonth('Monthly'),
+                                    text: 'Show <span class="name">months</span> in <span class="name">' + p.displayName + ' ' + p.year + '</span>',
+                                    iconCls: 'ns-menu-item-float'
+                                });
+                            })();
+
                             // weekly
                             (function() {
                                 items.push({
                                     items: p.getItemsByTypeByBimonth('Weekly'),
-                                    text: 'Show all <span class="name">weeks</span> in <span class="name">' + p.displayName + '</span>',
+                                    text: 'Show <span class="name">weeks</span> in <span class="name">' + p.displayName + ' ' + p.year + '</span>',
                                     iconCls: 'ns-menu-item-float'
                                 });
                             })();
@@ -2356,7 +2365,7 @@ console.log("itemify", periods[0].iso, periods);
                             (function() {
                                 items.push({
                                     items: p.getItemsByTypeByBimonth('Daily'),
-                                    text: 'Show all <span class="name">days</span> in <span class="name">' + p.displayName + '</span>',
+                                    text: 'Show <span class="name">days</span> in <span class="name">' + p.displayName + ' ' + p.year + '</span>',
                                     iconCls: 'ns-menu-item-float'
                                 });
                             })();
