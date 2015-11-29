@@ -1104,7 +1104,8 @@ console.log("itemify", periods[0].iso, periods);
                         return this.getItemifiedPeriods(this.gen(type, this.offset + yearOffset).slice(0, 1));
                     }
                     else if (type === 'Yearly') {
-                        return this.getItemifiedPeriods(this.gen(type, this.offset + yearOffset).slice(0, 1));
+                        var sliceEndIndex = sixmonthapril === 1 ? 1 : 2;
+                        return this.getItemifiedPeriods(this.gen(type, this.offset + yearOffset).slice(0, sliceEndIndex));
                     }
                     else if (type === 'SixMonthlyApril') {
                         if (isAll) {
@@ -1117,8 +1118,144 @@ console.log("itemify", periods[0].iso, periods);
                         var offset = sixmonthapril === 1 ? 0 : 1;
                         return this.getItemifiedPeriods(this.gen(type, this.offset).slice(1, 2).concat(this.gen(type, this.offset + offset).slice(0, 1)));
                     }
+                    else if (type === 'Quarterly') {
+                        var quarters = [];
 
+                        if (sixmonthapril === 1) {
+                            quarters = quarters.concat(this.gen(type, this.offset).slice(1, 3));
+                        }
+                        else {
+                            quarters = quarters.concat(this.gen(type, this.offset).slice(3, 4));
+                            quarters = quarters.concat(this.gen(type, this.offset + 1).slice(0, 1));
+                        }
 
+                        return this.getItemifiedPeriods(quarters);
+                    }
+                    else if (type === 'BiMonthly') {
+                        var bimonths = [];
+
+                        if (sixmonthapril === 1) {
+                            bimonths = bimonths.concat(this.gen(type, this.offset).slice(1, 5));
+                        }
+                        else {
+                            bimonths = bimonths.concat(this.gen(type, this.offset).slice(4, 6));
+                            bimonths = bimonths.concat(this.gen(type, this.offset + 1).slice(0, 2));
+                        }
+
+                        return this.getItemifiedPeriods(bimonths);
+                    }
+                    else if (type === 'Monthly') {
+                        var months = [];
+
+                        if (sixmonthapril === 1) {
+                            months = months.concat(this.gen(type, this.offset).slice(3, 9));
+                        }
+                        else {
+                            months = months.concat(this.gen(type, this.offset).slice(9, 12));
+                            months = months.concat(this.gen(type, this.offset + 1).slice(0, 3));
+                        }
+
+                        return this.getItemifiedPeriods(months);
+                    }
+                    else if (type === 'Weekly') {
+                        var allWeeks = this.gen(type, this.offset),
+                            weeks = [];
+
+                        if (sixmonthapril === 1) {
+                            for (var i = 0, week, sm, em; i < allWeeks.length; i++) {
+                                week = allWeeks[i];
+                                sm = parseInt(week.startDate.substring(5, 7));
+                                em = parseInt(week.endDate.substring(5, 7));
+
+                                if (Ext.Number.constrain(sm, 4, 9) === sm || Ext.Number.constrain(em, 4, 9) === em) {
+                                    weeks.push(week);
+                                }
+                            }
+                        }
+                        else {
+                            var allWeeksNext = this.gen(type, this.offset + 1),
+                                sliceStartIndex,
+                                sliceEndIndex;
+
+                            // this year
+                            for (var i = 0, week, sm, em; i < allWeeks.length; i++) {
+                                week = allWeeks[i];
+                                sm = parseInt(week.startDate.substring(5, 7));
+                                em = parseInt(week.endDate.substring(5, 7));
+
+                                if (sm === 10 || em === 10) {
+                                    sliceStartIndex = i;
+                                    break;
+                                }
+                            }
+
+                            weeks = weeks.concat(allWeeks.slice(sliceStartIndex));
+
+                            // next year
+                            for (var i = 0, week, sm, em; i < allWeeksNext.length; i++) {
+                                week = allWeeks[i];
+                                sm = parseInt(week.startDate.substring(5, 7));
+                                em = parseInt(week.endDate.substring(5, 7));
+
+                                if (sm === 4 && em === 4) {
+                                    sliceEndIndex = i - 1;
+                                    break;
+                                }
+                            }
+
+                            weeks = weeks.concat(allWeeksNext.slice(0, sliceEndIndex));
+                        }
+
+                        return this.getItemifiedPeriods(weeks);
+                    }
+                    else if (type === 'Daily') {
+                        var allDays = this.gen(type, this.offset),
+                            days = [];
+
+                        if (sixmonthapril === 1) {
+                            for (var i = 0, day, m; i < allDays.length; i++) {
+                                day = allDays[i];
+                                m = parseInt(day.startDate.substring(5, 7));
+
+                                if (Ext.Number.constrain(m, 4, 9) === m) {
+                                    days.push(day);
+                                }
+                            }
+                        }
+                        else {
+                            var allDaysNext = this.gen(type, this.offset + 1),
+                                sliceStartIndex,
+                                sliceEndIndex;
+
+                            // this year
+                            for (var i = 0, day, m; i < allDays.length; i++) {
+                                day = allDays[i];
+                                m = parseInt(day.startDate.substring(5, 7));
+
+                                if (m === 10) {
+                                    sliceStartIndex = i;
+                                    break;
+                                }
+                            }
+
+                            days = days.concat(allDays.slice(sliceStartIndex));
+
+                            // next year
+                            for (var i = 0, day, m; i < allDaysNext.length; i++) {
+                                day = allDaysNext[i];
+                                m = parseInt(day.startDate.substring(5, 7));
+
+                                if (m === 4) {
+                                    sliceEndIndex = i - 1;
+                                    break;
+                                }
+                            }
+
+                            days = days.concat(allDaysNext.slice(0, sliceEndIndex));
+                        }
+
+                        return this.getItemifiedPeriods(days);
+                    }
 
                     return [];
                 };
