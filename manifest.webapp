@@ -14,7 +14,7 @@
     "default_locale": "en",
     "activities": {
         "dhis": {
-            "href": "http://localhost:8888"
+            "href": "*"
         }
     }
 }
