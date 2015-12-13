@@ -1691,7 +1691,7 @@ console.log("itemify", periods[0].iso, periods);
                             isPrev = startDateMonth < 10 || startDateYear < this.year,
                             isThis = endDateMonth >= 10 || startDateYear > this.year,
                             offset = isPrev ? -1 : 0,
-                            sliceEndIndex = 0 + (isPrev ? 1 : 0) + (isThis ? 1 : 0),
+                            sliceEndIndex = 1 + (isPrev ? 1 : 0) + (isThis ? 1 : 0),
                             financialaprils = [];
 
                         return this.getItemifiedPeriods(this.gen('FinancialOct', this.offset + yearOffset + offset).slice(0, sliceEndIndex));
@@ -1701,7 +1701,7 @@ console.log("itemify", periods[0].iso, periods);
                             isPrev = startDateMonth < 7 || startDateYear < this.year,
                             isThis = endDateMonth >= 7 || startDateYear > this.year,
                             offset = isPrev ? -1 : 0,
-                            sliceEndIndex = 0 + (isPrev ? 1 : 0) + (isThis ? 1 : 0),
+                            sliceEndIndex = 1 + (isPrev ? 1 : 0) + (isThis ? 1 : 0),
                             financialaprils = [];
 
                         return this.getItemifiedPeriods(this.gen('FinancialJuly', this.offset + yearOffset + offset).slice(0, sliceEndIndex));
@@ -1711,7 +1711,7 @@ console.log("itemify", periods[0].iso, periods);
                             isPrev = startDateMonth < 4 || startDateYear < this.year,
                             isThis = endDateMonth >= 4 || startDateYear > this.year,
                             offset = isPrev ? -1 : 0,
-                            sliceEndIndex = 0 + (isPrev ? 1 : 0) + (isThis ? 1 : 0),
+                            sliceEndIndex = 1 + (isPrev ? 1 : 0) + (isThis ? 1 : 0),
                             financialaprils = [];
 
                         return this.getItemifiedPeriods(this.gen('FinancialApril', this.offset + yearOffset + offset).slice(0, sliceEndIndex));
@@ -1798,13 +1798,25 @@ console.log("itemify", periods[0].iso, periods);
                         var allDays = this.gen(type, this.offset),
                             startSlice,
                             endSlice,
-                            day,
-                            weekPeriod = this.gen('Weekly', this.offset)[week - 1];
+                            weekPeriod = this.gen('Weekly', this.offset)[week - 1],
+                            days = [];
 
                         if (isAll) {
                             return this.getItemifiedPeriods(allDays);
                         }
 
+                        // last year
+                        if (weekPeriod.startDate.slice(0, 4) < this.year) {
+                            for (var i = 0, lastDaysLastYear = this.gen(type, this.offset - 1).slice(358), day; i < lastDaysLastYear.length; i++) {
+                                day = lastDaysLastYear[i];
+
+                                if (day.startDate === weekPeriod.startDate) {
+                                    days = days.concat(lastDaysLastYear.slice(i));
+                                }
+                            }
+                        }
+
+                        // this year
                         for (var i = 0, sd; i < allDays.length; i++) {
                             sd = allDays[i].startDate;
 
@@ -1816,7 +1828,22 @@ console.log("itemify", periods[0].iso, periods);
                             }
                         }
 
-                        return this.getItemifiedPeriods(allDays.slice(startSlice, endSlice));
+                        days = days.concat(allDays.slice(startSlice, endSlice));
+
+                        // next year
+                        if (weekPeriod.endDate.slice(0, 4) > this.year) {
+                            for (var i = 0, firstDaysNextYear = this.gen(type, this.offset + 1).slice(0, 7), day; i < firstDaysNextYear.length; i++) {
+                                day = firstDaysNextYear[i];
+
+                                days.push(day);
+
+                                if (day.endDate === weekPeriod.endDate) {
+                                    break;
+                                }
+                            }
+                        }
+
+                        return this.getItemifiedPeriods(days);
                     }
 
                     return [];
