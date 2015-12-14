@@ -1872,9 +1872,11 @@ console.log("itemify", periods[0].iso, periods);
                         return this.getItemifiedPeriods(this.genRev(type, this.offset - 5).slice(0, 1));
                     }
                     else if (type === 'SixMonthlyApril') {
-                        var offset = month < 4 ? -1 : 0;
+                        var offset = month < 4 ? -1 : 0,
+                            sliceStartIndex = (month < 4 || month > 9) ? 1 : 0,
+                            sliceEndIndex = sliceStartIndex + 1;
 
-                        return this.getItemifiedPeriods(this.genRev(type, this.offset + offset).slice(0, 1));
+                        return this.getItemifiedPeriods(this.gen(type, this.offset + offset).slice(sliceStartIndex, sliceEndIndex));
                     }
                     else if (type === 'SixMonthly') {
                         var sliceStartIndex = (month <= 6) ? 0 : 1,
@@ -1944,7 +1946,7 @@ console.log("itemify", periods[0].iso, periods);
 //Financial April     2015April       Apr 2015 to Mar 2016
 //Yearly              2015            2015
 //Six-monthly April   2015AprilS1     Apr to Sep 2015
-//Six-monthly April   2015AprilS2     Oct to Mar 2016
+//Six-monthly April   2015AprilS2     Oct to Mar 2014
 //Six-monthly         2015S1          Jan to Jun 2015
 //Quarterly           2015Q1          Jan to Mar 2015
 //Bi-monthly          201501B         Jan to Feb 2015
