@@ -1643,15 +1643,25 @@ console.log("itemify", periods[0].iso, periods);
                         return this.getItemifiedPeriods(this.gen(type, this.offset).slice(month - 1, month));
                     }
                     else if (type === 'Weekly') {
-                        var allWeeks = this.gen(type, this.offset),
+                        var t = this,
+                            isFirstOrLast = month === 1 || month === 12,
+                            allWeeks = function() {
+                                var a = [];
+                                a = a.concat(isFirstOrLast ? t.gen(type, t.offset - 1) : []);
+                                a = a.concat(t.gen(type, t.offset));
+                                a = a.concat(isFirstOrLast ? t.gen(type, t.offset + 1) : []);
+                                return a;
+                            }(),
+                            monthTestString = this.year + '-' + monthStr,
                             weeks = [];
 
-                        for (var i = 0, sd, ed; i < allWeeks.length; i++) {
-                            sd = allWeeks[i].startDate;
-                            ed = allWeeks[i].endDate;
+                        for (var i = 0, sd, ed, week; i < allWeeks.length; i++) {
+                            week = allWeeks[i];
+                            sd = week.startDate;
+                            ed = week.endDate;
 
-                            if (sd.substring(5, 7) === monthStr || ed.substring(5, 7) === monthStr) {
-                                weeks.push(allWeeks[i]);
+                            if (sd.substring(0, 7) === monthTestString || ed.substring(0, 7) === monthTestString) {
+                                weeks.push(week);
                             }
                         }
 
@@ -1775,11 +1785,22 @@ console.log("itemify", periods[0].iso, periods);
                     }
                     else if (type === 'Monthly') {
                         var allMonths = this.gen(type, this.offset),
-                            actualMonthIndexes = Ext.Array.unique([startDateMonth, endDateMonth]),
                             months = [];
 
-                        for (var i = 0; i < actualMonthIndexes.length; i++) {
-                            months.push(allMonths[actualMonthIndexes[i] - 1]);
+                        if (startDateMonth === 12 && endDateMonth === 1) {
+                            months.push(this.gen(type, this.offset - 1)[11]);
+                            months.push(allMonths[0]);
+                        }
+                        else if (startDateMonth === 1 && endDateMonth === 12) {
+                            months.push(allMonths[11]);
+                            months.push(this.gen(type, this.offset + 1)[0]);
+                        }
+                        else {
+                            var actualMonthIndexes = Ext.Array.unique([startDateMonth, endDateMonth]);
+
+                            for (var i = 0, monthIndexes = Ext.Array.unique([startDateMonth, endDateMonth]); i < monthIndexes.length; i++) {
+                                months.push(allMonths[monthIndexes[i] - 1]);
+                            }
                         }
 
                         return this.getItemifiedPeriods(months);
