@@ -676,7 +676,7 @@ table.pivot.fontsize-small td {
 }
 
 .x-menu-item-link {
-    padding: 4px 5px 4px 26px;
+    padding: 4px 20px 5px 28px;
 }
 	/* Menu item color */
 .x-menu-item-text {
@@ -721,7 +721,7 @@ table.pivot.fontsize-small td {
 }
 
 .ns-floatmenu .x-menu-item-icon {
-    left: 6px;
+    left: 8px;
 }
 
 

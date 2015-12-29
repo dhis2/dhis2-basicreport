@@ -5422,10 +5422,7 @@ console.log(this.peReqItems);
                         return;
                     }
 
-                    $.ajax({
-                        url: init.contextPath + '/api/indicators.json?paging=false&filter=id:in:[' + aInReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,description,indicatorType,annualized,indicatorGroups[id,name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
-                        headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
-                    }).done(function(r) {
+                    $.getJSON(init.contextPath + '/api/indicators.json?paging=false&filter=id:in:[' + aInReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,description,indicatorType,annualized,indicatorGroups[id,name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]', function(r) {
                         if (r.indicators) {
                             for (var i = 0, obj; i < r.indicators.length; i++) {
                                 obj = new api.data.DataObject(r.indicators[i], sInName);
@@ -5446,10 +5443,7 @@ console.log(this.peReqItems);
                         return;
                     }
 
-                    $.ajax({
-                        url: init.contextPath + '/api/dataElements.json?paging=false&filter=id:in:[' + aDeReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,description,aggregationType,dataElementGroups[id,name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
-                        headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
-                    }).done(function(r) {
+                    $.getJSON(init.contextPath + '/api/dataElements.json?paging=false&filter=id:in:[' + aDeReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,description,aggregationType,dataElementGroups[id,name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]', function(r) {
                         if (r.dataElements) {
                             for (var i = 0, obj; i < r.dataElements.length; i++) {
                                 obj = new api.data.DataObject(r.dataElements[i], sDeName);
@@ -5469,10 +5463,7 @@ console.log(this.peReqItems);
                         return;
                     }
 
-                    $.ajax({
-                        url: init.contextPath + '/api/dataSets.json?paging=false&filter=id:in:[' + aDsReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,valueType,dataSetGroups[name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]',
-                        headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
-                    }).done(function(r) {
+                    $.getJSON(init.contextPath + '/api/dataSets.json?paging=false&filter=id:in:[' + aDsReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,valueType,dataSetGroups[name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]', function(r) {
                         aDsReqItems = r.dataSets;
                         support.prototype.array.addObjectProperty(aDsReqItems, 'type', sDsName);
                         getData();
@@ -5541,11 +5532,8 @@ console.log(this.peReqItems);
 
                     // analytics
 
-                    $.ajax({
-                        url: init.contextPath + '/api/analytics.json?dimension=pe:' + aPeReqIds.join(';') + '&dimension=dx:' + sLookupSubElements + aDxReqIds.join(';') + '&dimension=ou:' + aOuReqIds.join(';') + '&hierarchyMeta=true&displayProperty=NAME&showHierarchy=true',
-                        headers: {'Authorization': 'Basic ' + btoa(appConfig.username + ':' + appConfig.password)}
-                    }).done(function(analyticsData) {
-                        getTable(analyticsData);
+                    $.getJSON(init.contextPath + '/api/analytics.json?dimension=pe:' + aPeReqIds.join(';') + '&dimension=dx:' + sLookupSubElements + aDxReqIds.join(';') + '&dimension=ou:' + aOuReqIds.join(';') + '&hierarchyMeta=true&displayProperty=NAME&showHierarchy=true', function(r) {
+                        getTable(r);
                     });
                 };
 
