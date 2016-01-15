@@ -1050,9 +1050,35 @@ console.log("itemify", periods[0].iso, periods);
 				P.prototype.getItemsByTypeByFinancialOct = function(type) {
 					var startDate = this.year + '-10-01';
 					var endDate = (parseInt(this.year) + 1) + '-09-30';
+					var startMonth = this.year + '-10';
+					var endMonth = (parseInt(this.year) + 1) + '-10';
 
 					if (false) {
 
+					}
+					else if (type === 'Weekly') {
+						var thisPeriods = this.gen(type, this.offset);
+						var thisSliceStartIndex;
+						var nextPeriods = this.gen(type, this.offset + 1);
+						var nextSliceEndIndex;
+
+						for (var i = 0, week; i < thisPeriods.length; i++) {
+							week = thisPeriods[i];
+
+							if (week.startDate.slice(0, 7) === startMonth || week.endDate.slice(0, 7) === startMonth) {
+								thisSliceStartIndex = i;
+							}
+						}
+
+						for (var j = 0, week; j < nextPeriods.length; j++) {
+							week = thisPeriods[j];
+
+							if (week.startDate.slice(0, 7) === endMonth && week.endDate.slice(0, 7) === endMonth) {
+								nextSliceEndIndex = j;
+							}
+						}
+
+						return this.getItemifiedPeriods([].concat(thisPeriods.slice(thisSliceStartIndex), nextPeriods.slice(0, nextSliceEndIndex)));
 					}
 					else if (type === 'Daily') {
 						var thisPeriods = this.gen(type, this.offset);
@@ -1081,9 +1107,35 @@ console.log("itemify", periods[0].iso, periods);
 				P.prototype.getItemsByTypeByFinancialJuly = function(type) {
 					var startDate = this.year + '-07-01';
 					var endDate = (parseInt(this.year) + 1) + '-06-30';
+					var startMonth = this.year + '-07';
+					var endMonth = (parseInt(this.year) + 1) + '-07';
 
 					if (false) {
 
+					}
+					else if (type === 'Weekly') {
+						var thisPeriods = this.gen(type, this.offset);
+						var thisSliceStartIndex;
+						var nextPeriods = this.gen(type, this.offset + 1);
+						var nextSliceEndIndex;
+
+						for (var i = 0, week; i < thisPeriods.length; i++) {
+							week = thisPeriods[i];
+
+							if (week.startDate.slice(0, 7) === startMonth || week.endDate.slice(0, 7) === startMonth) {
+								thisSliceStartIndex = i;
+							}
+						}
+
+						for (var j = 0, week; j < nextPeriods.length; j++) {
+							week = thisPeriods[j];
+
+							if (week.startDate.slice(0, 7) === endMonth && week.endDate.slice(0, 7) === endMonth) {
+								nextSliceEndIndex = j;
+							}
+						}
+
+						return this.getItemifiedPeriods([].concat(thisPeriods.slice(thisSliceStartIndex), nextPeriods.slice(0, nextSliceEndIndex)));
 					}
 					else if (type === 'Daily') {
 						var thisPeriods = this.gen(type, this.offset);
@@ -1112,9 +1164,35 @@ console.log("itemify", periods[0].iso, periods);
                 P.prototype.getItemsByTypeByFinancialApril = function(type) {
 					var startDate = this.year + '-04-01';
 					var endDate = (parseInt(this.year) + 1) + '-03-31';
+					var startMonth = this.year + '-04';
+					var endMonth = (parseInt(this.year) + 1) + '-04';
 
 					if (false) {
 
+					}
+					else if (type === 'Weekly') {
+						var thisPeriods = this.gen(type, this.offset);
+						var thisSliceStartIndex;
+						var nextPeriods = this.gen(type, this.offset + 1);
+						var nextSliceEndIndex;
+
+						for (var i = 0, week; i < thisPeriods.length; i++) {
+							week = thisPeriods[i];
+
+							if (week.startDate.slice(0, 7) === startMonth || week.endDate.slice(0, 7) === startMonth) {
+								thisSliceStartIndex = i;
+							}
+						}
+
+						for (var j = 0, week; j < nextPeriods.length; j++) {
+							week = thisPeriods[j];
+
+							if (week.startDate.slice(0, 7) === endMonth && week.endDate.slice(0, 7) === endMonth) {
+								nextSliceEndIndex = j;
+							}
+						}
+
+						return this.getItemifiedPeriods([].concat(thisPeriods.slice(thisSliceStartIndex), nextPeriods.slice(0, nextSliceEndIndex)));
 					}
 					else if (type === 'Daily') {
 						var thisPeriods = this.gen(type, this.offset);
@@ -3246,6 +3324,15 @@ console.log("itemify", periods[0].iso, periods);
                                 text: 'Drill down'
                             });
 
+                            // weekly
+                            (function() {
+                                items.push({
+                                    items: p.getItemsByTypeByFinancialApril('Weekly'),
+                                    text: 'Show <span class="name">weeks</span> in <span class="name">' + p.name + '</span>',
+                                    iconCls: 'ns-menu-item-float'
+                                });
+                            })();
+
                             // daily
                             (function() {
                                 items.push({
@@ -3300,6 +3387,15 @@ console.log("itemify", periods[0].iso, periods);
                                 text: 'Drill down'
                             });
 
+                            // weekly
+                            (function() {
+                                items.push({
+                                    items: p.getItemsByTypeByFinancialJuly('Weekly'),
+                                    text: 'Show <span class="name">weeks</span> in <span class="name">' + p.name + '</span>',
+                                    iconCls: 'ns-menu-item-float'
+                                });
+                            })();
+
                             // daily
                             (function() {
                                 items.push({
@@ -3353,6 +3449,15 @@ console.log("itemify", periods[0].iso, periods);
                                 isSubtitle: true,
                                 text: 'Drill down'
                             });
+
+                            // weekly
+                            (function() {
+                                items.push({
+                                    items: p.getItemsByTypeByFinancialOctober('Weekly'),
+                                    text: 'Show <span class="name">weeks</span> in <span class="name">' + p.name + '</span>',
+                                    iconCls: 'ns-menu-item-float'
+                                });
+                            })();
 
                             // daily
                             (function() {
