@@ -6091,7 +6091,7 @@ console.log(this.peReqItems);
                         return;
                     }
 
-                    $.getJSON(init.contextPath + '/api/indicators.json?paging=false&filter=id:in:[' + aInReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,description,indicatorType,annualized,indicatorGroups[id,name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]', function(r) {
+                    $.getJSON(init.contextPath + '/api/indicators.json?paging=false&filter=id:in:[' + aInReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,description,indicatorType[id,displayName|rename(name)],annualized,indicatorGroups[id,displayName|rename(name)],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[id,displayName|rename(name),legends[id,displayName|rename(name),startValue,endValue,color]]', function(r) {
                         if (r.indicators) {
                             for (var i = 0, obj; i < r.indicators.length; i++) {
                                 obj = new api.data.DataObject(r.indicators[i], sInName);
@@ -6112,7 +6112,7 @@ console.log(this.peReqItems);
                         return;
                     }
 
-                    $.getJSON(init.contextPath + '/api/dataElements.json?paging=false&filter=id:in:[' + aDeReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,description,aggregationType,dataElementGroups[id,name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]', function(r) {
+                    $.getJSON(init.contextPath + '/api/dataElements.json?paging=false&filter=id:in:[' + aDeReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,description,aggregationType,dataElementGroups[id,displayName|rename(name)],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[id,displayName|rename(name),legends[id,displayName|rename(name),startValue,endValue,color]]', function(r) {
                         if (r.dataElements) {
                             for (var i = 0, obj; i < r.dataElements.length; i++) {
                                 obj = new api.data.DataObject(r.dataElements[i], sDeName);
@@ -6132,7 +6132,7 @@ console.log(this.peReqItems);
                         return;
                     }
 
-                    $.getJSON(init.contextPath + '/api/dataSets.json?paging=false&filter=id:in:[' + aDsReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,valueType,dataSetGroups[name],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[name,legends[name,startValue,endValue,color]]', function(r) {
+                    $.getJSON(init.contextPath + '/api/dataSets.json?paging=false&filter=id:in:[' + aDsReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,valueType,dataSetGroups[id,displayName|rename(name)],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[id,displayName|rename(name),legends[id,displayName|rename(name),startValue,endValue,color]]', function(r) {
                         aDsReqItems = r.dataSets;
                         support.prototype.array.addObjectProperty(aDsReqItems, 'type', sDsName);
                         getData();
