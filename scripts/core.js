@@ -1062,6 +1062,15 @@ console.log("itemify", periods[0].iso, periods);
 					if (false) {
 
 					}
+					else if (type === 'Yearly') {
+						thisYear = this.gen(type, this.offset + yearOffset)[0];
+						nextYear = this.gen(type, this.offset + 1 + yearOffset)[0];
+
+						return this.getItemifiedPeriods([thisYear, nextYear]);
+					}
+					else if (type === 'SixMonthlyApril') {
+						return this.getItemifiedPeriods([].concat(thisPeriods.slice(1), nextPeriods.slice(0, 1)));
+					}
 					else if (type === 'SixMonthly') {
 						return this.getItemifiedPeriods([].concat(thisPeriods.slice(1), nextPeriods));
 					}
@@ -1143,6 +1152,15 @@ console.log("itemify", periods[0].iso, periods);
 					if (false) {
 
 					}
+					else if (type === 'Yearly') {
+						thisYear = this.gen(type, this.offset + yearOffset)[0];
+						nextYear = this.gen(type, this.offset + 1 + yearOffset)[0];
+
+						return this.getItemifiedPeriods([thisYear, nextYear]);
+					}
+					else if (type === 'SixMonthlyApril') {
+						return this.getItemifiedPeriods([].concat(thisPeriods, nextPeriods.slice(0, 1)));
+					}
 					else if (type === 'SixMonthly') {
 						return this.getItemifiedPeriods([].concat(thisPeriods.slice(1), nextPeriods.slice(0, 1)));
 					}
@@ -1221,8 +1239,20 @@ console.log("itemify", periods[0].iso, periods);
 					var nextPeriods = this.gen(type, this.offset + 1);
 					var nextSliceEndIndex;
 
+					// used by yearly
+					var yearOffset = 5;
+
 					if (false) {
 
+					}
+					else if (type === 'Yearly') {
+						thisYear = this.gen(type, this.offset + yearOffset)[0];
+						nextYear = this.gen(type, this.offset + 1 + yearOffset)[0];
+
+						return this.getItemifiedPeriods([thisYear, nextYear]);
+					}
+					else if (type === 'SixMonthlyApril') {
+						return this.getItemifiedPeriods(thisPeriods);
 					}
 					else if (type === 'SixMonthly') {
 						return this.getItemifiedPeriods([].concat(thisPeriods, nextPeriods.slice(0, 1)));
