@@ -985,7 +985,7 @@ Ext.onReady( function() {
             (function() {
                 var P = api.data.Period = function(config) {
                     var p = this;
-console.log("config", config);
+
                     p.id = '' + config.id;
                     p.name = config.name;
 
@@ -1029,7 +1029,7 @@ console.log("config", config);
                     var items = [];
 
                     periods = Ext.Array.from(periods);
-console.log("itemify", periods[0].iso, periods);
+
                     for (var i = 0; i < periods.length; i++) {
                         items.push({
                             id: periods[i].iso,
@@ -4149,7 +4149,7 @@ console.log("itemify", periods[0].iso, periods);
                             iconCls: conf.iconCls,
                             peReqItems: conf.items,
                             handler: function() {
-console.log(this.peReqItems);
+
                                 // pe
                                 layout.rows[0] = {
                                     dimension: 'pe',
