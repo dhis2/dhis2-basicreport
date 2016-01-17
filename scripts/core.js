@@ -1062,6 +1062,9 @@ console.log("itemify", periods[0].iso, periods);
 					if (false) {
 
 					}
+					else if (type === 'SixMonthly') {
+						return this.getItemifiedPeriods([].concat(thisPeriods.slice(1), nextPeriods));
+					}
 					else if (type === 'Quarterly') {
 						return this.getItemifiedPeriods([].concat(thisPeriods.slice(3), nextPeriods.slice(0, 3)));
 					}
@@ -1140,6 +1143,9 @@ console.log("itemify", periods[0].iso, periods);
 					if (false) {
 
 					}
+					else if (type === 'SixMonthly') {
+						return this.getItemifiedPeriods([].concat(thisPeriods.slice(1), nextPeriods.slice(0, 1)));
+					}
 					else if (type === 'Quarterly') {
 						return this.getItemifiedPeriods([].concat(thisPeriods.slice(2), nextPeriods.slice(0, 2)));
 					}
@@ -1217,6 +1223,9 @@ console.log("itemify", periods[0].iso, periods);
 
 					if (false) {
 
+					}
+					else if (type === 'SixMonthly') {
+						return this.getItemifiedPeriods([].concat(thisPeriods, nextPeriods.slice(0, 1)));
 					}
 					else if (type === 'Quarterly') {
 						return this.getItemifiedPeriods([].concat(thisPeriods.slice(1), nextPeriods.slice(0, 1)));
