@@ -1062,6 +1062,9 @@ console.log("itemify", periods[0].iso, periods);
 					if (false) {
 
 					}
+					else if (type === 'BiMonthly') {
+						return this.getItemifiedPeriods([].concat(thisPeriods.slice(4), nextPeriods.slice(0, 5)));
+					}
 					else if (type === 'Monthly') {
 						for (var i = 0, month; i < thisPeriods.length; i++) {
 							month = thisPeriods[i];
@@ -1134,6 +1137,9 @@ console.log("itemify", periods[0].iso, periods);
 					if (false) {
 
 					}
+					else if (type === 'BiMonthly') {
+						return this.getItemifiedPeriods([].concat(thisPeriods.slice(3), nextPeriods.slice(0, 3)));
+					}
 					else if (type === 'Monthly') {
 						for (var i = 0, month; i < thisPeriods.length; i++) {
 							month = thisPeriods[i];
@@ -1205,6 +1211,12 @@ console.log("itemify", periods[0].iso, periods);
 
 					if (false) {
 
+					}
+					//else if (type === 'BiMonthly') {
+						//return this.getItemifiedPeriods([].concat(thisPeriods.slice(1), nextPeriods.slice(0, 2)));
+					//}
+					else if (type === 'BiMonthly') {
+						return this.getItemifiedPeriods([].concat(thisPeriods.slice(1), nextPeriods.slice(0, 2)));
 					}
 					else if (type === 'Monthly') {
 						for (var i = 0, month; i < thisPeriods.length; i++) {
@@ -3369,6 +3381,15 @@ console.log("itemify", periods[0].iso, periods);
                                 text: 'Drill down'
                             });
 
+                            // bi-monthly
+                            (function() {
+                                items.push({
+                                    items: p.getItemsByTypeByFinancialApril('BiMonthly'),
+                                    text: 'Show <span class="name">bi-months</span> in <span class="name">' + p.name + '</span>',
+                                    iconCls: 'ns-menu-item-float'
+                                });
+                            })();
+
                             // monthly
                             (function() {
                                 items.push({
@@ -3441,6 +3462,15 @@ console.log("itemify", periods[0].iso, periods);
                                 text: 'Drill down'
                             });
 
+                            // bi-monthly
+                            (function() {
+                                items.push({
+                                    items: p.getItemsByTypeByFinancialJuly('BiMonthly'),
+                                    text: 'Show <span class="name">bi-months</span> in <span class="name">' + p.name + '</span>',
+                                    iconCls: 'ns-menu-item-float'
+                                });
+                            })();
+
                             // monthly
                             (function() {
                                 items.push({
@@ -3512,6 +3542,15 @@ console.log("itemify", periods[0].iso, periods);
                                 isSubtitle: true,
                                 text: 'Drill down'
                             });
+
+                            // bi-monthly
+                            (function() {
+                                items.push({
+                                    items: p.getItemsByTypeByFinancialOct('BiMonthly'),
+                                    text: 'Show <span class="name">bi-months</span> in <span class="name">' + p.name + '</span>',
+                                    iconCls: 'ns-menu-item-float'
+                                });
+                            })();
 
                             // monthly
                             (function() {
