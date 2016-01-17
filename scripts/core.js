@@ -1047,17 +1047,20 @@ console.log("itemify", periods[0].iso, periods);
 
                 // dep 1
 
-				P.prototype.getItemsByTypeByFinancialOct = function(type) {
-					var startDate = this.year + '-10-01';
-					var endDate = (parseInt(this.year) + 1) + '-09-30';
-					var startMonth = this.year + '-10';
-					var endMonth = (parseInt(this.year) + 1) + '-10';
+                P.prototype.getItemsByTypeByFinancialApril = function(type) {
+					var startDate = this.year + '-04-01';
+					var endDate = (parseInt(this.year) + 1) + '-03-31';
+					var startMonth = this.year + '-04';
+					var endMonth = (parseInt(this.year) + 1) + '-04';
 
 					// used by daily, weekly, monthly
 					var thisPeriods = this.gen(type, this.offset);
 					var thisSliceStartIndex;
 					var nextPeriods = this.gen(type, this.offset + 1);
 					var nextSliceEndIndex;
+
+					// used by yearly
+					var yearOffset = 5;
 
 					if (false) {
 
@@ -1069,16 +1072,16 @@ console.log("itemify", periods[0].iso, periods);
 						return this.getItemifiedPeriods([thisYear, nextYear]);
 					}
 					else if (type === 'SixMonthlyApril') {
-						return this.getItemifiedPeriods([].concat(thisPeriods.slice(1), nextPeriods.slice(0, 1)));
+						return this.getItemifiedPeriods(thisPeriods);
 					}
 					else if (type === 'SixMonthly') {
-						return this.getItemifiedPeriods([].concat(thisPeriods.slice(1), nextPeriods));
+						return this.getItemifiedPeriods([].concat(thisPeriods, nextPeriods.slice(0, 1)));
 					}
 					else if (type === 'Quarterly') {
-						return this.getItemifiedPeriods([].concat(thisPeriods.slice(3), nextPeriods.slice(0, 3)));
+						return this.getItemifiedPeriods([].concat(thisPeriods.slice(1), nextPeriods.slice(0, 1)));
 					}
 					else if (type === 'BiMonthly') {
-						return this.getItemifiedPeriods([].concat(thisPeriods.slice(4), nextPeriods.slice(0, 5)));
+						return this.getItemifiedPeriods([].concat(thisPeriods.slice(1), nextPeriods.slice(0, 2)));
 					}
 					else if (type === 'Monthly') {
 						for (var i = 0, month; i < thisPeriods.length; i++) {
@@ -1227,20 +1230,17 @@ console.log("itemify", periods[0].iso, periods);
                     return [];
                 };
 
-                P.prototype.getItemsByTypeByFinancialApril = function(type) {
-					var startDate = this.year + '-04-01';
-					var endDate = (parseInt(this.year) + 1) + '-03-31';
-					var startMonth = this.year + '-04';
-					var endMonth = (parseInt(this.year) + 1) + '-04';
+				P.prototype.getItemsByTypeByFinancialOct = function(type) {
+					var startDate = this.year + '-10-01';
+					var endDate = (parseInt(this.year) + 1) + '-09-30';
+					var startMonth = this.year + '-10';
+					var endMonth = (parseInt(this.year) + 1) + '-10';
 
 					// used by daily, weekly, monthly
 					var thisPeriods = this.gen(type, this.offset);
 					var thisSliceStartIndex;
 					var nextPeriods = this.gen(type, this.offset + 1);
 					var nextSliceEndIndex;
-
-					// used by yearly
-					var yearOffset = 5;
 
 					if (false) {
 
@@ -1252,16 +1252,16 @@ console.log("itemify", periods[0].iso, periods);
 						return this.getItemifiedPeriods([thisYear, nextYear]);
 					}
 					else if (type === 'SixMonthlyApril') {
-						return this.getItemifiedPeriods(thisPeriods);
-					}
-					else if (type === 'SixMonthly') {
-						return this.getItemifiedPeriods([].concat(thisPeriods, nextPeriods.slice(0, 1)));
-					}
-					else if (type === 'Quarterly') {
 						return this.getItemifiedPeriods([].concat(thisPeriods.slice(1), nextPeriods.slice(0, 1)));
 					}
+					else if (type === 'SixMonthly') {
+						return this.getItemifiedPeriods([].concat(thisPeriods.slice(1), nextPeriods));
+					}
+					else if (type === 'Quarterly') {
+						return this.getItemifiedPeriods([].concat(thisPeriods.slice(3), nextPeriods.slice(0, 3)));
+					}
 					else if (type === 'BiMonthly') {
-						return this.getItemifiedPeriods([].concat(thisPeriods.slice(1), nextPeriods.slice(0, 2)));
+						return this.getItemifiedPeriods([].concat(thisPeriods.slice(4), nextPeriods.slice(0, 5)));
 					}
 					else if (type === 'Monthly') {
 						for (var i = 0, month; i < thisPeriods.length; i++) {
@@ -2283,13 +2283,13 @@ console.log("itemify", periods[0].iso, periods);
                                     text: 'Drill up'
                                 });
 
-                                // financial october
+                                // financial april
                                 (function() {
-                                    var periods = p.getItemsByTypeByYear('FinancialOct');
+                                    var periods = p.getItemsByTypeByYear('FinancialApril');
 
                                     items.push({
                                         items: periods,
-                                        text: 'Show parent <span class="name">financial October' + getSuffix(periods) + '</span>',
+                                        text: 'Show parent <span class="name">financial April' + getSuffix(periods) + '</span>',
                                         iconCls: 'ns-menu-item-float'
                                     });
                                 })();
@@ -2305,13 +2305,13 @@ console.log("itemify", periods[0].iso, periods);
                                     });
                                 })();
 
-                                // financial april
+                                // financial october
                                 (function() {
-                                    var periods = p.getItemsByTypeByYear('FinancialApril');
+                                    var periods = p.getItemsByTypeByYear('FinancialOct');
 
                                     items.push({
                                         items: periods,
-                                        text: 'Show parent <span class="name">financial April' + getSuffix(periods) + '</span>',
+                                        text: 'Show parent <span class="name">financial October' + getSuffix(periods) + '</span>',
                                         iconCls: 'ns-menu-item-float'
                                     });
                                 })();
@@ -2419,13 +2419,13 @@ console.log("itemify", periods[0].iso, periods);
                                     text: 'Drill up'
                                 });
 
-                                // financial october
+                                // financial april
                                 (function() {
-                                    var periods = p.getItemsByTypeByMonth('FinancialOct');
+                                    var periods = p.getItemsByTypeByMonth('FinancialApril');
 
                                     items.push({
                                         items: periods,
-                                        text: 'Show parent <span class="name">financial October' + getSuffix(periods) + '</span>',
+                                        text: 'Show parent <span class="name">financial April' + getSuffix(periods) + '</span>',
                                         iconCls: 'ns-menu-item-float'
                                     });
                                 })();
@@ -2441,13 +2441,13 @@ console.log("itemify", periods[0].iso, periods);
                                     });
                                 })();
 
-                                // financial april
+                                // financial october
                                 (function() {
-                                    var periods = p.getItemsByTypeByMonth('FinancialApril');
+                                    var periods = p.getItemsByTypeByMonth('FinancialOct');
 
                                     items.push({
                                         items: periods,
-                                        text: 'Show parent <span class="name">financial April' + getSuffix(periods) + '</span>',
+                                        text: 'Show parent <span class="name">financial October' + getSuffix(periods) + '</span>',
                                         iconCls: 'ns-menu-item-float'
                                     });
                                 })();
@@ -2571,11 +2571,11 @@ console.log("itemify", periods[0].iso, periods);
                                     text: 'Drill up'
                                 });
 
-                                // financial october
+                                // financial april
                                 (function() {
                                     items.push({
-                                        items: p.getItemsByTypeByDay('FinancialOct'),
-                                        text: 'Show parent <span class="name">financial October</span>',
+                                        items: p.getItemsByTypeByDay('FinancialApril'),
+                                        text: 'Show parent <span class="name">financial April</span>',
                                         iconCls: 'ns-menu-item-float'
                                     });
                                 })();
@@ -2589,11 +2589,11 @@ console.log("itemify", periods[0].iso, periods);
                                     });
                                 })();
 
-                                // financial april
+                                // financial october
                                 (function() {
                                     items.push({
-                                        items: p.getItemsByTypeByDay('FinancialApril'),
-                                        text: 'Show parent <span class="name">financial April</span>',
+                                        items: p.getItemsByTypeByDay('FinancialOct'),
+                                        text: 'Show parent <span class="name">financial October</span>',
                                         iconCls: 'ns-menu-item-float'
                                     });
                                 })();
@@ -2704,13 +2704,11 @@ console.log("itemify", periods[0].iso, periods);
                                 text: 'Drill up'
                             });
 
-                            // financial october
+                            // financial april
                             (function() {
-                                var periods = p.getItemsByTypeByWeek('FinancialOct');
-
                                 items.push({
-                                    items: periods,
-                                    text: 'Show parent <span class="name">financial October' + getSuffix(periods) + '</span>',
+                                    items: p.getItemsByTypeByWeek('FinancialApril'),
+                                    text: 'Show parent <span class="name">financial April</span>',
                                     iconCls: 'ns-menu-item-float'
                                 });
                             })();
@@ -2724,11 +2722,13 @@ console.log("itemify", periods[0].iso, periods);
                                 });
                             })();
 
-                            // financial april
+                            // financial october
                             (function() {
+                                var periods = p.getItemsByTypeByWeek('FinancialOct');
+
                                 items.push({
-                                    items: p.getItemsByTypeByWeek('FinancialApril'),
-                                    text: 'Show parent <span class="name">financial April</span>',
+                                    items: periods,
+                                    text: 'Show parent <span class="name">financial October' + getSuffix(periods) + '</span>',
                                     iconCls: 'ns-menu-item-float'
                                 });
                             })();
@@ -2844,13 +2844,13 @@ console.log("itemify", periods[0].iso, periods);
                                 text: 'Drill up'
                             });
 
-                            // financial october
+                            // financial april
                             (function() {
-                                var periods = p.getItemsByTypeByBimonth('FinancialOct');
+                                var periods = p.getItemsByTypeByBimonth('FinancialApril');
 
                                 items.push({
                                     items: periods,
-                                    text: 'Show parent <span class="name">financial October' + getSuffix(periods) + '</span>',
+                                    text: 'Show parent <span class="name">financial April' + getSuffix(periods) + '</span>',
                                     iconCls: 'ns-menu-item-float'
                                 });
                             })();
@@ -2866,13 +2866,13 @@ console.log("itemify", periods[0].iso, periods);
                                 });
                             })();
 
-                            // financial april
+                            // financial october
                             (function() {
-                                var periods = p.getItemsByTypeByBimonth('FinancialApril');
+                                var periods = p.getItemsByTypeByBimonth('FinancialOct');
 
                                 items.push({
                                     items: periods,
-                                    text: 'Show parent <span class="name">financial April' + getSuffix(periods) + '</span>',
+                                    text: 'Show parent <span class="name">financial October' + getSuffix(periods) + '</span>',
                                     iconCls: 'ns-menu-item-float'
                                 });
                             })();
@@ -2996,11 +2996,11 @@ console.log("itemify", periods[0].iso, periods);
                                 text: 'Drill up'
                             });
 
-                            // financial october
+                            // financial april
                             (function() {
                                 items.push({
-                                    items: p.getItemsByTypeByQuarter('FinancialOct'),
-                                    text: 'Show parent <span class="name">financial October</span>',
+                                    items: p.getItemsByTypeByQuarter('FinancialApril'),
+                                    text: 'Show parent <span class="name">financial April</span>',
                                     iconCls: 'ns-menu-item-float'
                                 });
                             })();
@@ -3014,11 +3014,11 @@ console.log("itemify", periods[0].iso, periods);
                                 });
                             })();
 
-                            // financial april
+                            // financial october
                             (function() {
                                 items.push({
-                                    items: p.getItemsByTypeByQuarter('FinancialApril'),
-                                    text: 'Show parent <span class="name">financial April</span>',
+                                    items: p.getItemsByTypeByQuarter('FinancialOct'),
+                                    text: 'Show parent <span class="name">financial October</span>',
                                     iconCls: 'ns-menu-item-float'
                                 });
                             })();
@@ -3125,13 +3125,13 @@ console.log("itemify", periods[0].iso, periods);
                                 text: 'Drill up'
                             });
 
-                            // financial october
+                            // financial april
                             (function() {
-                                var periods = p.getItemsByTypeBySixmonth('FinancialOct');
+                                var periods = p.getItemsByTypeBySixmonth('FinancialApril');
 
                                 items.push({
                                     items: periods,
-                                    text: 'Show parent <span class="name">financial October' + getSuffix(periods) + '</span>',
+                                    text: 'Show parent <span class="name">financial April</span>',
                                     iconCls: 'ns-menu-item-float'
                                 });
                             })();
@@ -3147,13 +3147,13 @@ console.log("itemify", periods[0].iso, periods);
                                 });
                             })();
 
-                            // financial april
+                            // financial october
                             (function() {
-                                var periods = p.getItemsByTypeBySixmonth('FinancialApril');
+                                var periods = p.getItemsByTypeBySixmonth('FinancialOct');
 
                                 items.push({
                                     items: periods,
-                                    text: 'Show parent <span class="name">financial April</span>',
+                                    text: 'Show parent <span class="name">financial October' + getSuffix(periods) + '</span>',
                                     iconCls: 'ns-menu-item-float'
                                 });
                             })();
@@ -3265,13 +3265,13 @@ console.log("itemify", periods[0].iso, periods);
                                 text: 'Drill up'
                             });
 
-                            // financial october
+                            // financial april
                             (function() {
-                                var periods = p.getItemsByTypeBySixmonthApril('FinancialOct');
+                                var periods = p.getItemsByTypeBySixmonthApril('FinancialApril');
 
                                 items.push({
                                     items: periods,
-                                    text: 'Show parent <span class="name">financial October' + getSuffix(periods) + '</span>',
+                                    text: 'Show parent <span class="name">financial April</span>',
                                     iconCls: 'ns-menu-item-float'
                                 });
                             })();
@@ -3287,13 +3287,13 @@ console.log("itemify", periods[0].iso, periods);
                                 });
                             })();
 
-                            // financial april
+                            // financial october
                             (function() {
-                                var periods = p.getItemsByTypeBySixmonthApril('FinancialApril');
+                                var periods = p.getItemsByTypeBySixmonthApril('FinancialOct');
 
                                 items.push({
                                     items: periods,
-                                    text: 'Show parent <span class="name">financial April</span>',
+                                    text: 'Show parent <span class="name">financial October' + getSuffix(periods) + '</span>',
                                     iconCls: 'ns-menu-item-float'
                                 });
                             })();
@@ -3394,12 +3394,6 @@ console.log("itemify", periods[0].iso, periods);
 
                         this.getContextMenuItemsConfig = function() {
                             var items = [];
-
-                            // drill up
-                            items.push({
-                                isSubtitle: true,
-                                text: 'Drill up'
-                            });
 
                             // same level
                             items.push({
