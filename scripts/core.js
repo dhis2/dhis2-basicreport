@@ -1053,15 +1053,35 @@ console.log("itemify", periods[0].iso, periods);
 					var startMonth = this.year + '-10';
 					var endMonth = (parseInt(this.year) + 1) + '-10';
 
+					// used by daily, weekly, monthly
+					var thisPeriods = this.gen(type, this.offset);
+					var thisSliceStartIndex;
+					var nextPeriods = this.gen(type, this.offset + 1);
+					var nextSliceEndIndex;
+
 					if (false) {
 
 					}
-					else if (type === 'Weekly') {
-						var thisPeriods = this.gen(type, this.offset);
-						var thisSliceStartIndex;
-						var nextPeriods = this.gen(type, this.offset + 1);
-						var nextSliceEndIndex;
+					else if (type === 'Monthly') {
+						for (var i = 0, month; i < thisPeriods.length; i++) {
+							month = thisPeriods[i];
 
+							if (month.startDate.slice(0, 7) === startMonth) {
+								thisSliceStartIndex = i;
+							}
+						}
+
+						for (var j = 0, month; j < nextPeriods.length; j++) {
+							month = nextPeriods[j];
+
+							if (month.startDate.slice(0, 7) === endMonth) {
+								nextSliceEndIndex = j;
+							}
+						}
+
+						return this.getItemifiedPeriods([].concat(thisPeriods.slice(thisSliceStartIndex), nextPeriods.slice(0, nextSliceEndIndex)));
+					}
+					else if (type === 'Weekly') {
 						for (var i = 0, week; i < thisPeriods.length; i++) {
 							week = thisPeriods[i];
 
@@ -1071,7 +1091,7 @@ console.log("itemify", periods[0].iso, periods);
 						}
 
 						for (var j = 0, week; j < nextPeriods.length; j++) {
-							week = thisPeriods[j];
+							week = nextPeriods[j];
 
 							if (week.startDate.slice(0, 7) === endMonth && week.endDate.slice(0, 7) === endMonth) {
 								nextSliceEndIndex = j;
@@ -1081,11 +1101,6 @@ console.log("itemify", periods[0].iso, periods);
 						return this.getItemifiedPeriods([].concat(thisPeriods.slice(thisSliceStartIndex), nextPeriods.slice(0, nextSliceEndIndex)));
 					}
 					else if (type === 'Daily') {
-						var thisPeriods = this.gen(type, this.offset);
-						var thisSliceStartIndex;
-						var nextPeriods = this.gen(type, this.offset + 1);
-						var nextSliceEndIndex;
-
 						for (var i = 0, day; i < thisPeriods.length; i++) {
 							if (thisPeriods[i].startDate === startDate) {
 								thisSliceStartIndex = i;
@@ -1110,15 +1125,35 @@ console.log("itemify", periods[0].iso, periods);
 					var startMonth = this.year + '-07';
 					var endMonth = (parseInt(this.year) + 1) + '-07';
 
+					// used by daily, weekly, monthly
+					var thisPeriods = this.gen(type, this.offset);
+					var thisSliceStartIndex;
+					var nextPeriods = this.gen(type, this.offset + 1);
+					var nextSliceEndIndex;
+
 					if (false) {
 
 					}
-					else if (type === 'Weekly') {
-						var thisPeriods = this.gen(type, this.offset);
-						var thisSliceStartIndex;
-						var nextPeriods = this.gen(type, this.offset + 1);
-						var nextSliceEndIndex;
+					else if (type === 'Monthly') {
+						for (var i = 0, month; i < thisPeriods.length; i++) {
+							month = thisPeriods[i];
 
+							if (month.startDate.slice(0, 7) === startMonth) {
+								thisSliceStartIndex = i;
+							}
+						}
+
+						for (var j = 0, month; j < nextPeriods.length; j++) {
+							month = nextPeriods[j];
+
+							if (month.startDate.slice(0, 7) === endMonth) {
+								nextSliceEndIndex = j;
+							}
+						}
+
+						return this.getItemifiedPeriods([].concat(thisPeriods.slice(thisSliceStartIndex), nextPeriods.slice(0, nextSliceEndIndex)));
+					}
+					else if (type === 'Weekly') {
 						for (var i = 0, week; i < thisPeriods.length; i++) {
 							week = thisPeriods[i];
 
@@ -1128,7 +1163,7 @@ console.log("itemify", periods[0].iso, periods);
 						}
 
 						for (var j = 0, week; j < nextPeriods.length; j++) {
-							week = thisPeriods[j];
+							week = nextPeriods[j];
 
 							if (week.startDate.slice(0, 7) === endMonth && week.endDate.slice(0, 7) === endMonth) {
 								nextSliceEndIndex = j;
@@ -1138,11 +1173,6 @@ console.log("itemify", periods[0].iso, periods);
 						return this.getItemifiedPeriods([].concat(thisPeriods.slice(thisSliceStartIndex), nextPeriods.slice(0, nextSliceEndIndex)));
 					}
 					else if (type === 'Daily') {
-						var thisPeriods = this.gen(type, this.offset);
-						var thisSliceStartIndex;
-						var nextPeriods = this.gen(type, this.offset + 1);
-						var nextSliceEndIndex;
-
 						for (var i = 0, day; i < thisPeriods.length; i++) {
 							if (thisPeriods[i].startDate === startDate) {
 								thisSliceStartIndex = i;
@@ -1167,15 +1197,35 @@ console.log("itemify", periods[0].iso, periods);
 					var startMonth = this.year + '-04';
 					var endMonth = (parseInt(this.year) + 1) + '-04';
 
+					// used by daily, weekly, monthly
+					var thisPeriods = this.gen(type, this.offset);
+					var thisSliceStartIndex;
+					var nextPeriods = this.gen(type, this.offset + 1);
+					var nextSliceEndIndex;
+
 					if (false) {
 
 					}
-					else if (type === 'Weekly') {
-						var thisPeriods = this.gen(type, this.offset);
-						var thisSliceStartIndex;
-						var nextPeriods = this.gen(type, this.offset + 1);
-						var nextSliceEndIndex;
+					else if (type === 'Monthly') {
+						for (var i = 0, month; i < thisPeriods.length; i++) {
+							month = thisPeriods[i];
 
+							if (month.startDate.slice(0, 7) === startMonth) {
+								thisSliceStartIndex = i;
+							}
+						}
+
+						for (var j = 0, month; j < nextPeriods.length; j++) {
+							month = nextPeriods[j];
+
+							if (month.startDate.slice(0, 7) === endMonth) {
+								nextSliceEndIndex = j;
+							}
+						}
+
+						return this.getItemifiedPeriods([].concat(thisPeriods.slice(thisSliceStartIndex), nextPeriods.slice(0, nextSliceEndIndex)));
+					}
+					else if (type === 'Weekly') {
 						for (var i = 0, week; i < thisPeriods.length; i++) {
 							week = thisPeriods[i];
 
@@ -1185,7 +1235,7 @@ console.log("itemify", periods[0].iso, periods);
 						}
 
 						for (var j = 0, week; j < nextPeriods.length; j++) {
-							week = thisPeriods[j];
+							week = nextPeriods[j];
 
 							if (week.startDate.slice(0, 7) === endMonth && week.endDate.slice(0, 7) === endMonth) {
 								nextSliceEndIndex = j;
@@ -1195,11 +1245,6 @@ console.log("itemify", periods[0].iso, periods);
 						return this.getItemifiedPeriods([].concat(thisPeriods.slice(thisSliceStartIndex), nextPeriods.slice(0, nextSliceEndIndex)));
 					}
 					else if (type === 'Daily') {
-						var thisPeriods = this.gen(type, this.offset);
-						var thisSliceStartIndex;
-						var nextPeriods = this.gen(type, this.offset + 1);
-						var nextSliceEndIndex;
-
 						for (var i = 0, day; i < thisPeriods.length; i++) {
 							if (thisPeriods[i].startDate === startDate) {
 								thisSliceStartIndex = i;
@@ -3324,6 +3369,15 @@ console.log("itemify", periods[0].iso, periods);
                                 text: 'Drill down'
                             });
 
+                            // monthly
+                            (function() {
+                                items.push({
+                                    items: p.getItemsByTypeByFinancialApril('Monthly'),
+                                    text: 'Show <span class="name">months</span> in <span class="name">' + p.name + '</span>',
+                                    iconCls: 'ns-menu-item-float'
+                                });
+                            })();
+
                             // weekly
                             (function() {
                                 items.push({
@@ -3387,6 +3441,15 @@ console.log("itemify", periods[0].iso, periods);
                                 text: 'Drill down'
                             });
 
+                            // monthly
+                            (function() {
+                                items.push({
+                                    items: p.getItemsByTypeByFinancialJuly('Monthly'),
+                                    text: 'Show <span class="name">months</span> in <span class="name">' + p.name + '</span>',
+                                    iconCls: 'ns-menu-item-float'
+                                });
+                            })();
+
                             // weekly
                             (function() {
                                 items.push({
@@ -3433,13 +3496,13 @@ console.log("itemify", periods[0].iso, periods);
 
                             // six-monthly october
                             items.push({
-                                items: p.getItemsByTypeByFinancialOctober('FinancialOct'),
+                                items: p.getItemsByTypeByFinancialOct('FinancialOct'),
                                 text: 'Show <span class="name">' + p.name + '</span> only',
                                 iconCls: 'ns-menu-item-float'
                             });
 
                             items.push({
-                                items: p.getItemsByTypeByFinancialOctober('FinancialOct', true),
+                                items: p.getItemsByTypeByFinancialOct('FinancialOct', true),
                                 text: 'Show all <span class="name">financial Octobers</span> in <span class="name">' + p.year + '</span>',
                                 iconCls: 'ns-menu-item-float'
                             });
@@ -3450,10 +3513,19 @@ console.log("itemify", periods[0].iso, periods);
                                 text: 'Drill down'
                             });
 
+                            // monthly
+                            (function() {
+                                items.push({
+                                    items: p.getItemsByTypeByFinancialOct('Monthly'),
+                                    text: 'Show <span class="name">months</span> in <span class="name">' + p.name + '</span>',
+                                    iconCls: 'ns-menu-item-float'
+                                });
+                            })();
+
                             // weekly
                             (function() {
                                 items.push({
-                                    items: p.getItemsByTypeByFinancialOctober('Weekly'),
+                                    items: p.getItemsByTypeByFinancialOct('Weekly'),
                                     text: 'Show <span class="name">weeks</span> in <span class="name">' + p.name + '</span>',
                                     iconCls: 'ns-menu-item-float'
                                 });
@@ -3462,7 +3534,7 @@ console.log("itemify", periods[0].iso, periods);
                             // daily
                             (function() {
                                 items.push({
-                                    items: p.getItemsByTypeByFinancialOctober('Daily'),
+                                    items: p.getItemsByTypeByFinancialOct('Daily'),
                                     text: 'Show <span class="name">days</span> in <span class="name">' + p.name + '</span>',
                                     iconCls: 'ns-menu-item-float'
                                 });
