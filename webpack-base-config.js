@@ -13,7 +13,7 @@ module.exports = {
         loaders: [
             {
                 test: /\.js$/,
-                exclude: [/node_modules/, /d2-analysis/],
+                exclude: [/node_modules/, /d2-analysis/, /libs/],
                 loader: 'babel',
                 query: {
                     cacheDirectory: true,
