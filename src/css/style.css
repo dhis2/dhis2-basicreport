@@ -3,35 +3,35 @@
  * Pivot
  *
  * Panel
- * PT Panel
+ * BR Panel
  *
  * Combobox
- * PT Combobox
+ * BR Combobox
  *
  * Multiselect
- * PT Multiselect
+ * BR Multiselect
  *
  * Checkbox
- * PT Checkbox
+ * BR Checkbox
  *
  * Toolbar
- * PT Toolbar
+ * BR Toolbar
  *
  * Menu
- * PT Menu
+ * BR Menu
  *
  * Button
  * Tooltip
  * LoadMask
  *
- * PT Grid
- * PT Window
- * PT Label
- * PT Textfield
- * PT Treepanel
- * PT Statusbar
- * PT Accordion
- * PT Textarea
+ * BR Grid
+ * BR Window
+ * BR Label
+ * BR Textfield
+ * BR Treepanel
+ * BR Statusbar
+ * BR Accordion
+ * BR Textarea
 */
 
 /*----------------------------------------------------------------------------
@@ -53,7 +53,8 @@ body,
 .x-form-item,
 .x-panel-header-text-default,
 .x-grid-cell-inner,
-.x-form-item-label {
+.x-form-item-label,
+.x-window-header-text-default {
     font-size: 11px;
 	font-family: 'Arial','Sans-serif','Roboto','Helvetica','Consolas';
 }
@@ -63,12 +64,9 @@ body,
     margin: 300px auto;
     font-size: 13px;
     color: #444;
+    text-align: center;
 }
 
-#init .brand {
-    font-weight: 600;
-    padding-right: 5px;
-}
 
 	/* Scrollbar Webkit */
 ::-webkit-scrollbar {
@@ -160,6 +158,12 @@ body,
 	background-position: right center;
 	padding-right: 15px !important;
 }
+.td-sortable-asc {
+	background-image: url('../images/arrowup.png');
+}
+.td-sortable-desc {
+	background-image: url('../images/arrowdown.png');
+}
 
 .text-weak {
 	color: #303038;
@@ -167,6 +171,10 @@ body,
 
 .text-medium {
     font-weight: 600;
+}
+
+.dataelementdenom {
+    color: #888;
 }
 
 .align-left {
@@ -231,17 +239,17 @@ table.pivot {
 	user-select: all;
 }
 
-table.pivot.displaydensity-COMFORTABLE td {
+table.pivot.displaydensity-comfortable td {
 	padding: 7px;
 }
-table.pivot.displaydensity-COMPACT td {
+table.pivot.displaydensity-compact td {
 	padding: 3px;
 }
 
-table.pivot.fontsize-LARGE td {
+table.pivot.fontsize-large td {
 	font-size: 13px;
 }
-table.pivot.fontsize-SMALL td {
+table.pivot.fontsize-small td {
 	font-size: 10px;
 }
 
@@ -253,6 +261,9 @@ table.pivot.fontsize-SMALL td {
 .pivot-dim {
 	background-color: #dae6f8;
 	text-align: center;
+}
+.pivot-dim.td-sortable:hover {
+	background-color: #c5d8f6;
 }
 .pivot-dim.highlighted {
 	background-color: #c5d8f6;
@@ -290,11 +301,14 @@ table.pivot.fontsize-SMALL td {
 
 .pivot-value {
 	background-color: #fff;
-	text-align: right;
 	max-width: 700px;
 }
 .pivot-value.highlighted {
-	background-color: #f3f3f3;
+	background-color: #f1f1f1;
+}
+.pivot-value.clickable:hover {
+    background-color: #f1f1f1;
+    cursor: pointer;
 }
 
 .pivot-value-subtotal {
@@ -357,7 +371,7 @@ table.pivot.fontsize-SMALL td {
  *--------------------------------------------------------------------------*/
 
 .ns-viewport-text * {
-    padding: 3px 10px;
+    padding: 3px 5px;
     font-size: 13px;
     color: #777;
 }
@@ -375,16 +389,14 @@ table.pivot.fontsize-SMALL td {
 
 .x-panel-body {
     font-size: 11px;
-    border-color: #dadada;
 }
 .x-panel .x-grid-body {
     border-style: none;
 }
 
 
-
 /*----------------------------------------------------------------------------
- * PT Panel
+ * BR Panel
  *--------------------------------------------------------------------------*/
 
 .ns-panel-title-data,
@@ -432,7 +444,7 @@ table.pivot.fontsize-SMALL td {
 
 
 /*----------------------------------------------------------------------------
- * PT Combobox
+ * BR Combobox
  *--------------------------------------------------------------------------*/
 
 	/* Combobox text position*/
@@ -450,7 +462,7 @@ table.pivot.fontsize-SMALL td {
 
 
 /*----------------------------------------------------------------------------
- * PT Trigger
+ * BR Trigger
  *--------------------------------------------------------------------------*/
 
     /* field default > trigger */
@@ -498,7 +510,7 @@ table.pivot.fontsize-SMALL td {
 
 
 /*----------------------------------------------------------------------------
- * PT Multiselect
+ * BR Multiselect
  *--------------------------------------------------------------------------*/
 
 .ns-multiselect {
@@ -576,7 +588,7 @@ table.pivot.fontsize-SMALL td {
 
 
 /*----------------------------------------------------------------------------
- * PT Checkbox
+ * BR Checkbox
  *--------------------------------------------------------------------------*/
 
 .ns-checkbox .x-form-item-label {
@@ -605,14 +617,31 @@ table.pivot.fontsize-SMALL td {
 
 	/* Background */
 .x-toolbar-default {
-    border-color: #dadada;
+    border-color: #D0D0D0;
     background-image: none;
-    background-color: #f6f6f6;
+    background-color: #f3f3f3;
+    background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #f1f1f1), color-stop(100%, #f5f5f5));
+    background-image: -webkit-linear-gradient(top, #f1f1f1,#f5f5f5);
+    background-image: -moz-linear-gradient(top, #f1f1f1,#f5f5f5);
+    background-image: -o-linear-gradient(top, #f1f1f1,#f5f5f5);
+    background-image: -ms-linear-gradient(top, #f1f1f1,#f5f5f5);
+    background-image: linear-gradient(top, #f1f1f1,#f5f5f5);
+}
+.ns-toolbar-main {
+    border-color: #D0D0D0;
+    background-image: none;
+    background-color: #f1f1f1;
+    background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #e3e3e3), color-stop(100%, #eaeaea));
+    background-image: -webkit-linear-gradient(top, #e3e3e3,#eaeaea);
+    background-image: -moz-linear-gradient(top, #e3e3e3,#eaeaea);
+    background-image: -o-linear-gradient(top, #e3e3e3,#eaeaea);
+    background-image: -ms-linear-gradient(top, #e3e3e3,#eaeaea);
+    background-image: linear-gradient(top, #e3e3e3,#eaeaea);
 }
 
 
 /*----------------------------------------------------------------------------
- * PT Toolbar
+ * BR Toolbar
  *--------------------------------------------------------------------------*/
 
 	/* Align menu */
@@ -647,7 +676,7 @@ table.pivot.fontsize-SMALL td {
 }
 
 .x-menu-item-link {
-    padding: 4px 5px 4px 26px;
+    padding: 4px 20px 5px 28px;
 }
 	/* Menu item color */
 .x-menu-item-text {
@@ -655,8 +684,46 @@ table.pivot.fontsize-SMALL td {
 }
 
 /*----------------------------------------------------------------------------
- * PT Menu
+ * BR Menu
  *--------------------------------------------------------------------------*/
+
+/* custom shadow instead of shadow */
+.ns-floatmenu.x-menu {
+    box-shadow: 0 0 2px 2px #ddd;
+    border: 1px solid #bbb;
+    border-radius: 1px;
+}
+
+.ns-floatmenu .x-box-inner,
+.ns-floatmenu .x-menu-item {
+    background-color: #fff;
+}
+
+.ns-floatmenu label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #222;
+    padding: 8px;
+}
+
+.ns-floatmenu .x-menu-item-active .x-menu-item-link {
+	border-radius: 0;
+	border-color: #e8e8e8;
+	background-color: #e8e8e8;
+	background-image: none;
+}
+
+.ns-floatmenu .x-menu-item-text {
+    color: #444;
+}
+.ns-floatmenu .x-menu-item-text .name {
+    color: #000;
+}
+
+.ns-floatmenu .x-menu-item-icon {
+    left: 8px;
+}
+
 
 	/* Menu item icon */
 .ns-menu-item-noicon .x-menu-item-link {
@@ -696,34 +763,14 @@ table.pivot.fontsize-SMALL td {
     background-image:url('../images/check-un.png');
 }
 
-/* Favorite */
-
-.ns-menu-item-favorite-new {
-    background-image:url('../images/fav-new.png');
+.ns-menu-item-drill {
+    background-image:url('../images/drill_16.png');
 }
-
-.ns-menu-item-favorite-open {
-    background-image:url('../images/fav-open.png');
+.ns-menu-item-float {
+    background-image:url('../images/float_16.png');
 }
-
-.ns-menu-item-favorite-save {
-    background-image:url('../images/fav-save.png');
-}
-
-.ns-menu-item-favorite-restore {
-    background-image:url('../images/fav-restore.png');
-}
-
-.ns-menu-item-favorite-interpretation {
-    background-image:url('../images/fav-interpretation.png');
-}
-
-.ns-menu-item-favorite-link {
-    background-image:url('../images/fav-link.png');
-}
-
-.ns-menu-item-favorite-delete {
-    background-image:url('../images/fav-delete.png');
+.ns-menu-item-expand {
+    background-image:url('../images/expand_16.png');
 }
 
 
@@ -776,7 +823,7 @@ table.pivot.fontsize-SMALL td {
 }
 
 /*----------------------------------------------------------------------------
- * PT Button
+ * BR Button
  *--------------------------------------------------------------------------*/
 
 .ns-button-icon-gear {
@@ -793,27 +840,6 @@ table.pivot.fontsize-SMALL td {
 }
 .ns-button-icon-map {
 	background: url('../images/map_14.png') no-repeat;
-}
-
-.ns-button-icon-arrowleft {
-	background: url('../images/arrowleft.png') no-repeat;
-}
-.ns-button-icon-arrowleftdouble {
-	background: url('../images/arrowleftdouble.png') no-repeat;
-}
-.ns-button-icon-arrowright {
-	background: url('../images/arrowright.png') no-repeat;
-}
-.ns-button-icon-arrowrightdouble {
-	background: url('../images/arrowrightdouble.png') no-repeat;
-}
-
-.ns-button-icon-search {
-	background: url('../images/search_14.png') 1px 1px no-repeat;
-}
-
-.ns-button-icon-nodeselectchild {
-	background: url('../images/node-select-child.png') 1px 1px no-repeat;
 }
 
 .ns-button-organisationunitselection .x-btn-center {
@@ -870,18 +896,9 @@ table.pivot.fontsize-SMALL td {
 	opacity: 0.65;
 }
 
-/*----------------------------------------------------------------------------
- * Grid
- *--------------------------------------------------------------------------*/
-
-.x-grid-row-selected .x-grid-cell {
-    background-color: #eaeaea !important;
-    border-style: solid;
-    border-color: transparent;
-}
 
 /*----------------------------------------------------------------------------
- * PT Grid
+ * BR Grid
  *--------------------------------------------------------------------------*/
 
 .ns-grid-row-icon-edit,
@@ -920,7 +937,7 @@ table.pivot.fontsize-SMALL td {
 
 .ns-grid .x-grid-cell-inner,
 .ns-grid .x-grid-cell-inner * {
-	font-size: 11px !important;
+	font-size: 10px !important;
 }
 .ns-grid .x-grid-cell-inner {
 	padding-top: 3px;
@@ -932,10 +949,10 @@ table.pivot.fontsize-SMALL td {
 }
 .ns-grid .x-grid-header-ct {
 	border-bottom-width: 1px !important;
-	border-bottom-color: #d6d6d6;
+	border-bottom-color: #d0d0d0;
 }
 .ns-grid .x-grid-body {
-	border: 1px solid #d6d6d6;
+	border: 1px solid #d0d0d0;
 	border-top: 0 none !important;
 }
 
@@ -953,27 +970,13 @@ table.pivot.fontsize-SMALL td {
 .ns-grid .link * {
 	cursor: pointer;
 	cursor: hand;
-	color: #001EFF;
+	color: blue;
 	text-decoration: underline;
 }
 
 
 /*----------------------------------------------------------------------------
- * Window
- *--------------------------------------------------------------------------*/
-
-.x-window .x-window-header-text-default {
-    font-size: 10px;
-    text-transform: uppercase;
-    text-align: center;
-    color: #444;
-    padding-left: 8px;
-    padding-top: 1px;
-}
-
-
-/*----------------------------------------------------------------------------
- * PT Window
+ * BR Window
  *--------------------------------------------------------------------------*/
 
 .ns-window-title-favorite {
@@ -1008,7 +1011,7 @@ table.pivot.fontsize-SMALL td {
 
 
 /*----------------------------------------------------------------------------
- * PT Label
+ * BR Label
  *--------------------------------------------------------------------------*/
 
 	/* Label heading periods */
@@ -1035,7 +1038,7 @@ table.pivot.fontsize-SMALL td {
 }
 
 /*----------------------------------------------------------------------------
- * PT Textfield
+ * BR Textfield
  *--------------------------------------------------------------------------*/
 
 .ns-textfield .x-form-field, .ns-textfield-alt1 .x-form-field {
@@ -1066,7 +1069,7 @@ table.pivot.fontsize-SMALL td {
 
 
 /*----------------------------------------------------------------------------
- * PT Treepanel
+ * BR Treepanel
  *--------------------------------------------------------------------------*/
 
 	/* Node height */
@@ -1097,7 +1100,7 @@ table.pivot.fontsize-SMALL td {
 
 
 /*----------------------------------------------------------------------------
- * PT Statusbar
+ * BR Statusbar
  *--------------------------------------------------------------------------*/
 
 .ns-statusbar .x-panel-body-default {
@@ -1112,7 +1115,7 @@ table.pivot.fontsize-SMALL td {
 
 
 /*----------------------------------------------------------------------------
- * PT Accordion
+ * BR Accordion
  *--------------------------------------------------------------------------*/
 
 	/* accordion title bar, shared */
@@ -1184,7 +1187,7 @@ table.pivot.fontsize-SMALL td {
 
 
 /*----------------------------------------------------------------------------
- * PT Textarea
+ * BR Textarea
  *--------------------------------------------------------------------------*/
 
 .ns-textarea .x-form-field {
