@@ -14,8 +14,9 @@
     "default_locale": "en",
     "activities": {
         "dhis": {
-            "href": "http://localhost:8080",
-            "auth": "admin:district"
+            "href": "*",
+            "auth": "admin:district",
+            "devHref": "http://localhost:8080"
         }
     }
 }
