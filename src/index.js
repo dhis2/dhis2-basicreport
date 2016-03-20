@@ -32,7 +32,7 @@ var ref = {
     requestManager: requestManager,
     responseManager: responseManager,
     i18nManager: i18nManager,
-    sessionStorageManager: sessionStorageManager,
+    //sessionStorageManager: sessionStorageManager,
     dimensionConfig: dimensionConfig,
     optionConfig: optionConfig,
     periodConfig: periodConfig,
@@ -51,6 +51,11 @@ ref.instanceManager = instanceManager;
 
 tableManager = new manager.TableManager(ref);
 ref.tableManager = tableManager;
+
+                    //tmp
+                    global.appManager = appManager;
+                    global.instanceManager = instanceManager;
+                    global.uiManager = uiManager;
 
 uiManager.setInstanceManager(instanceManager);
 
@@ -204,7 +209,3 @@ function createUi() {
     // viewport
     ui.Viewport(ref);
 }
-
-global.appManager = appManager;
-global.instanceManager = instanceManager;
-global.uiManager = uiManager;

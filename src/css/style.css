@@ -158,12 +158,6 @@ body,
 	background-position: right center;
 	padding-right: 15px !important;
 }
-.td-sortable-asc {
-	background-image: url('../images/arrowup.png');
-}
-.td-sortable-desc {
-	background-image: url('../images/arrowdown.png');
-}
 
 .text-weak {
 	color: #303038;
