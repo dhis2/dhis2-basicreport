@@ -7,7 +7,8 @@ import arrayTo from 'd2-utilizr/lib/arrayTo';
 
 import {api, pivot, manager, config, ui, init} from 'd2-analysis';
 
-import {OptionsWindow} from './ui/OptionsWindow.js';
+import {OptionsWindow} from './ui/OptionsWindow';
+import {Viewport} from './ui/Viewport';
 
 // manager instances
 var appManager = new manager.AppManager();
@@ -15,6 +16,7 @@ var calendarManager = new manager.CalendarManager();
 var requestManager = new manager.RequestManager();
 var responseManager = new manager.ResponseManager();
 var i18nManager = new manager.I18nManager();
+var sessionStorageManager = new manager.SessionStorageManager();
 var uiManager;
 var instanceManager;
 var tableManager;
@@ -32,7 +34,7 @@ var ref = {
     requestManager: requestManager,
     responseManager: responseManager,
     i18nManager: i18nManager,
-    //sessionStorageManager: sessionStorageManager,
+    sessionStorageManager: sessionStorageManager,
     dimensionConfig: dimensionConfig,
     optionConfig: optionConfig,
     periodConfig: periodConfig,
@@ -51,11 +53,6 @@ ref.instanceManager = instanceManager;
 
 tableManager = new manager.TableManager(ref);
 ref.tableManager = tableManager;
-
-                    //tmp
-                    global.appManager = appManager;
-                    global.instanceManager = instanceManager;
-                    global.uiManager = uiManager;
 
 uiManager.setInstanceManager(instanceManager);
 
@@ -207,5 +204,5 @@ function createUi() {
     optionsWindow.hide();
 
     // viewport
-    ui.Viewport(ref);
+    Viewport(ref);
 }
