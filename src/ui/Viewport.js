@@ -2176,7 +2176,7 @@ Viewport = function(c) {
         bodyStyle: 'border-style:none; border-top:1px solid #d6d6d6; padding:1px; padding-bottom:0; overflow-y:scroll;',
         items: accordionBody,
         setThisHeight: function(mx) {
-            var panelHeight = this.panels.length * 28,
+            var panelHeight = 3 * 28,
                 height;
 
             if (westRegion.hasScrollbar) {
@@ -2217,72 +2217,10 @@ Viewport = function(c) {
     });
     uiManager.reg(westRegion, 'westRegion');
 
-    var updateButton = Ext.create('Ext.button.Split', {
+    var updateButton = Ext.create('Ext.button.Button', {
         text: '<b>' + i18n.update + '</b>&nbsp;',
         handler: function() {
             instanceManager.getReport();
-        },
-        arrowHandler: function(b) {
-            b.menu = Ext.create('Ext.menu.Menu', {
-                closeAction: 'destroy',
-                shadow: false,
-                showSeparator: false,
-                items: [
-                    {
-                        xtype: 'label',
-                        text: i18n.download_data,
-                        style: 'padding:7px 40px 5px 7px; font-weight:bold; color:#111; border:0 none'
-                    },
-                    {
-                        text: 'CSV',
-                        iconCls: 'ns-menu-item-datasource',
-                        handler: function() {
-                            openDataDump('csv', 'ID');
-                        },
-                        menu: [
-                            {
-                                xtype: 'label',
-                                text: i18n.metadata_id_scheme,
-                                style: 'padding:7px 18px 5px 7px; font-weight:bold; color:#333'
-                            },
-                            {
-                                text: 'ID',
-                                iconCls: 'ns-menu-item-scheme',
-                                handler: function() {
-                                    openDataDump('csv', 'ID');
-                                }
-                            },
-                            {
-                                text: 'Code',
-                                iconCls: 'ns-menu-item-scheme',
-                                handler: function() {
-                                    openDataDump('csv', 'CODE');
-                                }
-                            },
-                            {
-                                text: 'Name',
-                                iconCls: 'ns-menu-item-scheme',
-                                handler: function() {
-                                    openDataDump('csv', 'NAME');
-                                }
-                            }
-                        ]
-                    }
-                ],
-                listeners: {
-                    show: function() {
-                        uiManager.setAnchorPosition(b.menu, b);
-                    },
-                    hide: function() {
-                        b.menu.destroy();
-                    },
-                    destroy: function(m) {
-                        b.menu = null;
-                    }
-                }
-            });
-
-            this.menu.show();
         }
     });
     uiManager.reg(updateButton, 'updateButton');
@@ -2304,6 +2242,7 @@ Viewport = function(c) {
             AboutWindow(c).getData();
         }
     });
+    uiManager.reg(aboutButton, 'aboutButton');
 
     var centerRegion = Ext.create('Ext.panel.Panel', {
         region: 'center',
@@ -2329,7 +2268,7 @@ Viewport = function(c) {
                 {
                     xtype: 'tbseparator',
                     height: 24,
-                    style: 'border-color:transparent; border-right-color:#d1d1d1; margin-right:4px',
+                    style: 'border-color:transparent; border-right-color:#d1d1d1; margin-right:6px',
                 },
                 optionsButton,
                 '->',                
