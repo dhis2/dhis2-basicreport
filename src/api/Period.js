@@ -1277,8 +1277,7 @@ Period.prototype.getItemsByTypeByDay = function(type, isAll) {
 	return [];
 };
 
-//Period type         Period id       Period name
-
+//TYPE				  ID			  NAME
 //Financial October   2015Oct         Oct 2015 to Sep 2016
 //Financial July      2015July        Jul 2015 to Jun 2016
 //Financial April     2015April       Apr 2015 to Mar 2016
@@ -1291,8 +1290,6 @@ Period.prototype.getItemsByTypeByDay = function(type, isAll) {
 //Monthly             201501          January 2015
 //Weekly              2015W1          2015W1
 //Daily               20150101        2015-01-01
-
-
 
 // dep 2
 
