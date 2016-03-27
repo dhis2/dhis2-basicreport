@@ -255,7 +255,7 @@ TableManager.prototype.getHtml = function(layout, fCallback) {
 			// ou headers
 			(function() {
 				for (var level; startOuLevel < maxOuLevel; startOuLevel++) {
-					level = clone(init.organisationUnitLevels[startOuLevel]);
+					level = clone(t.appManager.organisationUnitLevels[startOuLevel]);
 					level.objectName = 'ou';
 					level.cls = 'pivot-dim';
 					level.index = index++;
