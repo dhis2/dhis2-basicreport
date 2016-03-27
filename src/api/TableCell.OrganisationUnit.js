@@ -4,7 +4,7 @@ export var OrganisationUnitTableCell;
 
 OrganisationUnitTableCell = function(config) {
 	var t = this,
-		s = new C(config);
+		s = new TableCell(config);
 
 	Ext.apply(t, s);
 

@@ -5,7 +5,18 @@ import isString from 'd2-utilizr/lib/isString';
 import arrayFrom from 'd2-utilizr/lib/arrayFrom';
 import arrayTo from 'd2-utilizr/lib/arrayTo';
 
-import {api, pivot, manager, config, ui, init} from 'd2-analysis';
+import {api, manager, config, ui, init} from 'd2-analysis';
+
+import {DataObject} from './api/DataObject';
+import {OrganisationUnit} from './api/OrganisationUnit';
+import {Period} from './api/Period';
+import {Response} from './api/Response';
+import {Table} from './api/Table';
+import {TableCell} from './api/TableCell';
+import {OrganisationUnitTableCell} from './api/TableCell.OrganisationUnit';
+import {PeriodTableCell} from './api/TableCell.Period';
+import {TableHeader} from './api/TableHeader';
+import {TableRow} from './api/TableRow';
 
 import {OptionsWindow} from './ui/OptionsWindow';
 import {Viewport} from './ui/Viewport';
@@ -27,6 +38,19 @@ var optionConfig = new config.OptionConfig();
 var periodConfig = new config.PeriodConfig();
 var uiConfig = new config.UiConfig();
 
+// overrides
+//api.Layout = Layout;
+api.DataObject = DataObject;
+api.OrganisationUnit = OrganisationUnit;
+api.Period = Period;
+api.Response = Response;
+api.Table = Table;
+api.TableCell = TableCell;
+api.OrganisationUnitTableCell = OrganisationUnitTableCell;
+api.PeriodTableCell = PeriodTableCell;
+api.TableHeader = TableHeader;
+api.TableRow = TableRow;
+
 // references
 var ref = {
     appManager: appManager,
@@ -39,8 +63,7 @@ var ref = {
     optionConfig: optionConfig,
     periodConfig: periodConfig,
     uiConfig: uiConfig,
-    api: api,
-    pivot: pivot
+    api: api
 };
 
 // managers
@@ -66,8 +89,7 @@ uiManager.setI18nManager(i18nManager);
 appManager.applyTo(arrayTo(api));
 instanceManager.applyTo(arrayTo(api));
 uiManager.applyTo(arrayTo(api));
-dimensionConfig.applyTo(arrayTo(pivot));
-optionConfig.applyTo([].concat(arrayTo(api), arrayTo(pivot)));
+optionConfig.applyTo(arrayTo(api));
 
 // requests
 var manifestReq = $.getJSON('manifest.webapp');
@@ -164,39 +186,8 @@ function createUi() {
                     //web.mask.hide(ns.app.centerRegion);    
 
     // instance manager
-    instanceManager.setFn(function(layout) {
-        //var sortingId = layout.sorting ? layout.sorting.id : null,
-            //table;
-
-        //// get table
-        //var getTable = function() {
-            //var response = layout.getResponse();
-            //var colAxis = new pivot.TableAxis(layout, response, 'col');
-            //var rowAxis = new pivot.TableAxis(layout, response, 'row');
-            //return new pivot.Table(layout, response, colAxis, rowAxis);
-        //};
-
-        //// pre-sort if id
-        //if (sortingId && sortingId !== 'total') {
-            //layout.sort();
-        //}
-
-        //// table
-        //table = getTable();
-
-        //// sort if total
-        //if (sortingId && sortingId === 'total') {
-            //layout.sort(table);
-            //table = getTable();
-        //}
-
-        //uiManager.update(table.html);
-
-        //// events
-        //tableManager.setColumnHeaderMouseHandlers(layout, table);
-
-        //// mask
-        //uiManager.unmask();
+    instanceManager.setFn(function(table) {
+        console.log("table", table);
     });
 
     // windows

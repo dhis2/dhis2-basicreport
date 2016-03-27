@@ -7,10 +7,11 @@ import arrayClean from 'd2-utilizr/lib/arrayClean';
 import arrayMax from 'd2-utilizr/lib/arrayMax';
 import arrayMin from 'd2-utilizr/lib/arrayMin';
 import clone from 'd2-utilizr/lib/clone';
-import {Record} from './Record.js';
-import {ResponseHeader} from './ResponseHeader.js';
-import {ResponseRow} from './ResponseRow.js';
-import {ResponseRowIdCombination} from './ResponseRowIdCombination.js';
+
+import Record from 'd2-analysis/lib/api/Record.js';
+import ResponseHeader from 'd2-analysis/lib/api/ResponseHeader.js';
+import ResponseRow from 'd2-analysis/lib/api/ResponseRow.js';
+import ResponseRowIdCombination from 'd2-analysis/lib/api/ResponseRowIdCombination.js';
 
 export var Response;
 
