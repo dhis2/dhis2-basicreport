@@ -41,8 +41,7 @@ var optionConfig = new config.OptionConfig();
 var periodConfig = new config.PeriodConfig();
 var uiConfig = new config.UiConfig();
 
-// overrides
-//api.Layout = Layout;
+// extends
 api.DataObject = DataObject;
 api.OrganisationUnit = OrganisationUnit;
 api.Period = Period;

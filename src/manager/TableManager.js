@@ -14,11 +14,18 @@ import {OrganisationUnit} from '../api/OrganisationUnit';
 
 export var TableManager;
 
-TableManager = function() {
-	var t = this;    
+TableManager = function(c) {
+	var t = this;
+
+    t.appManager = c.appManager;
+    t.dimensionConfig = c.dimensionConfig;
 };
 
 TableManager.prototype.getHtml = function(layout, fCallback) {
+    var t = this;
+
+    var path = t.appManager.getPath();
+    
 	var data,
 		aInReqIds = [],
 		aInReqItems = [],
@@ -34,12 +41,15 @@ TableManager.prototype.getHtml = function(layout, fCallback) {
 		sDeName = 'dataElement',
 		sDsName = 'dataSet';
 
-	oDimNameReqItemArrayMap[dimConf.period.dimensionName] = aPeReqIds;
-	oDimNameReqItemArrayMap[dimConf.organisationUnit.dimensionName] = aOuReqIds;
+    var peDimName = t.dimensionConfig.get('period').dimensionName,
+        ouDimName = t.dimensionConfig.get('organisationUnit').dimensionName;
+
+	oDimNameReqItemArrayMap[peDimName] = aPeReqIds;
+	oDimNameReqItemArrayMap[ouDimName] = aOuReqIds;
 
 	// columns (data)
 	(function() {
-		var ddi = layout.dataDimensionItems,
+		var ddi = layout.getDataDimensionItems(),
 			dimMap = {};
 
 		dimMap[sInName] = aInReqIds;
@@ -108,7 +118,7 @@ TableManager.prototype.getHtml = function(layout, fCallback) {
 			return;
 		}
 
-		$.getJSON(init.contextPath + '/api/indicators.json?paging=false&filter=id:in:[' + aInReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,description,indicatorType[id,displayName|rename(name)],annualized,indicatorGroups[id,displayName|rename(name)],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[id,displayName|rename(name),legends[id,displayName|rename(name),startValue,endValue,color]]', function(r) {
+		$.getJSON(path + '/api/indicators.json?paging=false&filter=id:in:[' + aInReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,description,indicatorType[id,displayName|rename(name)],annualized,indicatorGroups[id,displayName|rename(name)],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[id,displayName|rename(name),legends[id,displayName|rename(name),startValue,endValue,color]]', function(r) {
 			if (r.indicators) {
 				for (var i = 0, obj; i < r.indicators.length; i++) {
 					obj = new DataObject(r.indicators[i], sInName);
@@ -129,7 +139,7 @@ TableManager.prototype.getHtml = function(layout, fCallback) {
 			return;
 		}
 
-		$.getJSON(init.contextPath + '/api/dataElements.json?paging=false&filter=id:in:[' + aDeReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,description,aggregationType,dataElementGroups[id,displayName|rename(name)],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[id,displayName|rename(name),legends[id,displayName|rename(name),startValue,endValue,color]]', function(r) {
+		$.getJSON(path + '/api/dataElements.json?paging=false&filter=id:in:[' + aDeReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,description,aggregationType,dataElementGroups[id,displayName|rename(name)],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[id,displayName|rename(name),legends[id,displayName|rename(name),startValue,endValue,color]]', function(r) {
 			if (r.dataElements) {
 				for (var i = 0, obj; i < r.dataElements.length; i++) {
 					obj = new DataObject(r.dataElements[i], sDeName);
@@ -149,7 +159,7 @@ TableManager.prototype.getHtml = function(layout, fCallback) {
 			return;
 		}
 
-		$.getJSON(init.contextPath + '/api/dataSets.json?paging=false&filter=id:in:[' + aDsReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,valueType,dataSetGroups[id,displayName|rename(name)],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[id,displayName|rename(name),legends[id,displayName|rename(name),startValue,endValue,color]]', function(r) {
+		$.getJSON(path + '/api/dataSets.json?paging=false&filter=id:in:[' + aDsReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,valueType,dataSetGroups[id,displayName|rename(name)],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[id,displayName|rename(name),legends[id,displayName|rename(name),startValue,endValue,color]]', function(r) {
 			aDsReqItems = r.dataSets;
 			support.prototype.array.addObjectProperty(aDsReqItems, 'type', sDsName);
 			getData();
@@ -218,7 +228,7 @@ TableManager.prototype.getHtml = function(layout, fCallback) {
 
 		// analytics
 
-		$.getJSON(init.contextPath + '/api/analytics.json?dimension=pe:' + aPeReqIds.join(';') + '&dimension=dx:' + sLookupSubElements + aDxReqIds.join(';') + '&dimension=ou:' + aOuReqIds.join(';') + '&hierarchyMeta=true&displayProperty=NAME&showHierarchy=true', function(r) {
+		$.getJSON(path + '/api/analytics.json?dimension=pe:' + aPeReqIds.join(';') + '&dimension=dx:' + sLookupSubElements + aDxReqIds.join(';') + '&dimension=ou:' + aOuReqIds.join(';') + '&hierarchyMeta=true&displayProperty=NAME&showHierarchy=true', function(r) {
 			getTable(r);
 		});
 	};

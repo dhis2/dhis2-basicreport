@@ -51,7 +51,7 @@ Viewport = function(c) {
 
     
     var indicatorAvailableStore = Ext.create('Ext.data.Store', {
-        fields: ['id', 'name'],
+        fields: ['id', 'name', 'objectName'],
         lastPage: null,
         nextPage: 1,
         isPending: false,
@@ -208,7 +208,7 @@ Viewport = function(c) {
     });
 
     var dataElementAvailableStore = Ext.create('Ext.data.Store', {
-        fields: ['id', 'name'],
+        fields: ['id', 'name', 'objectName'],
         lastPage: null,
         nextPage: 1,
         isPending: false,
@@ -1030,7 +1030,8 @@ Viewport = function(c) {
             dataSelectedStore.each( function(r) {
                 config.items.push({
                     id: r.data.id,
-                    name: r.data.name
+                    name: r.data.name,
+                    objectName: r.data.objectName
                 });
             });
 
@@ -2320,11 +2321,12 @@ Viewport = function(c) {
         var optionsWindow = uiManager.get('optionsWindow');
 
         var config = optionsWindow.getOptions(),
-            dx = dimensionConfig.get('data').dimensionName;
-
+            dx = dimensionConfig.get('data').dimensionName,
+            map = dimensionConfig.getObjectNameMap();
+console.log("map", map);
         config.columns = [];
         config.rows = [];
-        config.filters = [];
+        config.dataDimensionItems = [];
 
         // panel data
         for (var i = 0, dim, dimName; i < westRegionPanels.length; i++) {
@@ -2332,9 +2334,22 @@ Viewport = function(c) {
 
             if (dim) {
                 if (dim.dimension === dx) {
+
+                    // columns
                     config.columns.push(dim);
+
+                    // dataDimensionItems
+                    dim.items.forEach(function(item) {
+                        var ddi = {};
+console.log("item", item);
+                        ddi[map[item.objectName].value] = item;
+
+                        config.dataDimensionItems.push(ddi);
+                    });
                 }
                 else {
+
+                    // rows
                     config.rows.push(dim);
                 }
             }

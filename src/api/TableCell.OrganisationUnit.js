@@ -64,7 +64,7 @@ OrganisationUnitTableCell.prototype.showContextMenu = function(layout, row, tabl
 					items: [{id: this.ouReqId}]
 				});
 
-				layout.dataDimensionItems = function() {
+				layout.setDataDimensionItems(function() {
 					var obj = {};
 
 					obj[row.dataObject.dataType] = {
@@ -72,7 +72,7 @@ OrganisationUnitTableCell.prototype.showContextMenu = function(layout, row, tabl
 					};
 
 					return [obj];
-				}();
+				}());
 
 				layout.parentGraphMap = this.parentGraphMap;
 
