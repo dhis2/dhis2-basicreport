@@ -67,6 +67,11 @@ body,
     text-align: center;
 }
 
+#init .brand {
+    font-weight: 600;
+    padding-right: 5px;
+}
+
 
 	/* Scrollbar Webkit */
 ::-webkit-scrollbar {

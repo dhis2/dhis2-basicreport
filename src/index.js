@@ -18,6 +18,9 @@ import {PeriodTableCell} from './api/TableCell.Period';
 import {TableHeader} from './api/TableHeader';
 import {TableRow} from './api/TableRow';
 
+import {InstanceManager} from './manager/InstanceManager';
+import {TableManager} from './manager/TableManager';
+
 import {OptionsWindow} from './ui/OptionsWindow';
 import {Viewport} from './ui/Viewport';
 
@@ -51,6 +54,9 @@ api.PeriodTableCell = PeriodTableCell;
 api.TableHeader = TableHeader;
 api.TableRow = TableRow;
 
+manager.InstanceManager = InstanceManager;
+manager.TableManager = TableManager;
+
 // references
 var ref = {
     appManager: appManager,
@@ -70,12 +76,12 @@ var ref = {
 uiManager = new manager.UiManager(ref);
 ref.uiManager = uiManager;
 
+tableManager = new manager.TableManager(ref);
+ref.tableManager = tableManager;
+
 instanceManager = new manager.InstanceManager(ref);
 instanceManager.setApiResource('reportTables');
 ref.instanceManager = instanceManager;
-
-tableManager = new manager.TableManager(ref);
-ref.tableManager = tableManager;
 
 uiManager.setInstanceManager(instanceManager);
 

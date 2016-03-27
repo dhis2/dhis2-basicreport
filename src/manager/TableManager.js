@@ -15,8 +15,7 @@ import {OrganisationUnit} from '../api/OrganisationUnit';
 export var TableManager;
 
 TableManager = function() {
-	var t = this;
-    
+	var t = this;    
 };
 
 TableManager.prototype.getHtml = function(layout, fCallback) {
@@ -507,7 +506,7 @@ TableManager.prototype.getHtml = function(layout, fCallback) {
 			}
 		})();
 
-		table = new Table({
+		var table = new Table({
 			tableHeaders: tableHeaders,
 			tableRows: tableRows
 		});
@@ -516,6 +515,7 @@ TableManager.prototype.getHtml = function(layout, fCallback) {
 		table.sortData();
 
 		if (fCallback) {
+            console.log("tablemanager table", table);
 			fCallback(table);
 		}
 

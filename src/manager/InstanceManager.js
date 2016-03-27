@@ -1,6 +1,6 @@
 import {InstanceManager} from 'd2-analysis';
 
-export InstanceManager;
+export {InstanceManager};
 
 InstanceManager.prototype.getReport = function(layout) {
     var t = this;
@@ -14,7 +14,6 @@ InstanceManager.prototype.getReport = function(layout) {
     }
     
     t.tableManager.getHtml(layout, function(table) {
-        t.fn(table);
+        t.getFn()(table);
     });
 };
-    
