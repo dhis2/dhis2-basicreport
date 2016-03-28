@@ -15,7 +15,7 @@ InstanceManager.prototype.getReport = function(layout) {
     
     t.uiManager.mask();
     
-    t.setState(layout);
+    t.setState(layout, true);
     
     t.tableManager.getHtml(layout, function(table) {
         t.getFn()(table);

@@ -1,3 +1,4 @@
+import {Dimension} from 'd2-analysis';
 import {TableCell} from './TableCell';
 
 export var PeriodTableCell;
@@ -40,10 +41,10 @@ PeriodTableCell.prototype.showContextMenu = function(menuFn) {
 				var layout = instanceManager.getStateCurrent();
 
 				// pe
-				layout.rows[0] = {
+				layout.rows[0] = new Dimension({
 					dimension: 'pe',
 					items: this.peReqItems
-				};
+				});
 				
 				instanceManager.getReport(layout);
 			}

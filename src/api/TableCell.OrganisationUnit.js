@@ -1,3 +1,4 @@
+import {Axis} from 'd2-analysis';
 import {TableCell} from './TableCell';
 
 export var OrganisationUnitTableCell;
@@ -40,13 +41,12 @@ OrganisationUnitTableCell.prototype.showContextMenu = function(row, menuFn) {
 			ouReqId: conf.id,
 			parentGraphMap: conf.parentGraphMap,
 			handler: function() {
-				var layout = instanceManager.getStateCurrent();
-				
-				layout.columns = [];
-				layout.rows = [];
+				var layout = instanceManager.getStateCurrent(),
+					columns = [],
+					rows = [];
 
 				// dx
-				layout.columns.push({
+				columns.push({
 					dimension: 'dx',
 					items: [{
 						id: this.dxReqId,
@@ -56,19 +56,22 @@ OrganisationUnitTableCell.prototype.showContextMenu = function(row, menuFn) {
 				});
 
 				// pe
-				layout.rows.push({
+				rows.push({
 					dimension: 'pe',
 					items: [{
 						id: this.peReqId,
 						name: this.peReqName
 					}]
-				})
+				});
 
 				// ou
-				layout.rows.push({
+				rows.push({
 					dimension: 'ou',
 					items: [{id: this.ouReqId}]
 				});
+
+				layout.columns = new Axis(columns);
+				layout.rows = new Axis(rows);
 
 				layout.setDataDimensionItems(function() {
 					var obj = {};
