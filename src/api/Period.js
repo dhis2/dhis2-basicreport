@@ -9,6 +9,8 @@ export var Period;
 Period = function(config) {
 	var t = this;
 
+	t.klass = Period;
+
 	t.id = '' + config.id;
 	t.name = config.name;
 
@@ -18,7 +20,7 @@ Period = function(config) {
 	// transient
 	t.year = t.id.slice(0, 4);
 	t.offset = parseInt(t.year) - (new Date()).getFullYear();
-	t.generator = init.periodGenerator;
+	t.generator = t.klass.calendarManager.periodGenerator;
 
 	// uninitialized
 	t.sortId;
@@ -36,10 +38,12 @@ Period.prototype.getPrefixedNumber = function(number) {
 };
 
 Period.prototype.getNameByIdAndType = function(type, id, year) {
+	var t = this;
+	
 	year = year || this.year;
 
 	var offset = parseInt(year) - (new Date()).getFullYear(),
-		periods = init.periodGenerator.generateReversedPeriods(type, offset);
+		periods = t.generator.generateReversedPeriods(type, offset);
 
 	for (var i = 0; i < periods.length; i++) {
 		if (periods[i].iso === id) {
@@ -1294,11 +1298,12 @@ Period.prototype.getItemsByTypeByDay = function(type, isAll) {
 // dep 2
 
 Period.prototype.generateDisplayProperties = function() {
-	var p = this,
-		id = this.id,
+	var p = this;
+
+	var id = p.id,
 		months = 'Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec'.split('|'),
 		offset = parseInt(p.year) - (new Date()).getFullYear(),
-		generator = init.periodGenerator,
+		generator = p.klass.calendarManager.generator,
 		getSuffix = function(array) {
 			return array.length > 1 ? 's' : '';
 		};

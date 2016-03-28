@@ -93,6 +93,8 @@ uiManager.setI18nManager(i18nManager);
 // apply to
 appManager.applyTo(arrayTo(api));
 instanceManager.applyTo(arrayTo(api));
+calendarManager.applyTo(arrayTo(api));
+tableManager.applyTo(arrayTo(api));
 uiManager.applyTo(arrayTo(api));
 optionConfig.applyTo(arrayTo(api));
 
@@ -131,6 +133,8 @@ requestManager.add(new api.Request(init.i18nInit(ref)));
 requestManager.add(new api.Request(init.rootNodesInit(ref)));
 requestManager.add(new api.Request(init.organisationUnitLevelsInit(ref)));
 requestManager.add(new api.Request(init.legendSetsInit(ref)));
+
+global.instanceManager = instanceManager;
 
 requestManager.set(createUi);
 requestManager.run();
@@ -192,7 +196,16 @@ function createUi() {
 
     // instance manager
     instanceManager.setFn(function(table) {
-        console.log("table", table);
+		table.update = function(isSorting) {
+			uiManager.update(table.generateHtml());
+			table.addHeaderClickListeners();
+			table.addOuClickListeners();
+			table.addPeClickListeners();
+		};
+
+		table.update();
+        
+		uiManager.unmask();
     });
 
     // windows

@@ -1,6 +1,7 @@
 import isNumeric from 'd2-utilizr/lib/isNumeric';
 import isArray from 'd2-utilizr/lib/isArray';
 import isObject from 'd2-utilizr/lib/isObject';
+import arrayTo from 'd2-utilizr/lib/arrayTo';
 import clone from 'd2-utilizr/lib/clone';
 
 import {DataObject} from '../api/DataObject';
@@ -8,6 +9,8 @@ import {Response} from '../api/Response';
 import {TableHeader} from '../api/TableHeader';
 import {TableRow} from '../api/TableRow';
 import {TableCell} from '../api/TableCell';
+import {OrganisationUnitTableCell} from '../api/TableCell.OrganisationUnit';
+import {PeriodTableCell} from '../api/TableCell.Period';
 import {Table} from '../api/Table';
 import {Period} from '../api/Period';
 import {OrganisationUnit} from '../api/OrganisationUnit';
@@ -19,6 +22,14 @@ TableManager = function(c) {
 
     t.appManager = c.appManager;
     t.dimensionConfig = c.dimensionConfig;
+};
+
+TableManager.prototype.applyTo = function(modules) {
+    var t = this;
+
+    arrayTo(modules).forEach(function(module) {
+        module.tableManager = t;
+    });
 };
 
 TableManager.prototype.getHtml = function(layout, fCallback) {
@@ -410,7 +421,7 @@ TableManager.prototype.getHtml = function(layout, fCallback) {
 
 					// ou
 					if (th.objectName === 'ou') {
-						row.addCell(th.id, new TableCell.Ou(th.level > orgUnit.level ? {
+						row.addCell(th.id, new OrganisationUnitTableCell(th.level > orgUnit.level ? {
 							isEmpty: true
 						} : {
 							name: orgUnit.getParentNameByLevel(th.level),
@@ -440,7 +451,7 @@ TableManager.prototype.getHtml = function(layout, fCallback) {
 						}
 
 						else if (th.id === 'pe') {
-							row.addCell(th.id, new TableCell.Pe({
+							row.addCell(th.id, new PeriodTableCell({
 								name: period.displayName,
 								sortId: period.typeSortId + period.sortId + dataObject.groupName + dataObject.name + allOuSortId,
 								cls: 'pivot-value clickable',
@@ -525,14 +536,23 @@ TableManager.prototype.getHtml = function(layout, fCallback) {
 		table.sortData();
 
 		if (fCallback) {
-            console.log("tablemanager table", table);
 			fCallback(table);
 		}
 
-		if (NS.isDebug) {
-			console.log('response', response);
-		}
+		//if (NS.isDebug) {
+			//console.log('response', response);
+		//}
 	};
 
 	getIndicators();
+};
+
+TableManager.prototype.getContextMenu = function(config) {
+	config = config || {};
+
+	config.shadow = false;
+	config.showSeparator = false;
+	config.baseCls = 'ns-floatmenu';
+
+	return Ext.create('Ext.menu.Menu', config);
 };

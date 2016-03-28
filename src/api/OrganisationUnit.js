@@ -6,6 +6,8 @@ export var OrganisationUnit;
 OrganisationUnit = function(config) {
 	var t = this;
 
+	t.klass = OrganisationUnit;
+
 	// constructor
 	t.id = config.id;
 	t.name = config.name;
@@ -94,8 +96,12 @@ OrganisationUnit.prototype.getSortIdByLevel = function(level) {
 // dep 3
 
 OrganisationUnit.prototype.getContextMenuItemsConfig = function(level) {
+	var t = this;
+
+	var appManager = t.klass.appManager;
+	
 	var items = [],
-		levels = init.organisationUnitLevels,
+		levels = appManager.organisationUnitLevels,
 		ouId = this.getParentIdByLevel(level) || this.id,
 		ouName = this.getParentNameByLevel(level) || this.name,
 		levelName = levels[level - 1].name,

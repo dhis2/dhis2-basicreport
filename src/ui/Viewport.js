@@ -2323,7 +2323,7 @@ Viewport = function(c) {
         var config = optionsWindow.getOptions(),
             dx = dimensionConfig.get('data').dimensionName,
             map = dimensionConfig.getObjectNameMap();
-console.log("map", map);
+            
         config.columns = [];
         config.rows = [];
         config.dataDimensionItems = [];
@@ -2341,7 +2341,7 @@ console.log("map", map);
                     // dataDimensionItems
                     dim.items.forEach(function(item) {
                         var ddi = {};
-console.log("item", item);
+                        
                         ddi[map[item.objectName].value] = item;
 
                         config.dataDimensionItems.push(ddi);

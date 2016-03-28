@@ -8,13 +8,17 @@ OrganisationUnitTableCell = function(config) {
 
 	Ext.apply(t, s);
 
+	t.klass = OrganisationUnitTableCell;
+
 	this.level = config.level;
 	this.organisationUnit = config.organisationUnit;
 };
 
-OrganisationUnitTableCell.prototype.showContextMenu = function(layout, row, tableFn, menuFn) {
+OrganisationUnitTableCell.prototype.showContextMenu = function(row, menuFn) {
 	var t = this;
 
+	var instanceManager = t.klass.instanceManager;
+	
 	var itemsConfig = t.organisationUnit.getContextMenuItemsConfig(t.level),
 		items = [];
 
@@ -36,6 +40,8 @@ OrganisationUnitTableCell.prototype.showContextMenu = function(layout, row, tabl
 			ouReqId: conf.id,
 			parentGraphMap: conf.parentGraphMap,
 			handler: function() {
+				var layout = instanceManager.getStateCurrent();
+				
 				layout.columns = [];
 				layout.rows = [];
 
@@ -70,18 +76,18 @@ OrganisationUnitTableCell.prototype.showContextMenu = function(layout, row, tabl
 					obj[row.dataObject.dataType] = {
 						id: row.dataObject.id
 					};
-
+					
 					return [obj];
 				}());
-
+				
 				layout.parentGraphMap = this.parentGraphMap;
 
-				tableFn(layout, true);
+				instanceManager.getReport(layout);
 			}
 		});
 	}
 
-	menu = menuFn({
+	var menu = menuFn({
 		items: items
 	});
 

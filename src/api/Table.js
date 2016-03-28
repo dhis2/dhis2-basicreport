@@ -2,10 +2,15 @@ import isString from 'd2-utilizr/lib/isString';
 import isNumber from 'd2-utilizr/lib/isNumber';
 import isEmpty from 'd2-utilizr/lib/isEmpty';
 
+import {OrganisationUnitTableCell} from './TableCell.OrganisationUnit';
+import {PeriodTableCell} from './TableCell.Period';
+
 export var Table;
 
 Table = function(config) {
 	var t = this;
+
+	t.klass = Table;
 
 	t.tableHeaders = config.tableHeaders;
 	t.tableRows = config.tableRows;
@@ -135,16 +140,6 @@ Table.prototype.generateHtml = function() {
 	return this.html = html;
 };
 
-Table.prototype.getContextMenu = function(config) {
-	config = config || {};
-
-	config.shadow = false;
-	config.showSeparator = false;
-	config.baseCls = 'ns-floatmenu';
-
-	return Ext.create('Ext.menu.Menu', config);
-};
-
 Table.prototype.getTableCellsByInstance = function(type) {
 	var cells = [];
 
@@ -188,9 +183,12 @@ Table.prototype.getRowByCellId = function(cellId) {
 };
 
 // dep 2
-Table.prototype.addOuClickListeners = function(layout, tableFn) {
+Table.prototype.addOuClickListeners = function() {
 	var t = this,
-		cells = this.getTableCellsByInstance(api.data.TableCell.Ou);
+		cells = this.getTableCellsByInstance(OrganisationUnitTableCell);
+
+	//tableFn = tableFn || t.klass.instanceManager.getReport;
+	//layout = layout || t.klass.instanceManager.getStateCurrent();
 
 	for (var i = 0, cell, el; i < cells.length; i++) {
 		cell = cells[i];
@@ -204,14 +202,16 @@ Table.prototype.addOuClickListeners = function(layout, tableFn) {
 		el.row = t.getRowByCellId(cell.id);
 
 		el.on('click', function(event) {
-			this.cell.showContextMenu(layout, this.row, tableFn, t.getContextMenu);
+			this.cell.showContextMenu(this.row, function(items) {
+				return t.klass.tableManager.getContextMenu(items);
+			});
 		});
 	}
 };
 
 Table.prototype.addPeClickListeners = function(layout, tableFn) {
 	var t = this,
-		cells = this.getTableCellsByInstance(api.data.TableCell.Pe);
+		cells = this.getTableCellsByInstance(PeriodTableCell);
 
 	for (var i = 0, cell, el; i < cells.length; i++) {
 		cell = cells[i];
@@ -225,7 +225,9 @@ Table.prototype.addPeClickListeners = function(layout, tableFn) {
 		el.row = t.getRowByCellId(cell.id);
 
 		el.on('click', function(event) {
-			this.cell.showContextMenu(layout, this.row, tableFn, t.getContextMenu);
+			this.cell.showContextMenu(function(items) {
+				return t.klass.tableManager.getContextMenu(items);
+			});
 		});
 	}
 };

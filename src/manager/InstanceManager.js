@@ -13,6 +13,10 @@ InstanceManager.prototype.getReport = function(layout) {
         }
     }
     
+    t.uiManager.mask();
+    
+    t.setState(layout);
+    
     t.tableManager.getHtml(layout, function(table) {
         t.getFn()(table);
     });
