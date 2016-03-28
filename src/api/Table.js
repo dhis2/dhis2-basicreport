@@ -187,9 +187,6 @@ Table.prototype.addOuClickListeners = function() {
 	var t = this,
 		cells = this.getTableCellsByInstance(OrganisationUnitTableCell);
 
-	//tableFn = tableFn || t.klass.instanceManager.getReport;
-	//layout = layout || t.klass.instanceManager.getStateCurrent();
-
 	for (var i = 0, cell, el; i < cells.length; i++) {
 		cell = cells[i];
 
