@@ -6,7 +6,6 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack-dev-server",
-    "build": "rm -rf build && webpack --config webpack.config.prod.js && cp ./index.html build && cp ./node_modules/babel-polyfill/dist/polyfill.min.js build && cp ./jquery.min.js build && cp ./manifest.webapp build && cp -r i18n build && cp -r dhis2 build && cp -r extjs build"
     "build": "rm -rf build && webpack --config webpack.config.prod.js && cp ./index.html build && cp ./node_modules/babel-polyfill/dist/polyfill.min.js build && cp ./jquery.min.js build && cp ./manifest.webapp build && cp -r i18n build && cp -r dhis2 build && cp -r extjs build && cp jquery.min.js basicreport.js && more build/basicreport.js >> basicreport.js && mv -f basicreport.js build"
   },
   "repository": {
