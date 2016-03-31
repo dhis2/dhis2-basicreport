@@ -159,39 +159,6 @@ function createUi() {
             '</div>';
     }());
 
-
-                //web.mask.show(ns.app.centerRegion);
-
-                //web.report.getHtml(layout, function(table) {
-                    //table.update = function(isSorting) {
-                        //ns.app.centerRegion.removeAll(true);
-
-                        //ns.app.dateRender = new Date();
-                        //ns.app.centerRegion.update(table.generateHtml());
-                        //ns.app.dateTotal = new Date();
-
-                        //table.addHeaderClickListeners();
-                        //table.addOuClickListeners(layout, web.report.createReport);
-                        //table.addPeClickListeners(layout, web.report.createReport);
-                    //};
-
-                    //table.update();
-
-                    //// after render
-                    //if (isUpdateOuGui) {
-                        //ns.app.viewport.setGui(layout);
-                    //}
-
-                    //ns.app.layout = layout;
-
-                    //if (NS.isDebug) {
-                        //console.log("RENDER", (ns.app.dateTotal - ns.app.dateRender) / 1000);
-                        //console.log("layout", ns.app.layout);
-                        //console.log("table", table);
-                    //}
-
-                    //web.mask.hide(ns.app.centerRegion);    
-
     // instance manager
     instanceManager.setFn(function(table) {
 		table.update = function(isSorting) {
