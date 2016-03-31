@@ -3,9 +3,9 @@ var webpack = require('webpack');
 
 module.exports = {
     context: __dirname,
-    entry: 
+    entry: {
         'app': './src/index.js',
-        'basicreport': './src/basicreport.js',
+        'basicreport': './src/plugin.js',
     },
     devtool: 'source-map',
     output: {
