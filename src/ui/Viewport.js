@@ -21,7 +21,6 @@ export var Viewport;
 Viewport = function(c) {
     var uiManager = c.uiManager,
         appManager = c.appManager,
-        responseManager = c.responseManager,
         i18nManager = c.i18nManager,
         sessionStorageManager = c.sessionStorageManager,
         instanceManager = c.instanceManager,
