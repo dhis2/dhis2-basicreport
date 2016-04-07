@@ -4,7 +4,7 @@ var webpack = require('webpack');
 module.exports = {
     context: __dirname,
     entry: {
-        'app': './src/index.js',
+        'app': './index.js',
         'basicreport': './src/plugin.js',
     },
     devtool: 'source-map',
@@ -29,10 +29,7 @@ module.exports = {
             },
             {
                 test: /\.(jpe?g|png|gif|svg)$/i,
-                loaders: [
-                    'url?limit=8192',
-                    'img'
-                ]
+                loader: 'url?limit=10000!img?progressive=true'
             },
         ],
     },
