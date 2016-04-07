@@ -245,6 +245,7 @@ TableManager.prototype.getHtml = function(layout, fCallback) {
 	};
 
 	getTable = function(analyticsData) {
+console.log("analyticsData", analyticsData);
 		var response = new Response(analyticsData),
 			aDxResIds = aDxReqIds,
 			aPeResIds = response.metaData.pe,
@@ -534,7 +535,7 @@ TableManager.prototype.getHtml = function(layout, fCallback) {
 
 		table.addOptionsCls(layout);
 		table.sortData();
-
+		
 		if (fCallback) {
 			fCallback(table);
 		}

@@ -1,23 +1,24 @@
-import './css/style.css';
+import './extjs/resources/css/ext-all-gray.css';
+import './src/css/style.css';
 
 import isArray from 'd2-utilizr/lib/isArray';
 import arrayTo from 'd2-utilizr/lib/arrayTo';
 
-import {api, manager, config, init} from 'd2-analysis';
+import {api, manager, config, ui, init} from 'd2-analysis';
 
-import {DataObject} from './api/DataObject';
-import {OrganisationUnit} from './api/OrganisationUnit';
-import {Period} from './api/Period';
-import {Response} from './api/Response';
-import {Table} from './api/Table';
-import {TableCell} from './api/TableCell';
-import {OrganisationUnitTableCell} from './api/TableCell.OrganisationUnit';
-import {PeriodTableCell} from './api/TableCell.Period';
-import {TableHeader} from './api/TableHeader';
-import {TableRow} from './api/TableRow';
+import {DataObject} from './src/api/DataObject';
+import {OrganisationUnit} from './src/api/OrganisationUnit';
+import {Period} from './src/api/Period';
+import {Response} from './src/api/Response';
+import {Table} from './src/api/Table';
+import {TableCell} from './src/api/TableCell';
+import {OrganisationUnitTableCell} from './src/api/TableCell.OrganisationUnit';
+import {PeriodTableCell} from './src/api/TableCell.Period';
+import {TableHeader} from './src/api/TableHeader';
+import {TableRow} from './src/api/TableRow';
 
-import {InstanceManager} from './manager/InstanceManager';
-import {TableManager} from './manager/TableManager';
+import {InstanceManager} from './src/manager/InstanceManager';
+import {TableManager} from './src/manager/TableManager';
 
 // extends
 api.DataObject = DataObject;
@@ -30,7 +31,6 @@ api.OrganisationUnitTableCell = OrganisationUnitTableCell;
 api.PeriodTableCell = PeriodTableCell;
 api.TableHeader = TableHeader;
 api.TableRow = TableRow;
-
 manager.InstanceManager = InstanceManager;
 manager.TableManager = TableManager;
 
@@ -52,7 +52,10 @@ var plugin = {
 
 global.basicReportPlugin = plugin;
 
-var refs = {};
+// references
+var refs = {
+    api: api
+};
 
 // dimension config
 var dimensionConfig = new config.DimensionConfig();
@@ -91,8 +94,7 @@ optionConfig.setI18nManager(i18nManager);
 periodConfig.setI18nManager(i18nManager);
 
 appManager.applyTo(arrayTo(api));
-dimensionConfig.applyTo(arrayTo(pivot));
-optionConfig.applyTo([].concat(arrayTo(api), arrayTo(pivot)));
+optionConfig.applyTo(arrayTo(api));
 
 function _load(layouts) {
     if (!layouts.length) {
@@ -137,15 +139,15 @@ function _load(layouts) {
             instanceRefs.uiManager = uiManager;
             uiManager.applyTo(arrayTo(api));
 
+            var tableManager = new manager.TableManager(instanceRefs);
+            instanceRefs.tableManager = tableManager;
+
             var instanceManager = new manager.InstanceManager(instanceRefs);
             instanceRefs.instanceManager = instanceManager;
             instanceManager.apiResource = 'reportTables';
             instanceManager.applyTo(arrayTo(api));
 
-            var tableManager = new manager.TableManager(instanceRefs);
-            instanceRefs.tableManager = tableManager;
-
-            instanceManager.setFn(function(table) {
+			instanceManager.setFn(function(table) {
 				table.update = function(isSorting) {
 					uiManager.update(table.generateHtml());
 					table.addHeaderClickListeners();
