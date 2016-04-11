@@ -48,7 +48,7 @@ Viewport = function(c) {
 
         dimensionPanelMap = {};
 
-    
+
     var indicatorAvailableStore = Ext.create('Ext.data.Store', {
         fields: ['id', 'name', 'objectName'],
         lastPage: null,
@@ -1037,19 +1037,19 @@ Viewport = function(c) {
             return config.items.length ? config : null;
         },
         clearDimension: function() {
-			dataSelectedStore.removeAll();
+            dataSelectedStore.removeAll();
 
-			indicatorAvailableStore.removeAll();
-			indicatorGroup.clearValue();
+            indicatorAvailableStore.removeAll();
+            indicatorGroup.clearValue();
 
-			dataElementAvailableStore.removeAll();
-			dataElementGroup.clearValue();
-		},
-		setDimension: function(layout) {
+            dataElementAvailableStore.removeAll();
+            dataElementGroup.clearValue();
+        },
+        setDimension: function(layout) {
             if (layout.hasDimension(this.dimension, true)) {
-				dataSelectedStore.addRecords(layout.getDimension(this.dimension).getRecords());
-			}
-		},
+                dataSelectedStore.addRecords(layout.getDimension(this.dimension).getRecords());
+            }
+        },
         onExpand: function() {
             var accordionHeight = westRegion.hasScrollbar ? uiConfig.west_scrollbarheight_accordion_indicator : uiConfig.west_maxheight_accordion_indicator;
 
@@ -1470,35 +1470,35 @@ Viewport = function(c) {
         dimension: periodObjectName,
         checkboxes: [],
         clearDimension: function(all) {
-			fixedPeriodSelectedStore.removeAll();
-			period.resetRelativePeriods();
+            fixedPeriodSelectedStore.removeAll();
+            period.resetRelativePeriods();
 
             if (!all) {
                 relativePeriod.valueComponentMap[appManager.getRelativePeriod()].setValue(true);
             }
-		},
-		setDimension: function(layout) {
-			if (layout.hasDimension(this.dimension, true)) {
-				var records = layout.getDimension(this.dimension).getRecords(),
-					fixedRecords = [],
-					checkbox;
+        },
+        setDimension: function(layout) {
+            if (layout.hasDimension(this.dimension, true)) {
+                var records = layout.getDimension(this.dimension).getRecords(),
+                    fixedRecords = [],
+                    checkbox;
 
-				records.forEach(function(record) {
-					checkbox = relativePeriod.valueComponentMap[record.id];
+                records.forEach(function(record) {
+                    checkbox = relativePeriod.valueComponentMap[record.id];
 
-					if (checkbox) {
-						checkbox.setValue(true);
-					}
-					else {
-						fixedRecords.push(record);
-					}
-				});
+                    if (checkbox) {
+                        checkbox.setValue(true);
+                    }
+                    else {
+                        fixedRecords.push(record);
+                    }
+                });
 
-				fixedPeriodSelectedStore.add(fixedRecords);
+                fixedPeriodSelectedStore.add(fixedRecords);
 
-				uiManager.msFilterAvailable({store: fixedPeriodAvailableStore}, {store: fixedPeriodSelectedStore});
-			}
-		},
+                uiManager.msFilterAvailable({store: fixedPeriodAvailableStore}, {store: fixedPeriodSelectedStore});
+            }
+        },
         getDimension: function() {
             var config = {
                     dimension: periodObjectName,
@@ -2161,7 +2161,7 @@ Viewport = function(c) {
                 period,
                 organisationUnit
             ];
-            
+
             // last cls
             panels[panels.length - 1].cls = 'ns-accordion-last';
 
@@ -2212,8 +2212,8 @@ Viewport = function(c) {
         width: uiConfig.west_width + uiManager.getScrollbarSize().width,
         items: accordion,
         setState: function(layout) {
-			setUiState(layout);
-		}
+            setUiState(layout);
+        }
     });
     uiManager.reg(westRegion, 'westRegion');
 
@@ -2235,7 +2235,7 @@ Viewport = function(c) {
     });
     uiManager.reg(optionsButton, 'optionsButton');
 
-	var aboutButton = Ext.create('Ext.button.Button', {
+    var aboutButton = Ext.create('Ext.button.Button', {
         text: i18n.about,
         menu: {},
         handler: function() {
@@ -2271,7 +2271,7 @@ Viewport = function(c) {
                     style: 'border-color:transparent; border-right-color:#d1d1d1; margin-right:6px',
                 },
                 optionsButton,
-                '->',                
+                '->',
                 aboutButton,
                 {
                     xtype: 'button',
@@ -2322,7 +2322,7 @@ Viewport = function(c) {
         var config = optionsWindow.getOptions(),
             dx = dimensionConfig.get('data').dimensionName,
             map = dimensionConfig.getObjectNameMap();
-            
+
         config.columns = [];
         config.rows = [];
         config.dataDimensionItems = [];
@@ -2340,7 +2340,7 @@ Viewport = function(c) {
                     // dataDimensionItems
                     dim.items.forEach(function(item) {
                         var ddi = {};
-                        
+
                         ddi[map[item.objectName].value] = item;
 
                         config.dataDimensionItems.push(ddi);
@@ -2353,7 +2353,7 @@ Viewport = function(c) {
                 }
             }
         }
-        
+
         return config;
     };
 

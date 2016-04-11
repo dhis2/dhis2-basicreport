@@ -174,7 +174,7 @@ function initialize() {
 
     // instance manager
     instanceManager.apiResource = 'reportTables';
-    
+
     // ui manager
     uiManager.disableRightClick();
 
@@ -192,16 +192,16 @@ function initialize() {
 
     // instance manager
     instanceManager.setFn(function(table) {
-		table.update = function(isSorting) {
-			uiManager.update(table.generateHtml());
-			table.addHeaderClickListeners();
-			table.addOuClickListeners();
-			table.addPeClickListeners();
-		};
+        table.update = function(isSorting) {
+            uiManager.update(table.generateHtml());
+            table.addHeaderClickListeners();
+            table.addOuClickListeners();
+            table.addPeClickListeners();
+        };
 
-		table.update();
-        
-		uiManager.unmask();
+        table.update();
+
+        uiManager.unmask();
     });
 
     // windows

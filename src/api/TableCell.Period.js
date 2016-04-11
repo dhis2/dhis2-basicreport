@@ -4,66 +4,66 @@ import {TableCell} from './TableCell';
 export var PeriodTableCell;
 
 PeriodTableCell = function(config) {
-	var t = this,
-		s = new TableCell(config);
+    var t = this,
+        s = new TableCell(config);
 
-	$.extend(t, s);
+    $.extend(t, s);
 
-	t.klass = PeriodTableCell;
+    t.klass = PeriodTableCell;
 
-	this.period = config.period;
+    this.period = config.period;
 };
 
 PeriodTableCell.prototype.showContextMenu = function(menuFn) {
-	var t = this;
+    var t = this;
 
-	var instanceManager = t.klass.instanceManager;
+    var instanceManager = t.klass.instanceManager;
 
-	var itemsConfig = t.period.getContextMenuItemsConfig(),
-		items = [];
+    var itemsConfig = t.period.getContextMenuItemsConfig(),
+        items = [];
 
-	if (!itemsConfig || !itemsConfig.length) {
-		return;
-	}
+    if (!itemsConfig || !itemsConfig.length) {
+        return;
+    }
 
-	for (var i = 0, conf; i < itemsConfig.length; i++) {
-		conf = itemsConfig[i];
+    for (var i = 0, conf; i < itemsConfig.length; i++) {
+        conf = itemsConfig[i];
 
-		items.push(conf.isSubtitle ? {
-			xtype: 'label',
-			html: conf.text,
-			style: conf.style
-		} : {
-			text: conf.text,
-			iconCls: conf.iconCls,
-			peReqItems: conf.items,
-			handler: function() {
-				var layout = instanceManager.getStateCurrent();
+        items.push(conf.isSubtitle ? {
+            xtype: 'label',
+            html: conf.text,
+            style: conf.style
+        } : {
+            text: conf.text,
+            iconCls: conf.iconCls,
+            peReqItems: conf.items,
+            handler: function() {
+                var layout = instanceManager.getStateCurrent();
 
-				// pe
-				layout.rows[0] = new Dimension({
-					dimension: 'pe',
-					items: this.peReqItems
-				});
-				
-				instanceManager.getReport(layout);
-			}
-		});
-	}
+                // pe
+                layout.rows[0] = new Dimension({
+                    dimension: 'pe',
+                    items: this.peReqItems
+                });
 
-	var menu = menuFn({
-		items: items
-	});
+                instanceManager.getReport(layout);
+            }
+        });
+    }
 
-	menu.showAt(function() {
-		var el = Ext.get(t.elementId),
-			height = el.getHeight(),
-			width = el.getWidth(),
-			xy = el.getXY();
+    var menu = menuFn({
+        items: items
+    });
 
-		xy[0] += width - (height / 2);
-		xy[1] += height - (height / 2);
+    menu.showAt(function() {
+        var el = Ext.get(t.elementId),
+            height = el.getHeight(),
+            width = el.getWidth(),
+            xy = el.getXY();
 
-		return xy;
-	}());
+        xy[0] += width - (height / 2);
+        xy[1] += height - (height / 2);
+
+        return xy;
+    }());
 };

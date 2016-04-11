@@ -1,33 +1,33 @@
 Ext.onReady( function() {
-	var NS = BR,
+    var NS = BR,
 
-		LayoutWindow,
-		OptionsWindow,
-		FavoriteWindow,
-		SharingWindow,
-		InterpretationWindow,
+        LayoutWindow,
+        OptionsWindow,
+        FavoriteWindow,
+        SharingWindow,
+        InterpretationWindow,
         AboutWindow,
 
-		extendCore,
-		createViewport,
-		dimConf,
+        extendCore,
+        createViewport,
+        dimConf,
 
-		ns = {
-			core: {},
-			app: {}
-		};
+        ns = {
+            core: {},
+            app: {}
+        };
 
-	// set app config
-	(function() {
+    // set app config
+    (function() {
 
-		// ext configuration
-		Ext.QuickTips.init();
+        // ext configuration
+        Ext.QuickTips.init();
 
-		Ext.override(Ext.LoadMask, {
-			onHide: function() {
-				this.callParent();
-			}
-		});
+        Ext.override(Ext.LoadMask, {
+            onHide: function() {
+                this.callParent();
+            }
+        });
 
         Ext.override(Ext.grid.Scroller, {
             afterRender: function() {
@@ -99,218 +99,218 @@ Ext.onReady( function() {
             }
         });
 
-		// right click handler
-		document.body.oncontextmenu = function() {
-			return false;
-		};
-	}());
+        // right click handler
+        document.body.oncontextmenu = function() {
+            return false;
+        };
+    }());
 
-	// constructors
-	OptionsWindow = function() {
-		var showDataDescription,
+    // constructors
+    OptionsWindow = function() {
+        var showDataDescription,
             hideEmptyRows,
             showHierarchy,
             displayDensity,
-			fontSize,
+            fontSize,
             digitGroupSeparator,
             legendSet,
 
             data,
             organisationUnits,
-			style,
+            style,
 
-			comboboxWidth = 262,
+            comboboxWidth = 262,
             comboBottomMargin = 1,
             checkboxBottomMargin = 2,
             separatorTopMargin = 6,
-			window;
+            window;
 
-		showDataDescription = Ext.create('Ext.form.field.Checkbox', {
-			boxLabel: NS.i18n.show_descriptions,
-			style: 'margin-bottom:' + checkboxBottomMargin + 'px'
-		});
+        showDataDescription = Ext.create('Ext.form.field.Checkbox', {
+            boxLabel: NS.i18n.show_descriptions,
+            style: 'margin-bottom:' + checkboxBottomMargin + 'px'
+        });
 
-		hideEmptyRows = Ext.create('Ext.form.field.Checkbox', {
-			boxLabel: NS.i18n.hide_empty_rows,
-			style: 'margin-bottom:' + checkboxBottomMargin + 'px'
-		});
+        hideEmptyRows = Ext.create('Ext.form.field.Checkbox', {
+            boxLabel: NS.i18n.hide_empty_rows,
+            style: 'margin-bottom:' + checkboxBottomMargin + 'px'
+        });
 
-		showHierarchy = Ext.create('Ext.form.field.Checkbox', {
-			boxLabel: NS.i18n.show_hierarchy,
-			style: 'margin-bottom:' + checkboxBottomMargin + 'px',
+        showHierarchy = Ext.create('Ext.form.field.Checkbox', {
+            boxLabel: NS.i18n.show_hierarchy,
+            style: 'margin-bottom:' + checkboxBottomMargin + 'px',
             checked: true
-		});
+        });
 
-		displayDensity = Ext.create('Ext.form.field.ComboBox', {
-			cls: 'ns-combo',
-			style: 'margin-bottom:' + comboBottomMargin + 'px',
-			width: comboboxWidth,
-			labelWidth: 130,
-			fieldLabel: NS.i18n.display_density,
-			labelStyle: 'color:#333',
-			queryMode: 'local',
-			valueField: 'id',
-			editable: false,
-			value: 'COMFORTABLE',
-			store: Ext.create('Ext.data.Store', {
-				fields: ['id', 'text'],
-				data: [
-					{id: 'COMFORTABLE', text: NS.i18n.comfortable},
-					{id: 'NORMAL', text: NS.i18n.normal},
-					{id: 'COMPACT', text: NS.i18n.compact}
-				]
-			})
-		});
+        displayDensity = Ext.create('Ext.form.field.ComboBox', {
+            cls: 'ns-combo',
+            style: 'margin-bottom:' + comboBottomMargin + 'px',
+            width: comboboxWidth,
+            labelWidth: 130,
+            fieldLabel: NS.i18n.display_density,
+            labelStyle: 'color:#333',
+            queryMode: 'local',
+            valueField: 'id',
+            editable: false,
+            value: 'COMFORTABLE',
+            store: Ext.create('Ext.data.Store', {
+                fields: ['id', 'text'],
+                data: [
+                    {id: 'COMFORTABLE', text: NS.i18n.comfortable},
+                    {id: 'NORMAL', text: NS.i18n.normal},
+                    {id: 'COMPACT', text: NS.i18n.compact}
+                ]
+            })
+        });
 
-		fontSize = Ext.create('Ext.form.field.ComboBox', {
-			cls: 'ns-combo',
-			style: 'margin-bottom:' + comboBottomMargin + 'px',
-			width: comboboxWidth,
-			labelWidth: 130,
-			fieldLabel: NS.i18n.font_size,
-			labelStyle: 'color:#333',
-			queryMode: 'local',
-			valueField: 'id',
-			editable: false,
-			value: 'NORMAL',
-			store: Ext.create('Ext.data.Store', {
-				fields: ['id', 'text'],
-				data: [
-					{id: 'LARGE', text: NS.i18n.large},
-					{id: 'NORMAL', text: NS.i18n.normal},
-					{id: 'SMALL', text: NS.i18n.small_}
-				]
-			})
-		});
+        fontSize = Ext.create('Ext.form.field.ComboBox', {
+            cls: 'ns-combo',
+            style: 'margin-bottom:' + comboBottomMargin + 'px',
+            width: comboboxWidth,
+            labelWidth: 130,
+            fieldLabel: NS.i18n.font_size,
+            labelStyle: 'color:#333',
+            queryMode: 'local',
+            valueField: 'id',
+            editable: false,
+            value: 'NORMAL',
+            store: Ext.create('Ext.data.Store', {
+                fields: ['id', 'text'],
+                data: [
+                    {id: 'LARGE', text: NS.i18n.large},
+                    {id: 'NORMAL', text: NS.i18n.normal},
+                    {id: 'SMALL', text: NS.i18n.small_}
+                ]
+            })
+        });
 
-		digitGroupSeparator = Ext.create('Ext.form.field.ComboBox', {
-			labelStyle: 'color:#333',
-			cls: 'ns-combo',
-			style: 'margin-bottom:' + comboBottomMargin + 'px',
-			width: comboboxWidth,
-			labelWidth: 130,
-			fieldLabel: NS.i18n.digit_group_separator,
-			queryMode: 'local',
-			valueField: 'id',
-			editable: false,
-			value: 'SPACE',
-			store: Ext.create('Ext.data.Store', {
-				fields: ['id', 'text'],
-				data: [
-					{id: 'COMMA', text: 'Comma'},
-					{id: 'SPACE', text: 'Space'},
-					{id: 'NONE', text: 'None'}
-				]
-			})
-		});
+        digitGroupSeparator = Ext.create('Ext.form.field.ComboBox', {
+            labelStyle: 'color:#333',
+            cls: 'ns-combo',
+            style: 'margin-bottom:' + comboBottomMargin + 'px',
+            width: comboboxWidth,
+            labelWidth: 130,
+            fieldLabel: NS.i18n.digit_group_separator,
+            queryMode: 'local',
+            valueField: 'id',
+            editable: false,
+            value: 'SPACE',
+            store: Ext.create('Ext.data.Store', {
+                fields: ['id', 'text'],
+                data: [
+                    {id: 'COMMA', text: 'Comma'},
+                    {id: 'SPACE', text: 'Space'},
+                    {id: 'NONE', text: 'None'}
+                ]
+            })
+        });
 
-		legendSet = Ext.create('Ext.form.field.ComboBox', {
-			cls: 'ns-combo',
-			style: 'margin-bottom:' + comboBottomMargin + 'px',
-			width: comboboxWidth,
-			labelWidth: 130,
-			fieldLabel: NS.i18n.legend_set,
-			labelStyle: 'color:#333',
-			valueField: 'id',
-			displayField: 'name',
-			editable: false,
-			value: 0,
-			store: ns.app.stores.legendSet
-		});
+        legendSet = Ext.create('Ext.form.field.ComboBox', {
+            cls: 'ns-combo',
+            style: 'margin-bottom:' + comboBottomMargin + 'px',
+            width: comboboxWidth,
+            labelWidth: 130,
+            fieldLabel: NS.i18n.legend_set,
+            labelStyle: 'color:#333',
+            valueField: 'id',
+            displayField: 'name',
+            editable: false,
+            value: 0,
+            store: ns.app.stores.legendSet
+        });
 
         data = {
-			bodyStyle: 'border:0 none',
-			style: 'margin-left:14px',
-			items: [
-				showDataDescription,
+            bodyStyle: 'border:0 none',
+            style: 'margin-left:14px',
+            items: [
+                showDataDescription,
                 hideEmptyRows
-			]
-		};
+            ]
+        };
 
-		organisationUnits = {
-			bodyStyle: 'border:0 none',
-			style: 'margin-left:14px',
-			items: [
-				showHierarchy
-			]
-		};
+        organisationUnits = {
+            bodyStyle: 'border:0 none',
+            style: 'margin-left:14px',
+            items: [
+                showHierarchy
+            ]
+        };
 
-		style = {
-			bodyStyle: 'border:0 none',
-			style: 'margin-left:14px',
-			items: [
-				displayDensity,
-				fontSize
-				//digitGroupSeparator,
-				//legendSet
-			]
-		};
+        style = {
+            bodyStyle: 'border:0 none',
+            style: 'margin-left:14px',
+            items: [
+                displayDensity,
+                fontSize
+                //digitGroupSeparator,
+                //legendSet
+            ]
+        };
 
-		window = Ext.create('Ext.window.Window', {
-			title: NS.i18n.table_options,
-			bodyStyle: 'background-color:#fff; padding:2px 2px 1px',
-			closeAction: 'hide',
-			autoShow: true,
-			modal: true,
-			resizable: false,
-			hideOnBlur: true,
-			getOptions: function() {
-				return {
+        window = Ext.create('Ext.window.Window', {
+            title: NS.i18n.table_options,
+            bodyStyle: 'background-color:#fff; padding:2px 2px 1px',
+            closeAction: 'hide',
+            autoShow: true,
+            modal: true,
+            resizable: false,
+            hideOnBlur: true,
+            getOptions: function() {
+                return {
                     showDataDescription: showDataDescription.getValue(),
                     hideEmptyRows: hideEmptyRows.getValue(),
-					showHierarchy: showHierarchy.getValue(),
-					displayDensity: displayDensity.getValue(),
-					fontSize: fontSize.getValue(),
-					digitGroupSeparator: digitGroupSeparator.getValue(),
-					legendSet: {id: legendSet.getValue()}
-				};
-			},
-			setOptions: function(layout) {
+                    showHierarchy: showHierarchy.getValue(),
+                    displayDensity: displayDensity.getValue(),
+                    fontSize: fontSize.getValue(),
+                    digitGroupSeparator: digitGroupSeparator.getValue(),
+                    legendSet: {id: legendSet.getValue()}
+                };
+            },
+            setOptions: function(layout) {
                 showDataDescription.setValue(Ext.isBoolean(layout.showDataDescription) ? layout.showDataDescription : false);
                 hideEmptyRows.setValue(Ext.isBoolean(layout.hideEmptyRows) ? layout.hideEmptyRows : false);
                 showHierarchy.setValue(Ext.isBoolean(layout.showHierarchy) ? layout.showHierarchy : false);
                 displayDensity.setValue(Ext.isString(layout.displayDensity) ? layout.displayDensity : 'NORMAL');
-				fontSize.setValue(Ext.isString(layout.fontSize) ? layout.fontSize : 'NORMAL');
-				digitGroupSeparator.setValue(Ext.isString(layout.digitGroupSeparator) ? layout.digitGroupSeparator : 'SPACE');
-				legendSet.setValue(Ext.isObject(layout.legendSet) && Ext.isString(layout.legendSet.id) ? layout.legendSet.id : 0);
-			},
-			items: [
-				{
-					bodyStyle: 'border:0 none; color:#222; font-size:12px; font-weight:bold',
-					style: 'margin-top:4px; margin-bottom:6px; margin-left:5px',
-					html: NS.i18n.data
-				},
-				data,
-				{
-					bodyStyle: 'border:0 none; padding:7px'
-				},
-				{
-					bodyStyle: 'border:0 none; color:#222; font-size:12px; font-weight:bold',
-					style: 'margin-top:4px; margin-bottom:6px; margin-left:5px',
-					html: NS.i18n.organisation_units
-				},
-				organisationUnits,
-				{
-					bodyStyle: 'border:0 none; padding:7px'
-				},
-				{
-					bodyStyle: 'border:0 none; color:#222; font-size:12px; font-weight:bold',
-					style: 'margin-bottom:6px; margin-left:5px',
-					html: NS.i18n.style
-				},
-				style
-			],
-			bbar: [
-				'->',
-				{
-					text: NS.i18n.hide,
-					handler: function() {
-						window.hide();
-					}
-				},
-				{
-					text: '<b>' + NS.i18n.update + '</b>',
-					handler: function() {
+                fontSize.setValue(Ext.isString(layout.fontSize) ? layout.fontSize : 'NORMAL');
+                digitGroupSeparator.setValue(Ext.isString(layout.digitGroupSeparator) ? layout.digitGroupSeparator : 'SPACE');
+                legendSet.setValue(Ext.isObject(layout.legendSet) && Ext.isString(layout.legendSet.id) ? layout.legendSet.id : 0);
+            },
+            items: [
+                {
+                    bodyStyle: 'border:0 none; color:#222; font-size:12px; font-weight:bold',
+                    style: 'margin-top:4px; margin-bottom:6px; margin-left:5px',
+                    html: NS.i18n.data
+                },
+                data,
+                {
+                    bodyStyle: 'border:0 none; padding:7px'
+                },
+                {
+                    bodyStyle: 'border:0 none; color:#222; font-size:12px; font-weight:bold',
+                    style: 'margin-top:4px; margin-bottom:6px; margin-left:5px',
+                    html: NS.i18n.organisation_units
+                },
+                organisationUnits,
+                {
+                    bodyStyle: 'border:0 none; padding:7px'
+                },
+                {
+                    bodyStyle: 'border:0 none; color:#222; font-size:12px; font-weight:bold',
+                    style: 'margin-bottom:6px; margin-left:5px',
+                    html: NS.i18n.style
+                },
+                style
+            ],
+            bbar: [
+                '->',
+                {
+                    text: NS.i18n.hide,
+                    handler: function() {
+                        window.hide();
+                    }
+                },
+                {
+                    text: '<b>' + NS.i18n.update + '</b>',
+                    handler: function() {
                         var config = ns.core.web.report.getLayoutConfig(),
                             layout = ns.core.api.layout.Layout(config);
 
@@ -320,71 +320,71 @@ Ext.onReady( function() {
 
                         ns.core.web.report.createReport(layout, false);
 
-						window.hide();
-					}
-				}
-			],
-			listeners: {
-				show: function(w) {
-					if (ns.app.optionsButton.rendered) {
-						ns.core.web.window.setAnchorPosition(w, ns.app.optionsButton);
+                        window.hide();
+                    }
+                }
+            ],
+            listeners: {
+                show: function(w) {
+                    if (ns.app.optionsButton.rendered) {
+                        ns.core.web.window.setAnchorPosition(w, ns.app.optionsButton);
 
-						if (!w.hasHideOnBlurHandler) {
-							ns.core.web.window.addHideOnBlurHandler(w);
-						}
-					}
+                        if (!w.hasHideOnBlurHandler) {
+                            ns.core.web.window.addHideOnBlurHandler(w);
+                        }
+                    }
 
-					if (!legendSet.store.isLoaded) {
-						legendSet.store.load();
-					}
+                    if (!legendSet.store.isLoaded) {
+                        legendSet.store.load();
+                    }
 
-					// cmp
+                    // cmp
                     w.showDataDescription = showDataDescription;
                     w.hideEmptyRows = hideEmptyRows;
-					w.showHierarchy = showHierarchy;
-					w.displayDensity = displayDensity;
-					w.fontSize = fontSize;
-					w.digitGroupSeparator = digitGroupSeparator;
-					w.legendSet = legendSet;
-				}
-			}
-		});
+                    w.showHierarchy = showHierarchy;
+                    w.displayDensity = displayDensity;
+                    w.fontSize = fontSize;
+                    w.digitGroupSeparator = digitGroupSeparator;
+                    w.legendSet = legendSet;
+                }
+            }
+        });
 
-		return window;
-	};
+        return window;
+    };
 
-	AboutWindow = function() {
-		return Ext.create('Ext.window.Window', {
-			title: NS.i18n.about,
-			bodyStyle: 'background:#fff; padding:6px',
-			modal: true,
+    AboutWindow = function() {
+        return Ext.create('Ext.window.Window', {
+            title: NS.i18n.about,
+            bodyStyle: 'background:#fff; padding:6px',
+            modal: true,
             resizable: false,
-			hideOnBlur: true,
-			listeners: {
-				show: function(w) {
-					ns.ajax({
-						url: ns.core.init.contextPath + '/api/system/info.json',
-						success: function(r) {
-							var info = Ext.decode(r.responseText),
-								divStyle = 'padding:3px',
-								html = '<div class="user-select">';
+            hideOnBlur: true,
+            listeners: {
+                show: function(w) {
+                    ns.ajax({
+                        url: ns.core.init.contextPath + '/api/system/info.json',
+                        success: function(r) {
+                            var info = Ext.decode(r.responseText),
+                                divStyle = 'padding:3px',
+                                html = '<div class="user-select">';
 
-							if (Ext.isObject(info)) {
-								html += '<div style="' + divStyle + '"><b>' + NS.i18n.time_since_last_data_update + ': </b>' + info.intervalSinceLastAnalyticsTableSuccess + '</div>';
-								html += '<div style="' + divStyle + '"><b>' + NS.i18n.version + ': </b>' + info.version + '</div>';
-								html += '<div style="' + divStyle + '"><b>' + NS.i18n.revision + ': </b>' + info.revision + '</div>';
+                            if (Ext.isObject(info)) {
+                                html += '<div style="' + divStyle + '"><b>' + NS.i18n.time_since_last_data_update + ': </b>' + info.intervalSinceLastAnalyticsTableSuccess + '</div>';
+                                html += '<div style="' + divStyle + '"><b>' + NS.i18n.version + ': </b>' + info.version + '</div>';
+                                html += '<div style="' + divStyle + '"><b>' + NS.i18n.revision + ': </b>' + info.revision + '</div>';
                                 html += '<div style="' + divStyle + '"><b>' + NS.i18n.username + ': </b>' + ns.core.init.userAccount.username + '</div>';
                                 html += '</div>';
-							}
-							else {
-								html += 'No system info found';
-							}
+                            }
+                            else {
+                                html += 'No system info found';
+                            }
 
-							w.update(html);
-						},
-						failure: function(r) {
-							w.update(r.status + '\n' + r.statusText + '\n' + r.responseText);
-						},
+                            w.update(html);
+                        },
+                        failure: function(r) {
+                            w.update(r.status + '\n' + r.statusText + '\n' + r.responseText);
+                        },
                         callback: function() {
                             document.body.oncontextmenu = true;
 
@@ -396,8 +396,8 @@ Ext.onReady( function() {
                                 }
                             }
                         }
-					});
-				},
+                    });
+                },
                 hide: function() {
                     document.body.oncontextmenu = function() {
                         return false;
@@ -408,210 +408,210 @@ Ext.onReady( function() {
                         return false;
                     };
                 }
-			}
-		});
-	};
+            }
+        });
+    };
 
-	// core
-	extendCore = function(core) {
+    // core
+    extendCore = function(core) {
         var init = core.init,
             conf = core.conf,
-			api = core.api,
-			support = core.support,
-			service = core.service,
-			web = core.web,
+            api = core.api,
+            support = core.support,
+            service = core.service,
+            web = core.web,
             dimConf = conf.finals.dimension;
 
         // init
         (function() {
 
-			// root nodes
-			for (var i = 0; i < init.rootNodes.length; i++) {
-				init.rootNodes[i].expanded = true;
-				init.rootNodes[i].path = '/' + conf.finals.root.id + '/' + init.rootNodes[i].id;
-			}
+            // root nodes
+            for (var i = 0; i < init.rootNodes.length; i++) {
+                init.rootNodes[i].expanded = true;
+                init.rootNodes[i].path = '/' + conf.finals.root.id + '/' + init.rootNodes[i].id;
+            }
 
-			// sort organisation unit levels
-			if (Ext.isArray(init.organisationUnitLevels)) {
-				support.prototype.array.sort(init.organisationUnitLevels, 'ASC', 'level');
-			}
-		}());
+            // sort organisation unit levels
+            if (Ext.isArray(init.organisationUnitLevels)) {
+                support.prototype.array.sort(init.organisationUnitLevels, 'ASC', 'level');
+            }
+        }());
 
-		// web
-		(function() {
+        // web
+        (function() {
 
-			// multiSelect
-			web.multiSelect = web.multiSelect || {};
+            // multiSelect
+            web.multiSelect = web.multiSelect || {};
 
-			web.multiSelect.select = function(a, s) {
-				var selected = a.getValue();
-				if (selected.length) {
-					var array = [];
-					Ext.Array.each(selected, function(item) {
+            web.multiSelect.select = function(a, s) {
+                var selected = a.getValue();
+                if (selected.length) {
+                    var array = [];
+                    Ext.Array.each(selected, function(item) {
                         array.push(a.store.getAt(a.store.findExact('id', item)));
-					});
-					s.store.add(array);
-				}
-				this.filterAvailable(a, s);
-			};
+                    });
+                    s.store.add(array);
+                }
+                this.filterAvailable(a, s);
+            };
 
-			web.multiSelect.selectAll = function(a, s, isReverse) {
+            web.multiSelect.selectAll = function(a, s, isReverse) {
                 var array = a.store.getRange();
-				if (isReverse) {
-					array.reverse();
-				}
-				s.store.add(array);
-				this.filterAvailable(a, s);
-			};
+                if (isReverse) {
+                    array.reverse();
+                }
+                s.store.add(array);
+                this.filterAvailable(a, s);
+            };
 
-			web.multiSelect.unselect = function(a, s) {
-				var selected = s.getValue();
-				if (selected.length) {
-					Ext.Array.each(selected, function(id) {
-						a.store.add(s.store.getAt(s.store.findExact('id', id)));
-						s.store.remove(s.store.getAt(s.store.findExact('id', id)));
-					});
-					this.filterAvailable(a, s);
+            web.multiSelect.unselect = function(a, s) {
+                var selected = s.getValue();
+                if (selected.length) {
+                    Ext.Array.each(selected, function(id) {
+                        a.store.add(s.store.getAt(s.store.findExact('id', id)));
+                        s.store.remove(s.store.getAt(s.store.findExact('id', id)));
+                    });
+                    this.filterAvailable(a, s);
                     a.store.sortStore();
-				}
-			};
+                }
+            };
 
-			web.multiSelect.unselectAll = function(a, s) {
-				a.store.add(s.store.getRange());
-				s.store.removeAll();
-				this.filterAvailable(a, s);
+            web.multiSelect.unselectAll = function(a, s) {
+                a.store.add(s.store.getRange());
+                s.store.removeAll();
+                this.filterAvailable(a, s);
                 a.store.sortStore();
-			};
+            };
 
-			web.multiSelect.filterAvailable = function(a, s) {
-				if (a.store.getRange().length && s.store.getRange().length) {
-					var recordsToRemove = [];
+            web.multiSelect.filterAvailable = function(a, s) {
+                if (a.store.getRange().length && s.store.getRange().length) {
+                    var recordsToRemove = [];
 
-					a.store.each( function(ar) {
-						var removeRecord = false;
+                    a.store.each( function(ar) {
+                        var removeRecord = false;
 
-						s.store.each( function(sr) {
-							if (sr.data.id === ar.data.id) {
-								removeRecord = true;
-							}
-						});
+                        s.store.each( function(sr) {
+                            if (sr.data.id === ar.data.id) {
+                                removeRecord = true;
+                            }
+                        });
 
-						if (removeRecord) {
-							recordsToRemove.push(ar);
-						}
-					});
+                        if (removeRecord) {
+                            recordsToRemove.push(ar);
+                        }
+                    });
 
-					a.store.remove(recordsToRemove);
-				}
-			};
+                    a.store.remove(recordsToRemove);
+                }
+            };
 
-			web.multiSelect.setHeight = function(ms, panel, fill) {
-				for (var i = 0, height; i < ms.length; i++) {
-					height = panel.getHeight() - fill - (ms[i].hasToolbar ? 25 : 0);
-					ms[i].setHeight(height);
-				}
-			};
+            web.multiSelect.setHeight = function(ms, panel, fill) {
+                for (var i = 0, height; i < ms.length; i++) {
+                    height = panel.getHeight() - fill - (ms[i].hasToolbar ? 25 : 0);
+                    ms[i].setHeight(height);
+                }
+            };
 
-			// url
-			web.url = web.url || {};
+            // url
+            web.url = web.url || {};
 
-			web.url.getParam = function(s) {
-				var output = '';
-				var href = window.location.href;
-				if (href.indexOf('?') > -1 ) {
-					var query = href.substr(href.indexOf('?') + 1);
-					var query = query.split('&');
-					for (var i = 0; i < query.length; i++) {
-						if (query[i].indexOf('=') > -1) {
-							var a = query[i].split('=');
-							if (a[0].toLowerCase() === s) {
-								output = a[1];
-								break;
-							}
-						}
-					}
-				}
-				return unescape(output);
-			};
+            web.url.getParam = function(s) {
+                var output = '';
+                var href = window.location.href;
+                if (href.indexOf('?') > -1 ) {
+                    var query = href.substr(href.indexOf('?') + 1);
+                    var query = query.split('&');
+                    for (var i = 0; i < query.length; i++) {
+                        if (query[i].indexOf('=') > -1) {
+                            var a = query[i].split('=');
+                            if (a[0].toLowerCase() === s) {
+                                output = a[1];
+                                break;
+                            }
+                        }
+                    }
+                }
+                return unescape(output);
+            };
 
-			// storage
-			web.storage = web.storage || {};
+            // storage
+            web.storage = web.storage || {};
 
-				// internal
-			web.storage.internal = web.storage.internal || {};
+                // internal
+            web.storage.internal = web.storage.internal || {};
 
-			web.storage.internal.add = function(store, storage, parent, records) {
-				if (!Ext.isObject(store)) {
-					console.log('support.storeage.add: store is not an object');
-					return null;
-				}
+            web.storage.internal.add = function(store, storage, parent, records) {
+                if (!Ext.isObject(store)) {
+                    console.log('support.storeage.add: store is not an object');
+                    return null;
+                }
 
-				storage = storage || store.storage;
-				parent = parent || store.parent;
+                storage = storage || store.storage;
+                parent = parent || store.parent;
 
-				if (!Ext.isObject(storage)) {
-					console.log('support.storeage.add: storage is not an object');
-					return null;
-				}
+                if (!Ext.isObject(storage)) {
+                    console.log('support.storeage.add: storage is not an object');
+                    return null;
+                }
 
-				store.each( function(r) {
-					if (storage[r.data.id]) {
-						storage[r.data.id] = {id: r.data.id, name: r.data.name, parent: parent};
-					}
-				});
+                store.each( function(r) {
+                    if (storage[r.data.id]) {
+                        storage[r.data.id] = {id: r.data.id, name: r.data.name, parent: parent};
+                    }
+                });
 
-				if (support.prototype.array.getLength(records, true)) {
-					Ext.Array.each(records, function(r) {
-						if (storage[r.data.id]) {
-							storage[r.data.id] = {id: r.data.id, name: r.data.name, parent: parent};
-						}
-					});
-				}
-			};
+                if (support.prototype.array.getLength(records, true)) {
+                    Ext.Array.each(records, function(r) {
+                        if (storage[r.data.id]) {
+                            storage[r.data.id] = {id: r.data.id, name: r.data.name, parent: parent};
+                        }
+                    });
+                }
+            };
 
-			web.storage.internal.load = function(store, storage, parent, records) {
-				var a = [];
+            web.storage.internal.load = function(store, storage, parent, records) {
+                var a = [];
 
-				if (!Ext.isObject(store)) {
-					console.log('support.storeage.load: store is not an object');
-					return null;
-				}
+                if (!Ext.isObject(store)) {
+                    console.log('support.storeage.load: store is not an object');
+                    return null;
+                }
 
-				storage = storage || store.storage;
-				parent = parent || store.parent;
+                storage = storage || store.storage;
+                parent = parent || store.parent;
 
-				store.removeAll();
+                store.removeAll();
 
-				for (var key in storage) {
-					var record = storage[key];
+                for (var key in storage) {
+                    var record = storage[key];
 
-					if (storage.hasOwnProperty(key) && record.parent === parent) {
-						a.push(record);
-					}
-				}
+                    if (storage.hasOwnProperty(key) && record.parent === parent) {
+                        a.push(record);
+                    }
+                }
 
-				if (support.prototype.array.getLength(records)) {
-					a = a.concat(records);
-				}
+                if (support.prototype.array.getLength(records)) {
+                    a = a.concat(records);
+                }
 
-				store.add(a);
-				store.sort('name', 'ASC');
-			};
+                store.add(a);
+                store.sort('name', 'ASC');
+            };
 
-				// session
-			web.storage.session = web.storage.session || {};
+                // session
+            web.storage.session = web.storage.session || {};
 
-			web.storage.session.set = function(layout, session, url) {
-				if (NS.isSessionStorage) {
-					var dhis2 = JSON.parse(sessionStorage.getItem('dhis2')) || {};
-					dhis2[session] = layout;
-					sessionStorage.setItem('dhis2', JSON.stringify(dhis2));
+            web.storage.session.set = function(layout, session, url) {
+                if (NS.isSessionStorage) {
+                    var dhis2 = JSON.parse(sessionStorage.getItem('dhis2')) || {};
+                    dhis2[session] = layout;
+                    sessionStorage.setItem('dhis2', JSON.stringify(dhis2));
 
-					if (Ext.isString(url)) {
-						window.location.href = url;
-					}
-				}
-			};
+                    if (Ext.isString(url)) {
+                        window.location.href = url;
+                    }
+                }
+            };
 
             // document
             web.document = web.document || {};
@@ -645,230 +645,230 @@ Ext.onReady( function() {
                 alink.click();
             };
 
-			// mouse events
-			web.events = web.events || {};
+            // mouse events
+            web.events = web.events || {};
 
-			web.events.setValueMouseHandlers = function(layout, response, uuidDimUuidsMap, uuidObjectMap) {
-				var valueEl;
+            web.events.setValueMouseHandlers = function(layout, response, uuidDimUuidsMap, uuidObjectMap) {
+                var valueEl;
 
-				for (var key in uuidDimUuidsMap) {
-					if (uuidDimUuidsMap.hasOwnProperty(key)) {
-						valueEl = Ext.get(key);
+                for (var key in uuidDimUuidsMap) {
+                    if (uuidDimUuidsMap.hasOwnProperty(key)) {
+                        valueEl = Ext.get(key);
 
-						if (valueEl && parseFloat(valueEl.dom.textContent)) {
-							valueEl.dom.onValueMouseClick = web.events.onValueMouseClick;
-							valueEl.dom.onValueMouseOver = web.events.onValueMouseOver;
-							valueEl.dom.onValueMouseOut = web.events.onValueMouseOut;
-							valueEl.dom.layout = layout;
-							valueEl.dom.response = response;
-							valueEl.dom.uuidDimUuidsMap = uuidDimUuidsMap;
-							valueEl.dom.uuidObjectMap = uuidObjectMap;
-							valueEl.dom.setAttribute('onclick', 'this.onValueMouseClick(this.layout, this.response, this.uuidDimUuidsMap, this.uuidObjectMap, this.id);');
-							valueEl.dom.setAttribute('onmouseover', 'this.onValueMouseOver(this);');
-							valueEl.dom.setAttribute('onmouseout', 'this.onValueMouseOut(this);');
-						}
-					}
-				}
-			};
+                        if (valueEl && parseFloat(valueEl.dom.textContent)) {
+                            valueEl.dom.onValueMouseClick = web.events.onValueMouseClick;
+                            valueEl.dom.onValueMouseOver = web.events.onValueMouseOver;
+                            valueEl.dom.onValueMouseOut = web.events.onValueMouseOut;
+                            valueEl.dom.layout = layout;
+                            valueEl.dom.response = response;
+                            valueEl.dom.uuidDimUuidsMap = uuidDimUuidsMap;
+                            valueEl.dom.uuidObjectMap = uuidObjectMap;
+                            valueEl.dom.setAttribute('onclick', 'this.onValueMouseClick(this.layout, this.response, this.uuidDimUuidsMap, this.uuidObjectMap, this.id);');
+                            valueEl.dom.setAttribute('onmouseover', 'this.onValueMouseOver(this);');
+                            valueEl.dom.setAttribute('onmouseout', 'this.onValueMouseOut(this);');
+                        }
+                    }
+                }
+            };
 
-			web.events.onValueMouseClick = function(layout, response, uuidDimUuidsMap, uuidObjectMap, uuid) {
-				var uuids = uuidDimUuidsMap[uuid],
-					layoutConfig = Ext.clone(layout),
-					parentGraphMap = ns.app.viewport.treePanel.getParentGraphMap(),
-					objects = [],
-					menu;
+            web.events.onValueMouseClick = function(layout, response, uuidDimUuidsMap, uuidObjectMap, uuid) {
+                var uuids = uuidDimUuidsMap[uuid],
+                    layoutConfig = Ext.clone(layout),
+                    parentGraphMap = ns.app.viewport.treePanel.getParentGraphMap(),
+                    objects = [],
+                    menu;
 
-				// modify layout dimension items based on uuid objects
+                // modify layout dimension items based on uuid objects
 
-				// get objects
-				for (var i = 0; i < uuids.length; i++) {
-					objects.push(uuidObjectMap[uuids[i]]);
-				}
+                // get objects
+                for (var i = 0; i < uuids.length; i++) {
+                    objects.push(uuidObjectMap[uuids[i]]);
+                }
 
-				// clear layoutConfig dimension items
-				for (var i = 0, a = Ext.Array.clean([].concat(layoutConfig.columns || [], layoutConfig.rows || [])); i < a.length; i++) {
-					a[i].items = [];
-				}
+                // clear layoutConfig dimension items
+                for (var i = 0, a = Ext.Array.clean([].concat(layoutConfig.columns || [], layoutConfig.rows || [])); i < a.length; i++) {
+                    a[i].items = [];
+                }
 
-				// add new items
-				for (var i = 0, obj, axis; i < objects.length; i++) {
-					obj = objects[i];
+                // add new items
+                for (var i = 0, obj, axis; i < objects.length; i++) {
+                    obj = objects[i];
 
-					axis = obj.axis === 'col' ? layoutConfig.columns || [] : layoutConfig.rows || [];
+                    axis = obj.axis === 'col' ? layoutConfig.columns || [] : layoutConfig.rows || [];
 
-					if (axis.length) {
-						axis[obj.dim].items.push({
-							id: obj.id,
-							name: response.metaData.names[obj.id]
-						});
-					}
-				}
+                    if (axis.length) {
+                        axis[obj.dim].items.push({
+                            id: obj.id,
+                            name: response.metaData.names[obj.id]
+                        });
+                    }
+                }
 
-				// parent graph map
-				layoutConfig.parentGraphMap = {};
+                // parent graph map
+                layoutConfig.parentGraphMap = {};
 
-				for (var i = 0, id; i < objects.length; i++) {
-					id = objects[i].id;
+                for (var i = 0, id; i < objects.length; i++) {
+                    id = objects[i].id;
 
-					if (parentGraphMap.hasOwnProperty(id)) {
-						layoutConfig.parentGraphMap[id] = parentGraphMap[id];
-					}
-				}
+                    if (parentGraphMap.hasOwnProperty(id)) {
+                        layoutConfig.parentGraphMap[id] = parentGraphMap[id];
+                    }
+                }
 
-				// menu
-				menu = Ext.create('Ext.menu.Menu', {
-					shadow: true,
-					showSeparator: false,
-					items: [
-						{
-							text: 'Open selection as chart' + '&nbsp;&nbsp;', //i18n
-							iconCls: 'ns-button-icon-chart',
-							param: 'chart',
-							handler: function() {
-								web.storage.session.set(layoutConfig, 'analytical', init.contextPath + '/dhis-web-visualizer/index.html?s=analytical');
-							},
-							listeners: {
-								render: function() {
-									this.getEl().on('mouseover', function() {
-										web.events.onValueMenuMouseHover(uuidDimUuidsMap, uuid, 'mouseover', 'chart');
-									});
+                // menu
+                menu = Ext.create('Ext.menu.Menu', {
+                    shadow: true,
+                    showSeparator: false,
+                    items: [
+                        {
+                            text: 'Open selection as chart' + '&nbsp;&nbsp;', //i18n
+                            iconCls: 'ns-button-icon-chart',
+                            param: 'chart',
+                            handler: function() {
+                                web.storage.session.set(layoutConfig, 'analytical', init.contextPath + '/dhis-web-visualizer/index.html?s=analytical');
+                            },
+                            listeners: {
+                                render: function() {
+                                    this.getEl().on('mouseover', function() {
+                                        web.events.onValueMenuMouseHover(uuidDimUuidsMap, uuid, 'mouseover', 'chart');
+                                    });
 
-									this.getEl().on('mouseout', function() {
-										web.events.onValueMenuMouseHover(uuidDimUuidsMap, uuid, 'mouseout', 'chart');
-									});
-								}
-							}
-						},
-						{
-							text: 'Open selection as map' + '&nbsp;&nbsp;', //i18n
-							iconCls: 'ns-button-icon-map',
-							param: 'map',
-							disabled: true,
-							handler: function() {
-								web.storage.session.set(layoutConfig, 'analytical', init.contextPath + '/dhis-web-mapping/index.html?s=analytical');
-							},
-							listeners: {
-								render: function() {
-									this.getEl().on('mouseover', function() {
-										web.events.onValueMenuMouseHover(uuidDimUuidsMap, uuid, 'mouseover', 'map');
-									});
+                                    this.getEl().on('mouseout', function() {
+                                        web.events.onValueMenuMouseHover(uuidDimUuidsMap, uuid, 'mouseout', 'chart');
+                                    });
+                                }
+                            }
+                        },
+                        {
+                            text: 'Open selection as map' + '&nbsp;&nbsp;', //i18n
+                            iconCls: 'ns-button-icon-map',
+                            param: 'map',
+                            disabled: true,
+                            handler: function() {
+                                web.storage.session.set(layoutConfig, 'analytical', init.contextPath + '/dhis-web-mapping/index.html?s=analytical');
+                            },
+                            listeners: {
+                                render: function() {
+                                    this.getEl().on('mouseover', function() {
+                                        web.events.onValueMenuMouseHover(uuidDimUuidsMap, uuid, 'mouseover', 'map');
+                                    });
 
-									this.getEl().on('mouseout', function() {
-										web.events.onValueMenuMouseHover(uuidDimUuidsMap, uuid, 'mouseout', 'map');
-									});
-								}
-							}
-						}
-					]
-				});
+                                    this.getEl().on('mouseout', function() {
+                                        web.events.onValueMenuMouseHover(uuidDimUuidsMap, uuid, 'mouseout', 'map');
+                                    });
+                                }
+                            }
+                        }
+                    ]
+                });
 
-				menu.showAt(function() {
-					var el = Ext.get(uuid),
-						xy = el.getXY();
+                menu.showAt(function() {
+                    var el = Ext.get(uuid),
+                        xy = el.getXY();
 
-					xy[0] += (el.getWidth() * 0.75);
-					xy[1] += (el.getHeight() * 0.75);
+                    xy[0] += (el.getWidth() * 0.75);
+                    xy[1] += (el.getHeight() * 0.75);
 
-					return xy;
-				}());
-			};
+                    return xy;
+                }());
+            };
 
-			web.events.onValueMouseOver = function(uuid) {
-				Ext.get(uuid).addCls('highlighted');
-			};
+            web.events.onValueMouseOver = function(uuid) {
+                Ext.get(uuid).addCls('highlighted');
+            };
 
-			web.events.onValueMouseOut = function(uuid) {
-				Ext.get(uuid).removeCls('highlighted');
-			};
+            web.events.onValueMouseOut = function(uuid) {
+                Ext.get(uuid).removeCls('highlighted');
+            };
 
-			web.events.onValueMenuMouseHover = function(uuidDimUuidsMap, uuid, event, param) {
-				var dimUuids;
+            web.events.onValueMenuMouseHover = function(uuidDimUuidsMap, uuid, event, param) {
+                var dimUuids;
 
-				// dimension elements
-				if (param === 'chart') {
-					if (Ext.isString(uuid) && Ext.isArray(uuidDimUuidsMap[uuid])) {
-						dimUuids = uuidDimUuidsMap[uuid];
+                // dimension elements
+                if (param === 'chart') {
+                    if (Ext.isString(uuid) && Ext.isArray(uuidDimUuidsMap[uuid])) {
+                        dimUuids = uuidDimUuidsMap[uuid];
 
-						for (var i = 0, el; i < dimUuids.length; i++) {
-							el = Ext.get(dimUuids[i]);
+                        for (var i = 0, el; i < dimUuids.length; i++) {
+                            el = Ext.get(dimUuids[i]);
 
-							if (el) {
-								if (event === 'mouseover') {
-									el.addCls('highlighted');
-								}
-								else if (event === 'mouseout') {
-									el.removeCls('highlighted');
-								}
-							}
-						}
-					}
-				}
-			};
+                            if (el) {
+                                if (event === 'mouseover') {
+                                    el.addCls('highlighted');
+                                }
+                                else if (event === 'mouseout') {
+                                    el.removeCls('highlighted');
+                                }
+                            }
+                        }
+                    }
+                }
+            };
 
-			web.events.setColumnHeaderMouseHandlers = function(layout, xResponse) {
-				if (Ext.isArray(xResponse.sortableIdObjects)) {
-					for (var i = 0, obj, el; i < xResponse.sortableIdObjects.length; i++) {
-						obj = xResponse.sortableIdObjects[i];
-						el = Ext.get(obj.uuid);
+            web.events.setColumnHeaderMouseHandlers = function(layout, xResponse) {
+                if (Ext.isArray(xResponse.sortableIdObjects)) {
+                    for (var i = 0, obj, el; i < xResponse.sortableIdObjects.length; i++) {
+                        obj = xResponse.sortableIdObjects[i];
+                        el = Ext.get(obj.uuid);
 
-						el.dom.layout = layout;
-						el.dom.xResponse = xResponse;
-						el.dom.metaDataId = obj.id;
-						el.dom.onColumnHeaderMouseClick = web.events.onColumnHeaderMouseClick;
-						el.dom.onColumnHeaderMouseOver = web.events.onColumnHeaderMouseOver;
-						el.dom.onColumnHeaderMouseOut = web.events.onColumnHeaderMouseOut;
+                        el.dom.layout = layout;
+                        el.dom.xResponse = xResponse;
+                        el.dom.metaDataId = obj.id;
+                        el.dom.onColumnHeaderMouseClick = web.events.onColumnHeaderMouseClick;
+                        el.dom.onColumnHeaderMouseOver = web.events.onColumnHeaderMouseOver;
+                        el.dom.onColumnHeaderMouseOut = web.events.onColumnHeaderMouseOut;
 
-						el.dom.setAttribute('onclick', 'this.onColumnHeaderMouseClick(this.layout, this.xResponse, this.metaDataId)');
-						el.dom.setAttribute('onmouseover', 'this.onColumnHeaderMouseOver(this)');
-						el.dom.setAttribute('onmouseout', 'this.onColumnHeaderMouseOut(this)');
-					}
-				}
-			};
+                        el.dom.setAttribute('onclick', 'this.onColumnHeaderMouseClick(this.layout, this.xResponse, this.metaDataId)');
+                        el.dom.setAttribute('onmouseover', 'this.onColumnHeaderMouseOver(this)');
+                        el.dom.setAttribute('onmouseout', 'this.onColumnHeaderMouseOut(this)');
+                    }
+                }
+            };
 
-			web.events.onColumnHeaderMouseClick = function(layout, xResponse, id) {
-				if (layout.sorting && layout.sorting.id === id) {
-					layout.sorting.direction = support.prototype.str.toggleDirection(layout.sorting.direction);
-				}
-				else {
-					layout.sorting = {
-						id: id,
-						direction: 'DESC'
-					};
-				}
+            web.events.onColumnHeaderMouseClick = function(layout, xResponse, id) {
+                if (layout.sorting && layout.sorting.id === id) {
+                    layout.sorting.direction = support.prototype.str.toggleDirection(layout.sorting.direction);
+                }
+                else {
+                    layout.sorting = {
+                        id: id,
+                        direction: 'DESC'
+                    };
+                }
 
                 web.mask.show(ns.app.centerRegion, 'Sorting...');
 
                 Ext.defer(function() {
                     web.report.createReport(layout, null, xResponse, false);
                 }, 10);
-			};
+            };
 
-			web.events.onColumnHeaderMouseOver = function(el) {
-				Ext.get(el).addCls('pointer highlighted');
-			};
+            web.events.onColumnHeaderMouseOver = function(el) {
+                Ext.get(el).addCls('pointer highlighted');
+            };
 
-			web.events.onColumnHeaderMouseOut = function(el) {
-				Ext.get(el).removeCls('pointer highlighted');
-			};
+            web.events.onColumnHeaderMouseOut = function(el) {
+                Ext.get(el).removeCls('pointer highlighted');
+            };
 
-			// report
-			web.report = web.report || {};
+            // report
+            web.report = web.report || {};
 
-			web.report.getLayoutConfig = function() {
-				var panels = ns.app.accordion.panels,
-					config = ns.app.optionsWindow.getOptions(),
+            web.report.getLayoutConfig = function() {
+                var panels = ns.app.accordion.panels,
+                    config = ns.app.optionsWindow.getOptions(),
                     dx = dimConf.data.dimensionName,
                     map = dimConf.objectNameMap;
 
-				config.columns = [];
+                config.columns = [];
                 config.rows = [];
                 config.dataDimensionItems = [];
 
-				// panel data
-				for (var i = 0, dim, dimName; i < panels.length; i++) {
-					dim = panels[i].getDimension();
+                // panel data
+                for (var i = 0, dim, dimName; i < panels.length; i++) {
+                    dim = panels[i].getDimension();
 
-					if (dim) {
+                    if (dim) {
                         if (dim.dimension === dx) {
 
                             // columns
@@ -889,22 +889,22 @@ Ext.onReady( function() {
                             // rows
                             config.rows.push(dim);
                         }
-					}
-				}
+                    }
+                }
 
-				return config;
-			};
+                return config;
+            };
 
-			web.report.loadTable = function(id) {
-				if (!Ext.isString(id)) {
-					console.log('Invalid report table id');
-					return;
-				}
+            web.report.loadTable = function(id) {
+                if (!Ext.isString(id)) {
+                    console.log('Invalid report table id');
+                    return;
+                }
 
-				ns.ajax({
-					url: init.contextPath + '/api/reportTables/' + id + '.json?fields=' + conf.url.analysisFields.join(','),
-					failure: function(r) {
-						web.mask.hide(ns.app.centerRegion);
+                ns.ajax({
+                    url: init.contextPath + '/api/reportTables/' + id + '.json?fields=' + conf.url.analysisFields.join(','),
+                    failure: function(r) {
+                        web.mask.hide(ns.app.centerRegion);
 
                         r = Ext.decode(r.responseText);
 
@@ -913,27 +913,27 @@ Ext.onReady( function() {
                         }
 
                         ns.alert(r);
-					},
-					success: function(r) {
-						var layoutConfig = Ext.decode(r.responseText),
-							layout = api.layout.Layout(layoutConfig);
+                    },
+                    success: function(r) {
+                        var layoutConfig = Ext.decode(r.responseText),
+                            layout = api.layout.Layout(layoutConfig);
 
-						if (layout) {
-							web.report.getData(layout, true);
-						}
-					}
-				});
-			};
+                        if (layout) {
+                            web.report.getData(layout, true);
+                        }
+                    }
+                });
+            };
 
-			web.report.getData = function(layout, isUpdateGui) {
-				var xLayout,
-					paramString,
+            web.report.getData = function(layout, isUpdateGui) {
+                var xLayout,
+                    paramString,
                     sortedParamString,
                     onFailure;
 
-				if (!layout) {
-					return;
-				}
+                if (!layout) {
+                    return;
+                }
 
                 onFailure = function(r) {
                     ns.app.viewport.setGui(layout, xLayout, isUpdateGui);
@@ -951,28 +951,28 @@ Ext.onReady( function() {
                     }
                 };
 
-				xLayout = service.layout.getExtendedLayout(layout);
-				paramString = web.analytics.getParamString(xLayout) + '&skipData=true';
-				sortedParamString = web.analytics.getParamString(xLayout, true) + '&skipMeta=true';
+                xLayout = service.layout.getExtendedLayout(layout);
+                paramString = web.analytics.getParamString(xLayout) + '&skipData=true';
+                sortedParamString = web.analytics.getParamString(xLayout, true) + '&skipMeta=true';
 
-				// show mask
-				web.mask.show(ns.app.centerRegion);
+                // show mask
+                web.mask.show(ns.app.centerRegion);
 
                 // timing
                 ns.app.dateData = new Date();
 
                 ns.ajax({
-					url: init.contextPath + '/api/analytics.json' + paramString,
-					timeout: 60000,
-					headers: {
-						'Content-Type': 'application/json',
-						'Accepts': 'application/json'
-					},
-					disableCaching: false,
-					failure: function(r) {
+                    url: init.contextPath + '/api/analytics.json' + paramString,
+                    timeout: 60000,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accepts': 'application/json'
+                    },
+                    disableCaching: false,
+                    failure: function(r) {
                         onFailure(r);
-					},
-					success: function(r) {
+                    },
+                    success: function(r) {
                         var metaData = Ext.decode(r.responseText).metaData;
 
                         ns.ajax({
@@ -1005,9 +1005,9 @@ Ext.onReady( function() {
                         });
                     }
                 });
-			};
+            };
 
-			web.report.createReport = function(layout, isUpdateOuGui) {
+            web.report.createReport = function(layout, isUpdateOuGui) {
                 web.mask.show(ns.app.centerRegion);
 
                 web.report.getHtml(layout, function(table) {
@@ -1040,24 +1040,24 @@ Ext.onReady( function() {
 
                     web.mask.hide(ns.app.centerRegion);
                 });
-			};
-		}());
-	};
+            };
+        }());
+    };
 
-	// viewport
-	createViewport = function() {
+    // viewport
+    createViewport = function() {
         var indicatorAvailableStore,
             indicatorGroupStore,
-			dataElementAvailableStore,
-			dataElementGroupStore,
-			dataSetAvailableStore,
+            dataElementAvailableStore,
+            dataElementGroupStore,
+            dataSetAvailableStore,
             dataSelectedStore,
-			periodTypeStore,
-			fixedPeriodAvailableStore,
-			fixedPeriodSelectedStore,
-			organisationUnitLevelStore,
-			organisationUnitGroupStore,
-			legendSetStore,
+            periodTypeStore,
+            fixedPeriodAvailableStore,
+            fixedPeriodSelectedStore,
+            organisationUnitLevelStore,
+            organisationUnitGroupStore,
+            legendSetStore,
 
             isScrolled,
             onDataTypeSelect,
@@ -1071,7 +1071,7 @@ Ext.onReady( function() {
             indicatorAvailable,
             indicatorSelected,
             indicator,
-			dataElementLabel,
+            dataElementLabel,
             dataElementSearch,
             dataElementFilter,
             dataElementAvailable,
@@ -1087,7 +1087,7 @@ Ext.onReady( function() {
             dataSet,
             data,
 
-			rewind,
+            rewind,
             relativePeriodDefaults,
             relativePeriod,
             fixedPeriodAvailable,
@@ -1106,9 +1106,9 @@ Ext.onReady( function() {
             toolPanel,
             organisationUnit,
             dimensionPanelMap = {},
-			update,
+            update,
 
-			accordionBody,
+            accordionBody,
             accordion,
             westRegion,
             layoutButton,
@@ -1129,14 +1129,14 @@ Ext.onReady( function() {
             setGui,
             viewport,
 
-			accordionPanels = [],
+            accordionPanels = [],
 
             dimConf = ns.core.conf.finals.dimension;
 
-		ns.app.stores = ns.app.stores || {};
+        ns.app.stores = ns.app.stores || {};
 
-		indicatorAvailableStore = Ext.create('Ext.data.Store', {
-			fields: ['id', 'name', 'objectName'],
+        indicatorAvailableStore = Ext.create('Ext.data.Store', {
+            fields: ['id', 'name', 'objectName'],
             lastPage: null,
             nextPage: 1,
             isPending: false,
@@ -1180,7 +1180,7 @@ Ext.onReady( function() {
             },
             loadPage: function(uid, filter, append, noPaging, fn) {
                 var store = this,
-					params = {},
+                    params = {},
                     path;
 
                 uid = (Ext.isString(uid) || Ext.isNumber(uid)) ? uid : indicatorGroup.getValue();
@@ -1195,24 +1195,24 @@ Ext.onReady( function() {
                     return;
                 }
 
-				if (Ext.isString(uid)) {
-					path = '/indicators.json?fields=id,' + ns.core.init.namePropertyUrl + '&filter=indicatorGroups.id:eq:' + uid + (filter ? '&filter=name:like:' + filter : '');
-				}
-				else if (uid === 0) {
-					path = '/indicators.json?fields=id,' + ns.core.init.namePropertyUrl + '' + (filter ? '&filter=name:like:' + filter : '');
-				}
+                if (Ext.isString(uid)) {
+                    path = '/indicators.json?fields=id,' + ns.core.init.namePropertyUrl + '&filter=indicatorGroups.id:eq:' + uid + (filter ? '&filter=name:like:' + filter : '');
+                }
+                else if (uid === 0) {
+                    path = '/indicators.json?fields=id,' + ns.core.init.namePropertyUrl + '' + (filter ? '&filter=name:like:' + filter : '');
+                }
 
-				if (!path) {
-					return;
-				}
+                if (!path) {
+                    return;
+                }
 
-				if (noPaging) {
-					params.paging = false;
-				}
-				else {
-					params.page = store.nextPage;
-					params.pageSize = 50;
-				}
+                if (noPaging) {
+                    params.paging = false;
+                }
+                else {
+                    params.page = store.nextPage;
+                    params.pageSize = 50;
+                }
 
                 store.isPending = true;
                 ns.core.web.mask.show(indicatorAvailable.boundList);
@@ -1234,7 +1234,7 @@ Ext.onReady( function() {
                 });
             },
             loadStore: function(data, pager, append, fn) {
-				pager = pager || {};
+                pager = pager || {};
 
                 this.loadDataAndUpdate(data, append);
                 this.sortStore();
@@ -1250,20 +1250,20 @@ Ext.onReady( function() {
                 //ns.core.web.multiSelect.filterAvailable({store: indicatorAvailableStore}, {store: indicatorSelectedStore});
 
                 if (fn) {
-					fn();
-				}
+                    fn();
+                }
             },
-			storage: {},
-			parent: null,
-			sortStore: function() {
-				this.sort('name', 'ASC');
-			}
-		});
-		ns.app.stores.indicatorAvailable = indicatorAvailableStore;
+            storage: {},
+            parent: null,
+            sortStore: function() {
+                this.sort('name', 'ASC');
+            }
+        });
+        ns.app.stores.indicatorAvailable = indicatorAvailableStore;
 
-		indicatorGroupStore = Ext.create('Ext.data.Store', {
-			fields: ['id', 'name', 'index'],
-			proxy: function() {
+        indicatorGroupStore = Ext.create('Ext.data.Store', {
+            fields: ['id', 'name', 'index'],
+            proxy: function() {
                 var auth = ns.ajax(null, null, true),
                     proxy = {
                         type: 'ajax',
@@ -1283,30 +1283,30 @@ Ext.onReady( function() {
 
                 return proxy;
             }(),
-			listeners: {
-				load: function(s) {
-					s.add({
-						id: 0,
-						name: '[ ' + NS.i18n.all_indicators + ' ]',
-						index: -1
-					});
-					s.sort([
-						{
-							property: 'index',
-							direction: 'ASC'
-						},
-						{
-							property: 'name',
-							direction: 'ASC'
-						}
-					]);
-				}
-			}
-		});
-		ns.app.stores.indicatorGroup = indicatorGroupStore;
+            listeners: {
+                load: function(s) {
+                    s.add({
+                        id: 0,
+                        name: '[ ' + NS.i18n.all_indicators + ' ]',
+                        index: -1
+                    });
+                    s.sort([
+                        {
+                            property: 'index',
+                            direction: 'ASC'
+                        },
+                        {
+                            property: 'name',
+                            direction: 'ASC'
+                        }
+                    ]);
+                }
+            }
+        });
+        ns.app.stores.indicatorGroup = indicatorGroupStore;
 
-		dataElementAvailableStore = Ext.create('Ext.data.Store', {
-			fields: ['id', 'name'],
+        dataElementAvailableStore = Ext.create('Ext.data.Store', {
+            fields: ['id', 'name'],
             lastPage: null,
             nextPage: 1,
             isPending: false,
@@ -1366,31 +1366,31 @@ Ext.onReady( function() {
             },
             loadTotalsPage: function(uid, filter, append, noPaging, fn) {
                 var store = this,
-					params = {},
+                    params = {},
                     path;
 
                 if (store.nextPage === store.lastPage) {
                     return;
                 }
 
-				if (Ext.isString(uid)) {
-					path = '/dataElements.json?fields=id,' + ns.core.init.namePropertyUrl + '&filter=dataElementGroups.id:eq:' + uid + (filter ? '&filter=name:like:' + filter : '');
-				}
-				else if (uid === 0) {
-					path = '/dataElements.json?fields=id,' + ns.core.init.namePropertyUrl + '&filter=domainType:eq:AGGREGATE' + '' + (filter ? '&filter=name:like:' + filter : '');
-				}
+                if (Ext.isString(uid)) {
+                    path = '/dataElements.json?fields=id,' + ns.core.init.namePropertyUrl + '&filter=dataElementGroups.id:eq:' + uid + (filter ? '&filter=name:like:' + filter : '');
+                }
+                else if (uid === 0) {
+                    path = '/dataElements.json?fields=id,' + ns.core.init.namePropertyUrl + '&filter=domainType:eq:AGGREGATE' + '' + (filter ? '&filter=name:like:' + filter : '');
+                }
 
-				if (!path) {
-					return;
-				}
+                if (!path) {
+                    return;
+                }
 
-				if (noPaging) {
-					params.paging = false;
-				}
-				else {
-					params.page = store.nextPage;
-					params.pageSize = 50;
-				}
+                if (noPaging) {
+                    params.paging = false;
+                }
+                else {
+                    params.page = store.nextPage;
+                    params.pageSize = 50;
+                }
 
                 store.isPending = true;
                 ns.core.web.mask.show(dataElementAvailable.boundList);
@@ -1411,33 +1411,33 @@ Ext.onReady( function() {
                     }
                 });
             },
-			loadDetailsPage: function(uid, filter, append, noPaging, fn) {
+            loadDetailsPage: function(uid, filter, append, noPaging, fn) {
                 var store = this,
-					params = {},
+                    params = {},
                     path;
 
                 if (store.nextPage === store.lastPage) {
                     return;
                 }
 
-				if (Ext.isString(uid)) {
-					path = '/dataElementOperands.json?fields=id,' + ns.core.init.namePropertyUrl + '&filter=dataElement.dataElementGroups.id:eq:' + uid + (filter ? '&filter=name:like:' + filter : '');
-				}
-				else if (uid === 0) {
-					path = '/dataElementOperands.json?fields=id,' + ns.core.init.namePropertyUrl + '' + (filter ? '&filter=name:like:' + filter : '');
-				}
+                if (Ext.isString(uid)) {
+                    path = '/dataElementOperands.json?fields=id,' + ns.core.init.namePropertyUrl + '&filter=dataElement.dataElementGroups.id:eq:' + uid + (filter ? '&filter=name:like:' + filter : '');
+                }
+                else if (uid === 0) {
+                    path = '/dataElementOperands.json?fields=id,' + ns.core.init.namePropertyUrl + '' + (filter ? '&filter=name:like:' + filter : '');
+                }
 
-				if (!path) {
-					return;
-				}
+                if (!path) {
+                    return;
+                }
 
-				if (noPaging) {
-					params.paging = false;
-				}
-				else {
-					params.page = store.nextPage;
-					params.pageSize = 50;
-				}
+                if (noPaging) {
+                    params.paging = false;
+                }
+                else {
+                    params.page = store.nextPage;
+                    params.pageSize = 50;
+                }
 
                 store.isPending = true;
                 ns.core.web.mask.show(dataElementAvailable.boundList);
@@ -1447,7 +1447,7 @@ Ext.onReady( function() {
                     params: params,
                     success: function(r) {
                         var response = Ext.decode(r.responseText),
-							data = response.objects || response.dataElementOperands || [],
+                            data = response.objects || response.dataElementOperands || [],
                             pager = response.pager;
 
                         store.loadStore(data, pager, append, fn);
@@ -1457,9 +1457,9 @@ Ext.onReady( function() {
                         ns.core.web.mask.hide(dataElementAvailable.boundList);
                     }
                 });
-			},
+            },
             loadStore: function(data, pager, append, fn) {
-				pager = pager || {};
+                pager = pager || {};
 
                 this.loadDataAndUpdate(data, append);
                 this.sortStore();
@@ -1472,21 +1472,21 @@ Ext.onReady( function() {
 
                 this.isPending = false;
 
-				//ns.core.web.multiSelect.filterAvailable({store: dataElementAvailableStore}, {store: dataElementSelectedStore});
+                //ns.core.web.multiSelect.filterAvailable({store: dataElementAvailableStore}, {store: dataElementSelectedStore});
 
                 if (fn) {
-					fn();
-				}
+                    fn();
+                }
             },
             sortStore: function() {
-				this.sort('name', 'ASC');
-			}
-		});
-		ns.app.stores.dataElementAvailable = dataElementAvailableStore;
+                this.sort('name', 'ASC');
+            }
+        });
+        ns.app.stores.dataElementAvailable = dataElementAvailableStore;
 
-		dataElementGroupStore = Ext.create('Ext.data.Store', {
-			fields: ['id', 'name', 'index'],
-			proxy: function() {
+        dataElementGroupStore = Ext.create('Ext.data.Store', {
+            fields: ['id', 'name', 'index'],
+            proxy: function() {
                 var auth = ns.ajax(null, null, true),
                     proxy = {
                         type: 'ajax',
@@ -1506,25 +1506,25 @@ Ext.onReady( function() {
 
                 return proxy;
             }(),
-			listeners: {
-				load: function(s) {
+            listeners: {
+                load: function(s) {
                     s.add({
                         id: 0,
                         name: '[ ' + NS.i18n.all_data_elements + ' ]',
                         index: -1
                     });
 
-					s.sort([
-						{property: 'index', direction: 'ASC'},
-						{property: 'name', direction: 'ASC'}
-					]);
-				}
-			}
-		});
-		ns.app.stores.dataElementGroup = dataElementGroupStore;
+                    s.sort([
+                        {property: 'index', direction: 'ASC'},
+                        {property: 'name', direction: 'ASC'}
+                    ]);
+                }
+            }
+        });
+        ns.app.stores.dataElementGroup = dataElementGroupStore;
 
-		dataSetAvailableStore = Ext.create('Ext.data.Store', {
-			fields: ['id', 'name'],
+        dataSetAvailableStore = Ext.create('Ext.data.Store', {
+            fields: ['id', 'name'],
             lastPage: null,
             nextPage: 1,
             isPending: false,
@@ -1566,7 +1566,7 @@ Ext.onReady( function() {
             },
             loadPage: function(filter, append, noPaging, fn) {
                 var store = this,
-					params = {},
+                    params = {},
                     path;
 
                 filter = filter || dataSetFilter.getValue() || null;
@@ -1582,13 +1582,13 @@ Ext.onReady( function() {
 
                 path = '/dataSets.json?fields=id,' + ns.core.init.namePropertyUrl + '' + (filter ? '&filter=name:like:' + filter : '');
 
-				if (noPaging) {
-					params.paging = false;
-				}
-				else {
-					params.page = store.nextPage;
-					params.pageSize = 50;
-				}
+                if (noPaging) {
+                    params.paging = false;
+                }
+                else {
+                    params.page = store.nextPage;
+                    params.pageSize = 50;
+                }
 
                 store.isPending = true;
                 ns.core.web.mask.show(dataSetAvailable.boundList);
@@ -1610,7 +1610,7 @@ Ext.onReady( function() {
                 });
             },
             loadStore: function(data, pager, append, fn) {
-				pager = pager || {};
+                pager = pager || {};
 
                 this.loadDataAndUpdate(data, append);
                 this.sortStore();
@@ -1623,24 +1623,24 @@ Ext.onReady( function() {
 
                 this.isPending = false;
 
-				//ns.core.web.multiSelect.filterAvailable({store: dataSetAvailableStore}, {store: dataSetSelectedStore});
+                //ns.core.web.multiSelect.filterAvailable({store: dataSetAvailableStore}, {store: dataSetSelectedStore});
 
                 if (fn) {
-					fn();
-				}
+                    fn();
+                }
             },
-			storage: {},
-			parent: null,
+            storage: {},
+            parent: null,
             isLoaded: false,
-			sortStore: function() {
-				this.sort('name', 'ASC');
-			}
-		});
-		ns.app.stores.dataSetAvailable = dataSetAvailableStore;
+            sortStore: function() {
+                this.sort('name', 'ASC');
+            }
+        });
+        ns.app.stores.dataSetAvailable = dataSetAvailableStore;
 
         dataSelectedStore = Ext.create('Ext.data.Store', {
-			fields: ['id', 'name'],
-			data: [],
+            fields: ['id', 'name'],
+            data: [],
             getIds: function() {
                 var records = this.getRange(),
                     ids = [];
@@ -1726,44 +1726,44 @@ Ext.onReady( function() {
                     data.updateStoreFilters();
                 }
             }
-		});
-		ns.app.stores.dataSelected = dataSelectedStore;
+        });
+        ns.app.stores.dataSelected = dataSelectedStore;
 
-		periodTypeStore = Ext.create('Ext.data.Store', {
-			fields: ['id', 'name'],
-			data: ns.core.conf.period.periodTypes
-		});
-		ns.app.stores.periodType = periodTypeStore;
+        periodTypeStore = Ext.create('Ext.data.Store', {
+            fields: ['id', 'name'],
+            data: ns.core.conf.period.periodTypes
+        });
+        ns.app.stores.periodType = periodTypeStore;
 
-		fixedPeriodAvailableStore = Ext.create('Ext.data.Store', {
-			fields: ['id', 'name', 'index'],
-			data: [],
-			setIndex: function(periods) {
-				for (var i = 0; i < periods.length; i++) {
-					periods[i].index = i;
-				}
-			},
-			sortStore: function() {
-				this.sort('index', 'ASC');
-			}
-		});
-		ns.app.stores.fixedPeriodAvailable = fixedPeriodAvailableStore;
+        fixedPeriodAvailableStore = Ext.create('Ext.data.Store', {
+            fields: ['id', 'name', 'index'],
+            data: [],
+            setIndex: function(periods) {
+                for (var i = 0; i < periods.length; i++) {
+                    periods[i].index = i;
+                }
+            },
+            sortStore: function() {
+                this.sort('index', 'ASC');
+            }
+        });
+        ns.app.stores.fixedPeriodAvailable = fixedPeriodAvailableStore;
 
-		fixedPeriodSelectedStore = Ext.create('Ext.data.Store', {
-			fields: ['id', 'name'],
-			data: []
-		});
-		ns.app.stores.fixedPeriodSelected = fixedPeriodSelectedStore;
+        fixedPeriodSelectedStore = Ext.create('Ext.data.Store', {
+            fields: ['id', 'name'],
+            data: []
+        });
+        ns.app.stores.fixedPeriodSelected = fixedPeriodSelectedStore;
 
-		organisationUnitLevelStore = Ext.create('Ext.data.Store', {
-			fields: ['id', 'name', 'level'],
-			data: ns.core.init.organisationUnitLevels
-		});
-		ns.app.stores.organisationUnitLevel = organisationUnitLevelStore;
+        organisationUnitLevelStore = Ext.create('Ext.data.Store', {
+            fields: ['id', 'name', 'level'],
+            data: ns.core.init.organisationUnitLevels
+        });
+        ns.app.stores.organisationUnitLevel = organisationUnitLevelStore;
 
-		organisationUnitGroupStore = Ext.create('Ext.data.Store', {
-			fields: ['id', 'name'],
-			proxy: function() {
+        organisationUnitGroupStore = Ext.create('Ext.data.Store', {
+            fields: ['id', 'name'],
+            proxy: function() {
                 var auth = ns.ajax(null, null, true),
                     proxy = {
                         type: 'ajax',
@@ -1783,31 +1783,31 @@ Ext.onReady( function() {
 
                 return proxy;
             }()
-		});
-		ns.app.stores.organisationUnitGroup = organisationUnitGroupStore;
+        });
+        ns.app.stores.organisationUnitGroup = organisationUnitGroupStore;
 
-		legendSetStore = Ext.create('Ext.data.Store', {
-			fields: ['id', 'name', 'index'],
-			data: function() {
-				var data = ns.core.init.legendSets;
-				data.unshift({id: 0, name: NS.i18n.none, index: -1});
-				return data;
-			}(),
-			sorters: [
-				{property: 'index', direction: 'ASC'},
-				{property: 'name', direction: 'ASC'}
-			]
-		});
-		ns.app.stores.legendSet = legendSetStore;
+        legendSetStore = Ext.create('Ext.data.Store', {
+            fields: ['id', 'name', 'index'],
+            data: function() {
+                var data = ns.core.init.legendSets;
+                data.unshift({id: 0, name: NS.i18n.none, index: -1});
+                return data;
+            }(),
+            sorters: [
+                {property: 'index', direction: 'ASC'},
+                {property: 'name', direction: 'ASC'}
+            ]
+        });
+        ns.app.stores.legendSet = legendSetStore;
 
-		// data
+        // data
 
-		isScrolled = function(e) {
-			var el = e.srcElement,
-				scrollBottom = el.scrollTop + ((el.clientHeight / el.scrollHeight) * el.scrollHeight);
+        isScrolled = function(e) {
+            var el = e.srcElement,
+                scrollBottom = el.scrollTop + ((el.clientHeight / el.scrollHeight) * el.scrollHeight);
 
-			return scrollBottom / el.scrollHeight > 0.9;
-		};
+            return scrollBottom / el.scrollHeight > 0.9;
+        };
 
         onDataTypeSelect = function(type) {
             type = type || 'in';
@@ -1835,9 +1835,9 @@ Ext.onReady( function() {
                 //eventDataItem.hide();
                 //programIndicator.hide();
 
-				if (!dataSetAvailableStore.isLoaded) {
+                if (!dataSetAvailableStore.isLoaded) {
                     dataSetAvailableStore.isLoaded = true;
-					dataSetAvailableStore.loadPage(null, false);
+                    dataSetAvailableStore.loadPage(null, false);
                 }
             }
             //else if (type === 'di') {
@@ -1894,50 +1894,50 @@ Ext.onReady( function() {
         });
 
         dataSelected = Ext.create('Ext.ux.form.MultiSelect', {
-			cls: 'ns-toolbar-multiselect-right',
-			width: (ns.core.conf.layout.west_fieldset_width - ns.core.conf.layout.west_width_padding) / 2,
-			valueField: 'id',
-			displayField: 'name',
-			ddReorder: true,
-			store: dataSelectedStore,
-			tbar: [
-				{
-					xtype: 'button',
-					icon: 'images/arrowleftdouble.png',
-					width: 22,
-					handler: function() {
-						//ns.core.web.multiSelect.unselectAll(programIndicatorAvailable, programIndicatorSelected);
+            cls: 'ns-toolbar-multiselect-right',
+            width: (ns.core.conf.layout.west_fieldset_width - ns.core.conf.layout.west_width_padding) / 2,
+            valueField: 'id',
+            displayField: 'name',
+            ddReorder: true,
+            store: dataSelectedStore,
+            tbar: [
+                {
+                    xtype: 'button',
+                    icon: 'images/arrowleftdouble.png',
+                    width: 22,
+                    handler: function() {
+                        //ns.core.web.multiSelect.unselectAll(programIndicatorAvailable, programIndicatorSelected);
                         dataSelectedStore.removeAll();
                         data.updateStoreFilters();
-					}
-				},
-				{
-					xtype: 'button',
-					icon: 'images/arrowleft.png',
-					width: 22,
-					handler: function() {
-						//ns.core.web.multiSelect.unselect(programIndicatorAvailable, programIndicatorSelected);
+                    }
+                },
+                {
+                    xtype: 'button',
+                    icon: 'images/arrowleft.png',
+                    width: 22,
+                    handler: function() {
+                        //ns.core.web.multiSelect.unselect(programIndicatorAvailable, programIndicatorSelected);
                         dataSelectedStore.removeByIds(dataSelected.getValue());
                         data.updateStoreFilters();
-					}
-				},
-				'->',
-				{
-					xtype: 'label',
-					text: NS.i18n.selected,
-					cls: 'ns-toolbar-multiselect-right-label'
-				}
-			],
-			listeners: {
-				afterrender: function() {
-					this.boundList.on('itemdblclick', function() {
-						//ns.core.web.multiSelect.unselect(programIndicatorAvailable, this);
+                    }
+                },
+                '->',
+                {
+                    xtype: 'label',
+                    text: NS.i18n.selected,
+                    cls: 'ns-toolbar-multiselect-right-label'
+                }
+            ],
+            listeners: {
+                afterrender: function() {
+                    this.boundList.on('itemdblclick', function() {
+                        //ns.core.web.multiSelect.unselect(programIndicatorAvailable, this);
                         dataSelectedStore.removeByIds(dataSelected.getValue());
                         data.updateStoreFilters();
-					}, this);
-				}
-			}
-		});
+                    }, this);
+                }
+            }
+        });
 
         // indicator
         indicatorLabel = Ext.create('Ext.form.Label', {
@@ -1978,10 +1978,10 @@ Ext.onReady( function() {
             fieldStyle: 'height:22px; border-right:0 none',
             style: 'height:22px',
             onTriggerClick: function() {
-				if (this.getValue()) {
-					this.reset();
-					this.onKeyUpHandler();
-				}
+                if (this.getValue()) {
+                    this.reset();
+                    this.onKeyUpHandler();
+                }
             },
             onKeyUpHandler: function() {
                 var value = indicatorGroup.getValue(),
@@ -2019,62 +2019,62 @@ Ext.onReady( function() {
             emptyText: NS.i18n.select_indicator_group,
             editable: false,
             store: indicatorGroupStore,
-			loadAvailable: function(reset) {
-				var store = indicatorAvailableStore,
-					id = this.getValue();
+            loadAvailable: function(reset) {
+                var store = indicatorAvailableStore,
+                    id = this.getValue();
 
-				if (id !== null) {
+                if (id !== null) {
                     if (reset) {
                         store.reset();
                     }
 
                     store.loadPage(id, null, false);
-				}
-			},
-			listeners: {
-				select: function(cb) {
-					cb.loadAvailable(true);
+                }
+            },
+            listeners: {
+                select: function(cb) {
+                    cb.loadAvailable(true);
 
                     indicatorSearch.enable();
-				}
-			}
+                }
+            }
         });
 
-		indicatorAvailable = Ext.create('Ext.ux.form.MultiSelect', {
-			cls: 'ns-toolbar-multiselect-left',
-			width: (ns.core.conf.layout.west_fieldset_width - ns.core.conf.layout.west_width_padding) / 2,
-			valueField: 'id',
-			displayField: 'name',
-			store: indicatorAvailableStore,
-			tbar: [
-				indicatorLabel,
+        indicatorAvailable = Ext.create('Ext.ux.form.MultiSelect', {
+            cls: 'ns-toolbar-multiselect-left',
+            width: (ns.core.conf.layout.west_fieldset_width - ns.core.conf.layout.west_width_padding) / 2,
+            valueField: 'id',
+            displayField: 'name',
+            store: indicatorAvailableStore,
+            tbar: [
+                indicatorLabel,
                 indicatorSearch,
                 indicatorFilter,
-				'->',
-				{
-					xtype: 'button',
-					icon: 'images/arrowright.png',
-					width: 22,
-					handler: function() {
+                '->',
+                {
+                    xtype: 'button',
+                    icon: 'images/arrowright.png',
+                    width: 22,
+                    handler: function() {
                         if (indicatorAvailable.getValue().length) {
                             var records = indicatorAvailableStore.getRecordsByIds(indicatorAvailable.getValue());
                             dataSelectedStore.addRecords(records, 'in');
                         }
-					}
-				},
-				{
-					xtype: 'button',
-					icon: 'images/arrowrightdouble.png',
-					width: 22,
-					handler: function() {
-						indicatorAvailableStore.loadPage(null, null, null, true, function() {
+                    }
+                },
+                {
+                    xtype: 'button',
+                    icon: 'images/arrowrightdouble.png',
+                    width: 22,
+                    handler: function() {
+                        indicatorAvailableStore.loadPage(null, null, null, true, function() {
                             dataSelectedStore.addRecords(indicatorAvailableStore.getRange(), 'in');
-						});
-					}
-				}
-			],
-			listeners: {
-				render: function(ms) {
+                        });
+                    }
+                }
+            ],
+            listeners: {
+                render: function(ms) {
                     var el = Ext.get(ms.boundList.getEl().id + '-listEl').dom;
 
                     el.addEventListener('scroll', function(e) {
@@ -2083,85 +2083,85 @@ Ext.onReady( function() {
                         }
                     });
 
-					ms.boundList.on('itemdblclick', function(bl, record) {
+                    ms.boundList.on('itemdblclick', function(bl, record) {
                         dataSelectedStore.addRecords(record, 'in');
-					}, ms);
-				}
-			}
-		});
+                    }, ms);
+                }
+            }
+        });
 
-		indicatorSelected = Ext.create('Ext.ux.form.MultiSelect', {
-			cls: 'ns-toolbar-multiselect-right',
-			width: (ns.core.conf.layout.west_fieldset_width - ns.core.conf.layout.west_width_padding) / 2,
-			valueField: 'id',
-			displayField: 'name',
-			ddReorder: true,
-			store: dataSelectedStore,
-			tbar: [
-				{
-					xtype: 'button',
-					icon: 'images/arrowleftdouble.png',
-					width: 22,
-					handler: function() {
+        indicatorSelected = Ext.create('Ext.ux.form.MultiSelect', {
+            cls: 'ns-toolbar-multiselect-right',
+            width: (ns.core.conf.layout.west_fieldset_width - ns.core.conf.layout.west_width_padding) / 2,
+            valueField: 'id',
+            displayField: 'name',
+            ddReorder: true,
+            store: dataSelectedStore,
+            tbar: [
+                {
+                    xtype: 'button',
+                    icon: 'images/arrowleftdouble.png',
+                    width: 22,
+                    handler: function() {
                         if (dataSelectedStore.getRange().length) {
                             dataSelectedStore.removeAll();
                         }
-					}
-				},
-				{
-					xtype: 'button',
-					icon: 'images/arrowleft.png',
-					width: 22,
-					handler: function() {
+                    }
+                },
+                {
+                    xtype: 'button',
+                    icon: 'images/arrowleft.png',
+                    width: 22,
+                    handler: function() {
                         if (indicatorSelected.getValue().length) {
                             dataSelectedStore.removeByIds(indicatorSelected.getValue());
                         }
-					}
-				},
-				'->',
-				{
-					xtype: 'label',
-					text: NS.i18n.selected,
-					cls: 'ns-toolbar-multiselect-right-label'
-				}
-			],
-			listeners: {
-				afterrender: function() {
-					this.boundList.on('itemdblclick', function(bl, record) {
+                    }
+                },
+                '->',
+                {
+                    xtype: 'label',
+                    text: NS.i18n.selected,
+                    cls: 'ns-toolbar-multiselect-right-label'
+                }
+            ],
+            listeners: {
+                afterrender: function() {
+                    this.boundList.on('itemdblclick', function(bl, record) {
                         dataSelectedStore.removeByIds(record.data.id);
-					}, this);
-				}
-			}
-		});
+                    }, this);
+                }
+            }
+        });
 
-		indicator = Ext.create('Ext.panel.Panel', {
-			xtype: 'panel',
-			//title: '<div class="ns-panel-title-data">' + NS.i18n.indicators + '</div>',
+        indicator = Ext.create('Ext.panel.Panel', {
+            xtype: 'panel',
+            //title: '<div class="ns-panel-title-data">' + NS.i18n.indicators + '</div>',
             preventHeader: true,
-			hideCollapseTool: true,
+            hideCollapseTool: true,
             dimension: dimConf.indicator.objectName,
             bodyStyle: 'border:0 none',
-			items: [
-				indicatorGroup,
-				{
-					xtype: 'panel',
-					layout: 'column',
-					bodyStyle: 'border-style:none',
-					items: [
+            items: [
+                indicatorGroup,
+                {
+                    xtype: 'panel',
+                    layout: 'column',
+                    bodyStyle: 'border-style:none',
+                    items: [
                         indicatorAvailable,
-						indicatorSelected
-					]
-				}
-			],
-			listeners: {
-				added: function() {
-					//accordionPanels.push(this);
-				},
-				expand: function(p) {
-					//p.onExpand();
-				}
-			}
-		});
+                        indicatorSelected
+                    ]
+                }
+            ],
+            listeners: {
+                added: function() {
+                    //accordionPanels.push(this);
+                },
+                expand: function(p) {
+                    //p.onExpand();
+                }
+            }
+        });
 
         // data element
         dataElementLabel = Ext.create('Ext.form.Label', {
@@ -2202,10 +2202,10 @@ Ext.onReady( function() {
             fieldStyle: 'height:22px; border-right:0 none',
             style: 'height:22px',
             onTriggerClick: function() {
-				if (this.getValue()) {
-					this.reset();
-					this.onKeyUpHandler();
-				}
+                if (this.getValue()) {
+                    this.reset();
+                    this.onKeyUpHandler();
+                }
             },
             onKeyUpHandler: function() {
                 var value = dataElementGroup.getValue(),
@@ -2234,43 +2234,43 @@ Ext.onReady( function() {
             }
         });
 
-		dataElementAvailable = Ext.create('Ext.ux.form.MultiSelect', {
-			cls: 'ns-toolbar-multiselect-left',
-			width: (ns.core.conf.layout.west_fieldset_width - ns.core.conf.layout.west_width_padding) / 2,
-			valueField: 'id',
-			displayField: 'name',
+        dataElementAvailable = Ext.create('Ext.ux.form.MultiSelect', {
+            cls: 'ns-toolbar-multiselect-left',
+            width: (ns.core.conf.layout.west_fieldset_width - ns.core.conf.layout.west_width_padding) / 2,
+            valueField: 'id',
+            displayField: 'name',
             isPending: false,
             page: 1,
-			store: dataElementAvailableStore,
-			tbar: [
-				dataElementLabel,
+            store: dataElementAvailableStore,
+            tbar: [
+                dataElementLabel,
                 dataElementSearch,
                 dataElementFilter,
-				'->',
-				{
-					xtype: 'button',
-					icon: 'images/arrowright.png',
-					width: 22,
-					handler: function() {
+                '->',
+                {
+                    xtype: 'button',
+                    icon: 'images/arrowright.png',
+                    width: 22,
+                    handler: function() {
                         if (dataElementAvailable.getValue().length) {
                             var records = dataElementAvailableStore.getRecordsByIds(dataElementAvailable.getValue());
                             dataSelectedStore.addRecords(records, 'de');
                         }
-					}
-				},
-				{
-					xtype: 'button',
-					icon: 'images/arrowrightdouble.png',
-					width: 22,
-					handler: function() {
-						dataElementAvailableStore.loadPage(null, null, null, true, function() {
+                    }
+                },
+                {
+                    xtype: 'button',
+                    icon: 'images/arrowrightdouble.png',
+                    width: 22,
+                    handler: function() {
+                        dataElementAvailableStore.loadPage(null, null, null, true, function() {
                             dataSelectedStore.addRecords(dataElementAvailableStore.getRange(), 'de');
-						});
-					}
-				}
-			],
-			listeners: {
-				render: function(ms) {
+                        });
+                    }
+                }
+            ],
+            listeners: {
+                render: function(ms) {
                     var el = Ext.get(ms.boundList.getEl().id + '-listEl').dom;
 
                     el.addEventListener('scroll', function(e) {
@@ -2279,142 +2279,142 @@ Ext.onReady( function() {
                         }
                     });
 
-					ms.boundList.on('itemdblclick', function(bl, record) {
+                    ms.boundList.on('itemdblclick', function(bl, record) {
                         dataSelectedStore.addRecords(record, 'de');
-					}, ms);
-				}
-			}
-		});
+                    }, ms);
+                }
+            }
+        });
 
-		dataElementSelected = Ext.create('Ext.ux.form.MultiSelect', {
-			cls: 'ns-toolbar-multiselect-right',
-			width: (ns.core.conf.layout.west_fieldset_width - ns.core.conf.layout.west_width_padding) / 2,
-			valueField: 'id',
-			displayField: 'name',
-			ddReorder: true,
-			store: dataSelectedStore,
-			tbar: [
-				{
-					xtype: 'button',
-					icon: 'images/arrowleftdouble.png',
-					width: 22,
-					handler: function() {
+        dataElementSelected = Ext.create('Ext.ux.form.MultiSelect', {
+            cls: 'ns-toolbar-multiselect-right',
+            width: (ns.core.conf.layout.west_fieldset_width - ns.core.conf.layout.west_width_padding) / 2,
+            valueField: 'id',
+            displayField: 'name',
+            ddReorder: true,
+            store: dataSelectedStore,
+            tbar: [
+                {
+                    xtype: 'button',
+                    icon: 'images/arrowleftdouble.png',
+                    width: 22,
+                    handler: function() {
                         if (dataSelectedStore.getRange().length) {
                             dataSelectedStore.removeAll();
                         }
-					}
-				},
-				{
-					xtype: 'button',
-					icon: 'images/arrowleft.png',
-					width: 22,
-					handler: function() {
+                    }
+                },
+                {
+                    xtype: 'button',
+                    icon: 'images/arrowleft.png',
+                    width: 22,
+                    handler: function() {
                         if (dataElementSelected.getValue().length) {
                             dataSelectedStore.removeByIds(dataElementSelected.getValue());
                         }
-					}
-				},
-				'->',
-				{
-					xtype: 'label',
-					text: NS.i18n.selected,
-					cls: 'ns-toolbar-multiselect-right-label'
-				}
-			],
-			listeners: {
-				afterrender: function() {
-					this.boundList.on('itemdblclick', function(bl, record) {
+                    }
+                },
+                '->',
+                {
+                    xtype: 'label',
+                    text: NS.i18n.selected,
+                    cls: 'ns-toolbar-multiselect-right-label'
+                }
+            ],
+            listeners: {
+                afterrender: function() {
+                    this.boundList.on('itemdblclick', function(bl, record) {
                         dataSelectedStore.removeByIds(record.data.id);
-					}, this);
-				}
-			}
-		});
+                    }, this);
+                }
+            }
+        });
 
-		dataElementGroup = Ext.create('Ext.form.field.ComboBox', {
-			cls: 'ns-combo',
-			style: 'margin:0 1px 1px 0',
+        dataElementGroup = Ext.create('Ext.form.field.ComboBox', {
+            cls: 'ns-combo',
+            style: 'margin:0 1px 1px 0',
             width: ns.core.conf.layout.west_fieldset_width - ns.core.conf.layout.west_width_padding,
-			valueField: 'id',
-			displayField: 'name',
-			emptyText: NS.i18n.select_data_element_group,
-			editable: false,
-			store: dataElementGroupStore,
-			loadAvailable: function(reset) {
-				var store = dataElementAvailableStore,
-					id = this.getValue();
+            valueField: 'id',
+            displayField: 'name',
+            emptyText: NS.i18n.select_data_element_group,
+            editable: false,
+            store: dataElementGroupStore,
+            loadAvailable: function(reset) {
+                var store = dataElementAvailableStore,
+                    id = this.getValue();
 
-				if (id !== null) {
+                if (id !== null) {
                     if (reset) {
                         store.reset();
                     }
 
                     store.loadPage(id, null, false);
-				}
-			},
-			listeners: {
-				select: function(cb) {
-					cb.loadAvailable(true);
+                }
+            },
+            listeners: {
+                select: function(cb) {
+                    cb.loadAvailable(true);
 
                     dataElementSearch.enable();
-				}
-			}
-		});
+                }
+            }
+        });
 
-		dataElementDetailLevel = Ext.create('Ext.form.field.ComboBox', {
-			cls: 'ns-combo',
-			style: 'margin-bottom:1px',
-			baseBodyCls: 'small',
-			queryMode: 'local',
-			editable: false,
-			valueField: 'id',
-			displayField: 'text',
-			width: 90 - 1,
-			value: dimConf.dataElement.objectName,
+        dataElementDetailLevel = Ext.create('Ext.form.field.ComboBox', {
+            cls: 'ns-combo',
+            style: 'margin-bottom:1px',
+            baseBodyCls: 'small',
+            queryMode: 'local',
+            editable: false,
+            valueField: 'id',
+            displayField: 'text',
+            width: 90 - 1,
+            value: dimConf.dataElement.objectName,
             disabled: true,
-			store: {
-				fields: ['id', 'text'],
-				data: [
-					{id: ns.core.conf.finals.dimension.dataElement.objectName, text: NS.i18n.totals},
-					{id: ns.core.conf.finals.dimension.operand.objectName, text: NS.i18n.details}
-				]
-			},
-			listeners: {
-				select: function(cb) {
-					dataElementGroup.loadAvailable(true);
+            store: {
+                fields: ['id', 'text'],
+                data: [
+                    {id: ns.core.conf.finals.dimension.dataElement.objectName, text: NS.i18n.totals},
+                    {id: ns.core.conf.finals.dimension.operand.objectName, text: NS.i18n.details}
+                ]
+            },
+            listeners: {
+                select: function(cb) {
+                    dataElementGroup.loadAvailable(true);
                     dataSelectedStore.removeByProperty('objectName', 'de');
-				}
-			}
-		});
+                }
+            }
+        });
 
-		dataElement = Ext.create('Ext.panel.Panel', {
-			xtype: 'panel',
-			//title: '<div class="ns-panel-title-data">' + NS.i18n.data_elements + '</div>',
+        dataElement = Ext.create('Ext.panel.Panel', {
+            xtype: 'panel',
+            //title: '<div class="ns-panel-title-data">' + NS.i18n.data_elements + '</div>',
             preventHeader: true,
             hidden: true,
-			hideCollapseTool: true,
+            hideCollapseTool: true,
             bodyStyle: 'border:0 none',
             dimension: dimConf.dataElement.objectName,
-			items: [
-				dataElementGroup,
-				{
-					xtype: 'panel',
-					layout: 'column',
-					bodyStyle: 'border-style:none',
-					items: [
+            items: [
+                dataElementGroup,
+                {
+                    xtype: 'panel',
+                    layout: 'column',
+                    bodyStyle: 'border-style:none',
+                    items: [
                         dataElementAvailable,
-						dataElementSelected
-					]
-				}
-			],
-			listeners: {
-				added: function() {
-					//accordionPanels.push(this);
-				},
-				expand: function(p) {
-					//p.onExpand();
-				}
-			}
-		});
+                        dataElementSelected
+                    ]
+                }
+            ],
+            listeners: {
+                added: function() {
+                    //accordionPanels.push(this);
+                },
+                expand: function(p) {
+                    //p.onExpand();
+                }
+            }
+        });
 
         // data set
         dataSetLabel = Ext.create('Ext.form.Label', {
@@ -2454,10 +2454,10 @@ Ext.onReady( function() {
             fieldStyle: 'height:22px; border-right:0 none',
             style: 'height:22px',
             onTriggerClick: function() {
-				if (this.getValue()) {
-					this.reset();
-					this.onKeyUpHandler();
-				}
+                if (this.getValue()) {
+                    this.reset();
+                    this.onKeyUpHandler();
+                }
             },
             onKeyUpHandler: function() {
                 var store = dataSetAvailableStore;
@@ -2482,41 +2482,41 @@ Ext.onReady( function() {
             }
         });
 
-		dataSetAvailable = Ext.create('Ext.ux.form.MultiSelect', {
-			cls: 'ns-toolbar-multiselect-left',
-			width: (ns.core.conf.layout.west_fieldset_width - ns.core.conf.layout.west_width_padding) / 2,
-			valueField: 'id',
-			displayField: 'name',
-			store: dataSetAvailableStore,
-			tbar: [
-				dataSetLabel,
+        dataSetAvailable = Ext.create('Ext.ux.form.MultiSelect', {
+            cls: 'ns-toolbar-multiselect-left',
+            width: (ns.core.conf.layout.west_fieldset_width - ns.core.conf.layout.west_width_padding) / 2,
+            valueField: 'id',
+            displayField: 'name',
+            store: dataSetAvailableStore,
+            tbar: [
+                dataSetLabel,
                 dataSetSearch,
                 dataSetFilter,
-				'->',
-				{
-					xtype: 'button',
-					icon: 'images/arrowright.png',
-					width: 22,
-					handler: function() {
+                '->',
+                {
+                    xtype: 'button',
+                    icon: 'images/arrowright.png',
+                    width: 22,
+                    handler: function() {
                         if (dataSetAvailable.getValue().length) {
                             var records = dataSetAvailableStore.getRecordsByIds(dataSetAvailable.getValue());
                             dataSelectedStore.addRecords(records, 'ds');
                         }
-					}
-				},
-				{
-					xtype: 'button',
-					icon: 'images/arrowrightdouble.png',
-					width: 22,
-					handler: function() {
-						dataSetAvailableStore.loadPage(null, null, true, function() {
+                    }
+                },
+                {
+                    xtype: 'button',
+                    icon: 'images/arrowrightdouble.png',
+                    width: 22,
+                    handler: function() {
+                        dataSetAvailableStore.loadPage(null, null, true, function() {
                             dataSelectedStore.addRecords(dataSetAvailableStore.getRange(), 'ds');
-						});
-					}
-				}
-			],
-			listeners: {
-				render: function(ms) {
+                        });
+                    }
+                }
+            ],
+            listeners: {
+                render: function(ms) {
                     var el = Ext.get(ms.boundList.getEl().id + '-listEl').dom;
 
                     el.addEventListener('scroll', function(e) {
@@ -2525,90 +2525,90 @@ Ext.onReady( function() {
                         }
                     });
 
-					ms.boundList.on('itemdblclick', function(bl, record) {
+                    ms.boundList.on('itemdblclick', function(bl, record) {
                         dataSelectedStore.addRecords(record, 'ds');
-					}, ms);
-				}
-			}
-		});
+                    }, ms);
+                }
+            }
+        });
 
-		dataSetSelected = Ext.create('Ext.ux.form.MultiSelect', {
-			cls: 'ns-toolbar-multiselect-right',
-			width: (ns.core.conf.layout.west_fieldset_width - ns.core.conf.layout.west_width_padding) / 2,
-			valueField: 'id',
-			displayField: 'name',
-			ddReorder: true,
-			store: dataSelectedStore,
-			tbar: [
-				{
-					xtype: 'button',
-					icon: 'images/arrowleftdouble.png',
-					width: 22,
-					handler: function() {
+        dataSetSelected = Ext.create('Ext.ux.form.MultiSelect', {
+            cls: 'ns-toolbar-multiselect-right',
+            width: (ns.core.conf.layout.west_fieldset_width - ns.core.conf.layout.west_width_padding) / 2,
+            valueField: 'id',
+            displayField: 'name',
+            ddReorder: true,
+            store: dataSelectedStore,
+            tbar: [
+                {
+                    xtype: 'button',
+                    icon: 'images/arrowleftdouble.png',
+                    width: 22,
+                    handler: function() {
                         if (dataSelectedStore.getRange().length) {
                             dataSelectedStore.removeAll();
                         }
-					}
-				},
-				{
-					xtype: 'button',
-					icon: 'images/arrowleft.png',
-					width: 22,
-					handler: function() {
+                    }
+                },
+                {
+                    xtype: 'button',
+                    icon: 'images/arrowleft.png',
+                    width: 22,
+                    handler: function() {
                         if (dataSetSelected.getValue().length) {
                             dataSelectedStore.removeByIds(dataSetSelected.getValue());
                         }
-					}
-				},
-				'->',
-				{
-					xtype: 'label',
-					text: NS.i18n.selected,
-					cls: 'ns-toolbar-multiselect-right-label'
-				}
-			],
-			listeners: {
-				afterrender: function() {
-					this.boundList.on('itemdblclick', function(bl, record) {
+                    }
+                },
+                '->',
+                {
+                    xtype: 'label',
+                    text: NS.i18n.selected,
+                    cls: 'ns-toolbar-multiselect-right-label'
+                }
+            ],
+            listeners: {
+                afterrender: function() {
+                    this.boundList.on('itemdblclick', function(bl, record) {
                         dataSelectedStore.removeByIds(record.data.id);
-					}, this);
-				}
-			}
-		});
+                    }, this);
+                }
+            }
+        });
 
-		dataSet = Ext.create('Ext.panel.Panel', {
-			xtype: 'panel',
-			//title: '<div class="ns-panel-title-data">' + NS.i18n.reporting_rates + '</div>',
+        dataSet = Ext.create('Ext.panel.Panel', {
+            xtype: 'panel',
+            //title: '<div class="ns-panel-title-data">' + NS.i18n.reporting_rates + '</div>',
             preventHeader: true,
             hidden: true,
-			hideCollapseTool: true,
+            hideCollapseTool: true,
             bodyStyle: 'border:0 none',
             dimension: dimConf.dataSet.objectName,
-			items: [
-				{
-					xtype: 'panel',
-					layout: 'column',
-					bodyStyle: 'border-style:none',
-					items: [
-						dataSetAvailable,
-						dataSetSelected
-					]
-				}
-			],
-			listeners: {
-				added: function() {
-					//accordionPanels.push(this);
-				},
-				expand: function(p) {
-					//p.onExpand();
-				}
-			}
-		});
+            items: [
+                {
+                    xtype: 'panel',
+                    layout: 'column',
+                    bodyStyle: 'border-style:none',
+                    items: [
+                        dataSetAvailable,
+                        dataSetSelected
+                    ]
+                }
+            ],
+            listeners: {
+                added: function() {
+                    //accordionPanels.push(this);
+                },
+                expand: function(p) {
+                    //p.onExpand();
+                }
+            }
+        });
 
         data = {
-			xtype: 'panel',
-			title: '<div class="ns-panel-title-data">' + NS.i18n.data + '</div>',
-			hideCollapseTool: true,
+            xtype: 'panel',
+            title: '<div class="ns-panel-title-data">' + NS.i18n.data + '</div>',
+            hideCollapseTool: true,
             dimension: dimConf.data.objectName,
             updateStoreFilters: function() {
                 indicatorAvailableStore.updateFilter();
@@ -2617,66 +2617,66 @@ Ext.onReady( function() {
                 //eventDataItemAvailableStore.updateFilter();
                 //programIndicatorAvailableStore.updateFilter();
             },
-			getDimension: function() {
-				var config = {
-					dimension: dimConf.data.objectName,
-					items: []
-				};
+            getDimension: function() {
+                var config = {
+                    dimension: dimConf.data.objectName,
+                    items: []
+                };
 
-				dataSelectedStore.each( function(r) {
-					config.items.push({
-						id: r.data.id,
-						name: r.data.name,
+                dataSelectedStore.each( function(r) {
+                    config.items.push({
+                        id: r.data.id,
+                        name: r.data.name,
                         objectName: r.data.objectName
-					});
-				});
+                    });
+                });
 
                 // TODO program
                 //if (eventDataItemProgram.getValue() || programIndicatorProgram.getValue()) {
                     //config.program = {id: eventDataItemProgram.getValue() || programIndicatorProgram.getValue()};
                 //}
 
-				return config.items.length ? config : null;
-			},
-			onExpand: function() {
+                return config.items.length ? config : null;
+            },
+            onExpand: function() {
                 var conf = ns.core.conf.layout,
                     h = westRegion.hasScrollbar ? conf.west_scrollbarheight_accordion_indicator : conf.west_maxheight_accordion_indicator;
 
-				accordion.setThisHeight(h);
+                accordion.setThisHeight(h);
 
-				ns.core.web.multiSelect.setHeight([indicatorAvailable, indicatorSelected], this, conf.west_fill_accordion_indicator);
+                ns.core.web.multiSelect.setHeight([indicatorAvailable, indicatorSelected], this, conf.west_fill_accordion_indicator);
                 ns.core.web.multiSelect.setHeight([dataElementAvailable, dataElementSelected], this, conf.west_fill_accordion_dataelement);
                 //ns.core.web.multiSelect.setHeight([dataSetAvailable, dataSetSelected], this, conf.west_fill_accordion_dataset);
                 //ns.core.web.multiSelect.setHeight([eventDataItemAvailable, eventDataItemSelected], this, conf.west_fill_accordion_eventdataitem);
                 //ns.core.web.multiSelect.setHeight([programIndicatorAvailable, programIndicatorSelected], this, conf.west_fill_accordion_programindicator);
-			},
-			items: [
+            },
+            items: [
                 dataType,
                 indicator,
                 dataElement
                 //dataSet
                 //eventDataItem,
                 //programIndicator
-			],
-			listeners: {
-				added: function() {
-					accordionPanels.push(this);
-				},
-				expand: function(p) {
-					p.onExpand();
-				}
-			}
-		};
+            ],
+            listeners: {
+                added: function() {
+                    accordionPanels.push(this);
+                },
+                expand: function(p) {
+                    p.onExpand();
+                }
+            }
+        };
 
-		// period
+        // period
 
-		rewind = Ext.create('Ext.form.field.Checkbox', {
-			relativePeriodId: 'rewind',
-			boxLabel: 'Rewind one period',
-			xable: function() {
-				this.setDisabled(period.isNoRelativePeriods());
-			}
-		});
+        rewind = Ext.create('Ext.form.field.Checkbox', {
+            relativePeriodId: 'rewind',
+            boxLabel: 'Rewind one period',
+            xable: function() {
+                this.setDisabled(period.isNoRelativePeriods());
+            }
+        });
 
         relativePeriodDefaults = {
             labelSeparator: '',
@@ -2695,337 +2695,337 @@ Ext.onReady( function() {
             }
         };
 
-		relativePeriod = {
-			xtype: 'panel',
+        relativePeriod = {
+            xtype: 'panel',
             layout: 'column',
-			hideCollapseTool: true,
-			autoScroll: true,
-			bodyStyle: 'border:0 none',
-			valueComponentMap: {},
-			items: [
-				{
-					xtype: 'container',
+            hideCollapseTool: true,
+            autoScroll: true,
+            bodyStyle: 'border:0 none',
+            valueComponentMap: {},
+            items: [
+                {
+                    xtype: 'container',
                     columnWidth: 0.34,
-					bodyStyle: 'border-style:none',
-					items: [
-						{
-							xtype: 'panel',
-							//columnWidth: 0.34,
-							bodyStyle: 'border-style:none; padding:0 0 0 8px',
-							defaults: relativePeriodDefaults,
-							items: [
-								{
-									xtype: 'label',
-									text: NS.i18n.weeks,
-									cls: 'ns-label-period-heading'
-								},
-								{
-									xtype: 'checkbox',
-									relativePeriodId: 'THIS_WEEK',
-									boxLabel: NS.i18n.this_week
-								},
-								{
-									xtype: 'checkbox',
-									relativePeriodId: 'LAST_WEEK',
-									boxLabel: NS.i18n.last_week
-								},
-								{
-									xtype: 'checkbox',
-									relativePeriodId: 'LAST_4_WEEKS',
-									boxLabel: NS.i18n.last_4_weeks
-								},
-								{
-									xtype: 'checkbox',
-									relativePeriodId: 'LAST_12_WEEKS',
-									boxLabel: NS.i18n.last_12_weeks
-								},
-								{
-									xtype: 'checkbox',
-									relativePeriodId: 'LAST_52_WEEKS',
-									boxLabel: NS.i18n.last_52_weeks
-								}
-							]
-						},
-						{
-							xtype: 'panel',
-							//columnWidth: 0.34,
-							bodyStyle: 'border-style:none; padding:5px 0 0 8px',
-							defaults: relativePeriodDefaults,
-							items: [
-								{
-									xtype: 'label',
-									text: NS.i18n.quarters,
-									cls: 'ns-label-period-heading'
-								},
-								{
-									xtype: 'checkbox',
-									relativePeriodId: 'THIS_QUARTER',
-									boxLabel: NS.i18n.this_quarter
-								},
-								{
-									xtype: 'checkbox',
-									relativePeriodId: 'LAST_QUARTER',
-									boxLabel: NS.i18n.last_quarter
-								},
-								{
-									xtype: 'checkbox',
-									relativePeriodId: 'LAST_4_QUARTERS',
-									boxLabel: NS.i18n.last_4_quarters
-								}
-							]
-						},
-						{
-							xtype: 'panel',
-							//columnWidth: 0.35,
-							bodyStyle: 'border-style:none; padding:5px 0 0 8px',
-							defaults: relativePeriodDefaults,
-							items: [
-								{
-									xtype: 'label',
-									text: NS.i18n.years,
-									cls: 'ns-label-period-heading'
-								},
-								{
-									xtype: 'checkbox',
-									relativePeriodId: 'THIS_YEAR',
-									boxLabel: NS.i18n.this_year
-								},
-								{
-									xtype: 'checkbox',
-									relativePeriodId: 'LAST_YEAR',
-									boxLabel: NS.i18n.last_year
-								},
-								{
-									xtype: 'checkbox',
-									relativePeriodId: 'LAST_5_YEARS',
-									boxLabel: NS.i18n.last_5_years
-								}
-							]
-						}
-					]
-				},
-				{
-					xtype: 'container',
+                    bodyStyle: 'border-style:none',
+                    items: [
+                        {
+                            xtype: 'panel',
+                            //columnWidth: 0.34,
+                            bodyStyle: 'border-style:none; padding:0 0 0 8px',
+                            defaults: relativePeriodDefaults,
+                            items: [
+                                {
+                                    xtype: 'label',
+                                    text: NS.i18n.weeks,
+                                    cls: 'ns-label-period-heading'
+                                },
+                                {
+                                    xtype: 'checkbox',
+                                    relativePeriodId: 'THIS_WEEK',
+                                    boxLabel: NS.i18n.this_week
+                                },
+                                {
+                                    xtype: 'checkbox',
+                                    relativePeriodId: 'LAST_WEEK',
+                                    boxLabel: NS.i18n.last_week
+                                },
+                                {
+                                    xtype: 'checkbox',
+                                    relativePeriodId: 'LAST_4_WEEKS',
+                                    boxLabel: NS.i18n.last_4_weeks
+                                },
+                                {
+                                    xtype: 'checkbox',
+                                    relativePeriodId: 'LAST_12_WEEKS',
+                                    boxLabel: NS.i18n.last_12_weeks
+                                },
+                                {
+                                    xtype: 'checkbox',
+                                    relativePeriodId: 'LAST_52_WEEKS',
+                                    boxLabel: NS.i18n.last_52_weeks
+                                }
+                            ]
+                        },
+                        {
+                            xtype: 'panel',
+                            //columnWidth: 0.34,
+                            bodyStyle: 'border-style:none; padding:5px 0 0 8px',
+                            defaults: relativePeriodDefaults,
+                            items: [
+                                {
+                                    xtype: 'label',
+                                    text: NS.i18n.quarters,
+                                    cls: 'ns-label-period-heading'
+                                },
+                                {
+                                    xtype: 'checkbox',
+                                    relativePeriodId: 'THIS_QUARTER',
+                                    boxLabel: NS.i18n.this_quarter
+                                },
+                                {
+                                    xtype: 'checkbox',
+                                    relativePeriodId: 'LAST_QUARTER',
+                                    boxLabel: NS.i18n.last_quarter
+                                },
+                                {
+                                    xtype: 'checkbox',
+                                    relativePeriodId: 'LAST_4_QUARTERS',
+                                    boxLabel: NS.i18n.last_4_quarters
+                                }
+                            ]
+                        },
+                        {
+                            xtype: 'panel',
+                            //columnWidth: 0.35,
+                            bodyStyle: 'border-style:none; padding:5px 0 0 8px',
+                            defaults: relativePeriodDefaults,
+                            items: [
+                                {
+                                    xtype: 'label',
+                                    text: NS.i18n.years,
+                                    cls: 'ns-label-period-heading'
+                                },
+                                {
+                                    xtype: 'checkbox',
+                                    relativePeriodId: 'THIS_YEAR',
+                                    boxLabel: NS.i18n.this_year
+                                },
+                                {
+                                    xtype: 'checkbox',
+                                    relativePeriodId: 'LAST_YEAR',
+                                    boxLabel: NS.i18n.last_year
+                                },
+                                {
+                                    xtype: 'checkbox',
+                                    relativePeriodId: 'LAST_5_YEARS',
+                                    boxLabel: NS.i18n.last_5_years
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    xtype: 'container',
                     columnWidth: 0.33,
-					bodyStyle: 'border-style:none',
-					items: [
-						{
-							xtype: 'panel',
-							//columnWidth: 0.33,
-							bodyStyle: 'border-style:none',
-							defaults: relativePeriodDefaults,
-							items: [
-								{
-									xtype: 'label',
-									text: NS.i18n.months,
-									cls: 'ns-label-period-heading'
-								},
-								{
-									xtype: 'checkbox',
-									relativePeriodId: 'THIS_MONTH',
-									boxLabel: NS.i18n.this_month
-								},
-								{
-									xtype: 'checkbox',
-									relativePeriodId: 'LAST_MONTH',
-									boxLabel: NS.i18n.last_month
-								},
-								{
-									xtype: 'checkbox',
-									relativePeriodId: 'LAST_3_MONTHS',
-									boxLabel: NS.i18n.last_3_months
-								},
-								{
-									xtype: 'checkbox',
-									relativePeriodId: 'LAST_6_MONTHS',
-									boxLabel: NS.i18n.last_6_months
-								},
-								{
-									xtype: 'checkbox',
-									relativePeriodId: 'LAST_12_MONTHS',
-									boxLabel: NS.i18n.last_12_months
-								}
-							]
-						},
-						{
-							xtype: 'panel',
-							//columnWidth: 0.33,
-							bodyStyle: 'border-style:none; padding:5px 0 0',
-							defaults: relativePeriodDefaults,
-							items: [
-								{
-									xtype: 'label',
-									text: NS.i18n.sixmonths,
-									cls: 'ns-label-period-heading'
-								},
-								{
-									xtype: 'checkbox',
-									relativePeriodId: 'THIS_SIX_MONTH',
-									boxLabel: NS.i18n.this_sixmonth
-								},
-								{
-									xtype: 'checkbox',
-									relativePeriodId: 'LAST_SIX_MONTH',
-									boxLabel: NS.i18n.last_sixmonth
-								},
-								{
-									xtype: 'checkbox',
-									relativePeriodId: 'LAST_2_SIXMONTHS',
-									boxLabel: NS.i18n.last_2_sixmonths
-								}
-							]
-						}
-					]
-				},
-				{
-					xtype: 'container',
+                    bodyStyle: 'border-style:none',
+                    items: [
+                        {
+                            xtype: 'panel',
+                            //columnWidth: 0.33,
+                            bodyStyle: 'border-style:none',
+                            defaults: relativePeriodDefaults,
+                            items: [
+                                {
+                                    xtype: 'label',
+                                    text: NS.i18n.months,
+                                    cls: 'ns-label-period-heading'
+                                },
+                                {
+                                    xtype: 'checkbox',
+                                    relativePeriodId: 'THIS_MONTH',
+                                    boxLabel: NS.i18n.this_month
+                                },
+                                {
+                                    xtype: 'checkbox',
+                                    relativePeriodId: 'LAST_MONTH',
+                                    boxLabel: NS.i18n.last_month
+                                },
+                                {
+                                    xtype: 'checkbox',
+                                    relativePeriodId: 'LAST_3_MONTHS',
+                                    boxLabel: NS.i18n.last_3_months
+                                },
+                                {
+                                    xtype: 'checkbox',
+                                    relativePeriodId: 'LAST_6_MONTHS',
+                                    boxLabel: NS.i18n.last_6_months
+                                },
+                                {
+                                    xtype: 'checkbox',
+                                    relativePeriodId: 'LAST_12_MONTHS',
+                                    boxLabel: NS.i18n.last_12_months
+                                }
+                            ]
+                        },
+                        {
+                            xtype: 'panel',
+                            //columnWidth: 0.33,
+                            bodyStyle: 'border-style:none; padding:5px 0 0',
+                            defaults: relativePeriodDefaults,
+                            items: [
+                                {
+                                    xtype: 'label',
+                                    text: NS.i18n.sixmonths,
+                                    cls: 'ns-label-period-heading'
+                                },
+                                {
+                                    xtype: 'checkbox',
+                                    relativePeriodId: 'THIS_SIX_MONTH',
+                                    boxLabel: NS.i18n.this_sixmonth
+                                },
+                                {
+                                    xtype: 'checkbox',
+                                    relativePeriodId: 'LAST_SIX_MONTH',
+                                    boxLabel: NS.i18n.last_sixmonth
+                                },
+                                {
+                                    xtype: 'checkbox',
+                                    relativePeriodId: 'LAST_2_SIXMONTHS',
+                                    boxLabel: NS.i18n.last_2_sixmonths
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    xtype: 'container',
                     columnWidth: 0.33,
-					bodyStyle: 'border-style:none',
-					items: [
-						{
-							xtype: 'panel',
-							//columnWidth: 0.33,
-							bodyStyle: 'border-style:none',
+                    bodyStyle: 'border-style:none',
+                    items: [
+                        {
+                            xtype: 'panel',
+                            //columnWidth: 0.33,
+                            bodyStyle: 'border-style:none',
                             style: 'margin-bottom: 32px',
-							defaults: relativePeriodDefaults,
-							items: [
-								{
-									xtype: 'label',
-									text: NS.i18n.bimonths,
-									cls: 'ns-label-period-heading'
-								},
-								{
-									xtype: 'checkbox',
-									relativePeriodId: 'THIS_BIMONTH',
-									boxLabel: NS.i18n.this_bimonth
-								},
-								{
-									xtype: 'checkbox',
-									relativePeriodId: 'LAST_BIMONTH',
-									boxLabel: NS.i18n.last_bimonth
-								},
-								{
-									xtype: 'checkbox',
-									relativePeriodId: 'LAST_6_BIMONTHS',
-									boxLabel: NS.i18n.last_6_bimonths
-								}
-							]
-						},
-						{
-							xtype: 'panel',
-							//columnWidth: 0.33,
-							bodyStyle: 'border-style:none; padding:5px 0 0',
-							defaults: relativePeriodDefaults,
-							items: [
-								{
-									xtype: 'label',
-									text: NS.i18n.financial_years,
-									cls: 'ns-label-period-heading'
-								},
-								{
-									xtype: 'checkbox',
-									relativePeriodId: 'THIS_FINANCIAL_YEAR',
-									boxLabel: NS.i18n.this_financial_year
-								},
-								{
-									xtype: 'checkbox',
-									relativePeriodId: 'LAST_FINANCIAL_YEAR',
-									boxLabel: NS.i18n.last_financial_year
-								},
-								{
-									xtype: 'checkbox',
-									relativePeriodId: 'LAST_5_FINANCIAL_YEARS',
-									boxLabel: NS.i18n.last_5_financial_years
-								}
-							]
-						}
-					]
-				}
-			]
-		};
+                            defaults: relativePeriodDefaults,
+                            items: [
+                                {
+                                    xtype: 'label',
+                                    text: NS.i18n.bimonths,
+                                    cls: 'ns-label-period-heading'
+                                },
+                                {
+                                    xtype: 'checkbox',
+                                    relativePeriodId: 'THIS_BIMONTH',
+                                    boxLabel: NS.i18n.this_bimonth
+                                },
+                                {
+                                    xtype: 'checkbox',
+                                    relativePeriodId: 'LAST_BIMONTH',
+                                    boxLabel: NS.i18n.last_bimonth
+                                },
+                                {
+                                    xtype: 'checkbox',
+                                    relativePeriodId: 'LAST_6_BIMONTHS',
+                                    boxLabel: NS.i18n.last_6_bimonths
+                                }
+                            ]
+                        },
+                        {
+                            xtype: 'panel',
+                            //columnWidth: 0.33,
+                            bodyStyle: 'border-style:none; padding:5px 0 0',
+                            defaults: relativePeriodDefaults,
+                            items: [
+                                {
+                                    xtype: 'label',
+                                    text: NS.i18n.financial_years,
+                                    cls: 'ns-label-period-heading'
+                                },
+                                {
+                                    xtype: 'checkbox',
+                                    relativePeriodId: 'THIS_FINANCIAL_YEAR',
+                                    boxLabel: NS.i18n.this_financial_year
+                                },
+                                {
+                                    xtype: 'checkbox',
+                                    relativePeriodId: 'LAST_FINANCIAL_YEAR',
+                                    boxLabel: NS.i18n.last_financial_year
+                                },
+                                {
+                                    xtype: 'checkbox',
+                                    relativePeriodId: 'LAST_5_FINANCIAL_YEARS',
+                                    boxLabel: NS.i18n.last_5_financial_years
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
 
-		fixedPeriodAvailable = Ext.create('Ext.ux.form.MultiSelect', {
-			cls: 'ns-toolbar-multiselect-left',
-			width: (ns.core.conf.layout.west_fieldset_width - ns.core.conf.layout.west_width_padding) / 2,
-			height: 180,
-			valueField: 'id',
-			displayField: 'name',
-			store: fixedPeriodAvailableStore,
-			tbar: [
-				{
-					xtype: 'label',
-					text: NS.i18n.available,
-					cls: 'ns-toolbar-multiselect-left-label'
-				},
-				'->',
-				{
-					xtype: 'button',
-					icon: 'images/arrowright.png',
-					width: 22,
-					handler: function() {
-						ns.core.web.multiSelect.select(fixedPeriodAvailable, fixedPeriodSelected);
-					}
-				},
-				{
-					xtype: 'button',
-					icon: 'images/arrowrightdouble.png',
-					width: 22,
-					handler: function() {
-						ns.core.web.multiSelect.selectAll(fixedPeriodAvailable, fixedPeriodSelected, true);
-					}
-				},
-				' '
-			],
-			listeners: {
-				afterrender: function() {
-					this.boundList.on('itemdblclick', function() {
-						ns.core.web.multiSelect.select(fixedPeriodAvailable, fixedPeriodSelected);
-					}, this);
-				}
-			}
-		});
+        fixedPeriodAvailable = Ext.create('Ext.ux.form.MultiSelect', {
+            cls: 'ns-toolbar-multiselect-left',
+            width: (ns.core.conf.layout.west_fieldset_width - ns.core.conf.layout.west_width_padding) / 2,
+            height: 180,
+            valueField: 'id',
+            displayField: 'name',
+            store: fixedPeriodAvailableStore,
+            tbar: [
+                {
+                    xtype: 'label',
+                    text: NS.i18n.available,
+                    cls: 'ns-toolbar-multiselect-left-label'
+                },
+                '->',
+                {
+                    xtype: 'button',
+                    icon: 'images/arrowright.png',
+                    width: 22,
+                    handler: function() {
+                        ns.core.web.multiSelect.select(fixedPeriodAvailable, fixedPeriodSelected);
+                    }
+                },
+                {
+                    xtype: 'button',
+                    icon: 'images/arrowrightdouble.png',
+                    width: 22,
+                    handler: function() {
+                        ns.core.web.multiSelect.selectAll(fixedPeriodAvailable, fixedPeriodSelected, true);
+                    }
+                },
+                ' '
+            ],
+            listeners: {
+                afterrender: function() {
+                    this.boundList.on('itemdblclick', function() {
+                        ns.core.web.multiSelect.select(fixedPeriodAvailable, fixedPeriodSelected);
+                    }, this);
+                }
+            }
+        });
 
-		fixedPeriodSelected = Ext.create('Ext.ux.form.MultiSelect', {
-			cls: 'ns-toolbar-multiselect-right',
-			width: (ns.core.conf.layout.west_fieldset_width - ns.core.conf.layout.west_width_padding) / 2,
-			height: 180,
-			valueField: 'id',
-			displayField: 'name',
-			ddReorder: true,
-			store: fixedPeriodSelectedStore,
-			tbar: [
-				' ',
-				{
-					xtype: 'button',
-					icon: 'images/arrowleftdouble.png',
-					width: 22,
-					handler: function() {
-						ns.core.web.multiSelect.unselectAll(fixedPeriodAvailable, fixedPeriodSelected);
-					}
-				},
-				{
-					xtype: 'button',
-					icon: 'images/arrowleft.png',
-					width: 22,
-					handler: function() {
-						ns.core.web.multiSelect.unselect(fixedPeriodAvailable, fixedPeriodSelected);
-					}
-				},
-				'->',
-				{
-					xtype: 'label',
-					text: NS.i18n.selected,
-					cls: 'ns-toolbar-multiselect-right-label'
-				}
-			],
-			listeners: {
-				afterrender: function() {
-					this.boundList.on('itemdblclick', function() {
-						ns.core.web.multiSelect.unselect(fixedPeriodAvailable, fixedPeriodSelected);
-					}, this);
-				}
-			}
-		});
+        fixedPeriodSelected = Ext.create('Ext.ux.form.MultiSelect', {
+            cls: 'ns-toolbar-multiselect-right',
+            width: (ns.core.conf.layout.west_fieldset_width - ns.core.conf.layout.west_width_padding) / 2,
+            height: 180,
+            valueField: 'id',
+            displayField: 'name',
+            ddReorder: true,
+            store: fixedPeriodSelectedStore,
+            tbar: [
+                ' ',
+                {
+                    xtype: 'button',
+                    icon: 'images/arrowleftdouble.png',
+                    width: 22,
+                    handler: function() {
+                        ns.core.web.multiSelect.unselectAll(fixedPeriodAvailable, fixedPeriodSelected);
+                    }
+                },
+                {
+                    xtype: 'button',
+                    icon: 'images/arrowleft.png',
+                    width: 22,
+                    handler: function() {
+                        ns.core.web.multiSelect.unselect(fixedPeriodAvailable, fixedPeriodSelected);
+                    }
+                },
+                '->',
+                {
+                    xtype: 'label',
+                    text: NS.i18n.selected,
+                    cls: 'ns-toolbar-multiselect-right-label'
+                }
+            ],
+            listeners: {
+                afterrender: function() {
+                    this.boundList.on('itemdblclick', function() {
+                        ns.core.web.multiSelect.unselect(fixedPeriodAvailable, fixedPeriodSelected);
+                    }, this);
+                }
+            }
+        });
 
         onPeriodTypeSelect = function() {
             var type = periodType.getValue(),
@@ -3061,135 +3061,135 @@ Ext.onReady( function() {
             }
         });
 
-		period = {
-			xtype: 'panel',
-			title: '<div class="ns-panel-title-period">Periods</div>',
-			hideCollapseTool: true,
+        period = {
+            xtype: 'panel',
+            title: '<div class="ns-panel-title-period">Periods</div>',
+            hideCollapseTool: true,
             dimension: dimConf.period.objectName,
-			checkboxes: [],
-			getDimension: function() {
-				var config = {
-						dimension: dimConf.period.objectName,
-						items: []
-					};
+            checkboxes: [],
+            getDimension: function() {
+                var config = {
+                        dimension: dimConf.period.objectName,
+                        items: []
+                    };
 
-				fixedPeriodSelectedStore.each( function(r) {
-					config.items.push({
-						id: r.data.id,
-						name: r.data.name
-					});
-				});
+                fixedPeriodSelectedStore.each( function(r) {
+                    config.items.push({
+                        id: r.data.id,
+                        name: r.data.name
+                    });
+                });
 
-				for (var i = 0; i < this.checkboxes.length; i++) {
-					if (this.checkboxes[i].getValue()) {
-						config.items.push({
-							id: this.checkboxes[i].relativePeriodId,
-							name: ''
-						});
-					}
-				}
+                for (var i = 0; i < this.checkboxes.length; i++) {
+                    if (this.checkboxes[i].getValue()) {
+                        config.items.push({
+                            id: this.checkboxes[i].relativePeriodId,
+                            name: ''
+                        });
+                    }
+                }
 
-				return config.items.length ? config : null;
-			},
-			onExpand: function() {
-				var h = ns.app.westRegion.hasScrollbar ?
-					ns.core.conf.layout.west_scrollbarheight_accordion_period : ns.core.conf.layout.west_maxheight_accordion_period;
-				accordion.setThisHeight(h);
-				ns.core.web.multiSelect.setHeight(
-					[fixedPeriodAvailable, fixedPeriodSelected],
-					this,
-					ns.core.conf.layout.west_fill_accordion_period
-				);
-			},
-			resetRelativePeriods: function() {
-				var a = this.checkboxes;
-				for (var i = 0; i < a.length; i++) {
-					a[i].setValue(false);
-				}
-			},
-			isNoRelativePeriods: function() {
-				var a = this.checkboxes;
-				for (var i = 0; i < a.length; i++) {
-					if (a[i].getValue()) {
-						return false;
-					}
-				}
-				return true;
-			},
-			items: [
-				{
-					xtype: 'panel',
-					layout: 'column',
-					bodyStyle: 'border-style:none',
-					style: 'margin-top:0px',
-					items: [
+                return config.items.length ? config : null;
+            },
+            onExpand: function() {
+                var h = ns.app.westRegion.hasScrollbar ?
+                    ns.core.conf.layout.west_scrollbarheight_accordion_period : ns.core.conf.layout.west_maxheight_accordion_period;
+                accordion.setThisHeight(h);
+                ns.core.web.multiSelect.setHeight(
+                    [fixedPeriodAvailable, fixedPeriodSelected],
+                    this,
+                    ns.core.conf.layout.west_fill_accordion_period
+                );
+            },
+            resetRelativePeriods: function() {
+                var a = this.checkboxes;
+                for (var i = 0; i < a.length; i++) {
+                    a[i].setValue(false);
+                }
+            },
+            isNoRelativePeriods: function() {
+                var a = this.checkboxes;
+                for (var i = 0; i < a.length; i++) {
+                    if (a[i].getValue()) {
+                        return false;
+                    }
+                }
+                return true;
+            },
+            items: [
+                {
+                    xtype: 'panel',
+                    layout: 'column',
+                    bodyStyle: 'border-style:none',
+                    style: 'margin-top:0px',
+                    items: [
                         periodType,
-						{
-							xtype: 'button',
-							text: NS.i18n.prev_year,
-							style: 'margin-left:1px; border-radius:2px',
-							height: 24,
+                        {
+                            xtype: 'button',
+                            text: NS.i18n.prev_year,
+                            style: 'margin-left:1px; border-radius:2px',
+                            height: 24,
                             width: 62,
-							handler: function() {
-								if (periodType.getValue()) {
-									periodType.periodOffset--;
+                            handler: function() {
+                                if (periodType.getValue()) {
+                                    periodType.periodOffset--;
                                     onPeriodTypeSelect();
-								}
-							}
-						},
-						{
-							xtype: 'button',
-							text: NS.i18n.next_year,
-							style: 'margin-left:1px; border-radius:2px',
-							height: 24,
+                                }
+                            }
+                        },
+                        {
+                            xtype: 'button',
+                            text: NS.i18n.next_year,
+                            style: 'margin-left:1px; border-radius:2px',
+                            height: 24,
                             width: 62,
-							handler: function() {
-								if (periodType.getValue()) {
-									periodType.periodOffset++;
+                            handler: function() {
+                                if (periodType.getValue()) {
+                                    periodType.periodOffset++;
                                     onPeriodTypeSelect();
-								}
-							}
-						}
-					]
-				},
-				{
-					xtype: 'panel',
-					layout: 'column',
-					bodyStyle: 'border-style:none; padding-bottom:2px',
-					items: [
-						fixedPeriodAvailable,
-						fixedPeriodSelected
-					]
-				},
-				relativePeriod
-			],
-			listeners: {
-				added: function() {
-					accordionPanels.push(this);
-				},
-				expand: function(p) {
-					p.onExpand();
-				}
-			}
-		};
+                                }
+                            }
+                        }
+                    ]
+                },
+                {
+                    xtype: 'panel',
+                    layout: 'column',
+                    bodyStyle: 'border-style:none; padding-bottom:2px',
+                    items: [
+                        fixedPeriodAvailable,
+                        fixedPeriodSelected
+                    ]
+                },
+                relativePeriod
+            ],
+            listeners: {
+                added: function() {
+                    accordionPanels.push(this);
+                },
+                expand: function(p) {
+                    p.onExpand();
+                }
+            }
+        };
 
-		// organisation unit
+        // organisation unit
 
-		treePanel = Ext.create('Ext.tree.Panel', {
-			cls: 'ns-tree',
-			style: 'border-top: 1px solid #ddd; padding-top: 1px',
-			width: ns.core.conf.layout.west_fieldset_width - ns.core.conf.layout.west_width_padding,
-			displayField: 'name',
-			rootVisible: false,
-			autoScroll: true,
-			multiSelect: true,
-			rendered: false,
-			reset: function() {
-				var rootNode = this.getRootNode().findChild('id', ns.core.init.rootNodes[0].id);
-				this.collapseAll();
-				this.expandPath(rootNode.getPath());
-				this.getSelectionModel().select(rootNode);
-			},
+        treePanel = Ext.create('Ext.tree.Panel', {
+            cls: 'ns-tree',
+            style: 'border-top: 1px solid #ddd; padding-top: 1px',
+            width: ns.core.conf.layout.west_fieldset_width - ns.core.conf.layout.west_width_padding,
+            displayField: 'name',
+            rootVisible: false,
+            autoScroll: true,
+            multiSelect: true,
+            rendered: false,
+            reset: function() {
+                var rootNode = this.getRootNode().findChild('id', ns.core.init.rootNodes[0].id);
+                this.collapseAll();
+                this.expandPath(rootNode.getPath());
+                this.getSelectionModel().select(rootNode);
+            },
             selectRoot: function() {
                 var node = this.getRootNode().findChild('id', ns.core.init.rootNodes[0].id);
 
@@ -3199,39 +3199,39 @@ Ext.onReady( function() {
                 return node;
             },
             selectRootIf: function() {
-				if (this.getSelectionModel().getSelection().length < 1) {
+                if (this.getSelectionModel().getSelection().length < 1) {
                     this.selectRoot();
-				}
-			},
-			isPending: false,
-			recordsToSelect: [],
-			recordsToRestore: [],
-			multipleSelectIf: function(map, doUpdate) {
-				if (this.recordsToSelect.length === ns.core.support.prototype.object.getLength(map)) {
-					this.getSelectionModel().select(this.recordsToSelect);
-					this.recordsToSelect = [];
-					this.isPending = false;
+                }
+            },
+            isPending: false,
+            recordsToSelect: [],
+            recordsToRestore: [],
+            multipleSelectIf: function(map, doUpdate) {
+                if (this.recordsToSelect.length === ns.core.support.prototype.object.getLength(map)) {
+                    this.getSelectionModel().select(this.recordsToSelect);
+                    this.recordsToSelect = [];
+                    this.isPending = false;
 
-					if (doUpdate) {
-						update();
-					}
-				}
-			},
-			multipleExpand: function(id, map, doUpdate) {
-				var that = this,
-					rootId = ns.core.conf.finals.root.id,
-					path = map[id];
+                    if (doUpdate) {
+                        update();
+                    }
+                }
+            },
+            multipleExpand: function(id, map, doUpdate) {
+                var that = this,
+                    rootId = ns.core.conf.finals.root.id,
+                    path = map[id];
 
-				if (path.substr(0, rootId.length + 1) !== ('/' + rootId)) {
-					path = '/' + rootId + path;
-				}
+                if (path.substr(0, rootId.length + 1) !== ('/' + rootId)) {
+                    path = '/' + rootId + path;
+                }
 
-				that.expandPath(path, 'id', '/', function() {
-					record = Ext.clone(that.getRootNode().findChild('id', id, true));
-					that.recordsToSelect.push(record);
-					that.multipleSelectIf(map, doUpdate);
-				});
-			},
+                that.expandPath(path, 'id', '/', function() {
+                    record = Ext.clone(that.getRootNode().findChild('id', id, true));
+                    that.recordsToSelect.push(record);
+                    that.multipleSelectIf(map, doUpdate);
+                });
+            },
             select: function(url, params) {
                 if (!params) {
                     params = {};
@@ -3250,36 +3250,36 @@ Ext.onReady( function() {
                     }
                 });
             },
-			getParentGraphMap: function() {
-				var selection = this.getSelectionModel().getSelection(),
-					map = {};
+            getParentGraphMap: function() {
+                var selection = this.getSelectionModel().getSelection(),
+                    map = {};
 
-				if (Ext.isArray(selection) && selection.length) {
-					for (var i = 0, pathArray, key; i < selection.length; i++) {
-						pathArray = selection[i].getPath().split('/');
-						map[pathArray.pop()] = pathArray.join('/');
-					}
-				}
+                if (Ext.isArray(selection) && selection.length) {
+                    for (var i = 0, pathArray, key; i < selection.length; i++) {
+                        pathArray = selection[i].getPath().split('/');
+                        map[pathArray.pop()] = pathArray.join('/');
+                    }
+                }
 
-				return map;
-			},
-			selectGraphMap: function(map, update) {
-				if (!ns.core.support.prototype.object.getLength(map)) {
+                return map;
+            },
+            selectGraphMap: function(map, update) {
+                if (!ns.core.support.prototype.object.getLength(map)) {
                     this.selectRootIf();
-					return;
-				}
+                    return;
+                }
 
-				this.isPending = true;
+                this.isPending = true;
 
-				for (var key in map) {
-					if (map.hasOwnProperty(key)) {
-						treePanel.multipleExpand(key, map, update);
-					}
-				}
-			},
-			store: Ext.create('Ext.data.TreeStore', {
-				fields: ['id', 'name', 'hasChildren'],
-				proxy: function() {
+                for (var key in map) {
+                    if (map.hasOwnProperty(key)) {
+                        treePanel.multipleExpand(key, map, update);
+                    }
+                }
+            },
+            store: Ext.create('Ext.data.TreeStore', {
+                fields: ['id', 'name', 'hasChildren'],
+                proxy: function() {
                     var auth = ns.ajax(null, null, true),
                         proxy = {
                             type: 'ajax',
@@ -3303,320 +3303,320 @@ Ext.onReady( function() {
 
                     return proxy;
                 }(),
-				sorters: [{
-					property: 'name',
-					direction: 'ASC'
-				}],
-				root: {
-					id: ns.core.conf.finals.root.id,
-					expanded: true,
-					children: ns.core.init.rootNodes
-				},
-				listeners: {
-					load: function(store, node, records) {
-						Ext.Array.each(records, function(record) {
+                sorters: [{
+                    property: 'name',
+                    direction: 'ASC'
+                }],
+                root: {
+                    id: ns.core.conf.finals.root.id,
+                    expanded: true,
+                    children: ns.core.init.rootNodes
+                },
+                listeners: {
+                    load: function(store, node, records) {
+                        Ext.Array.each(records, function(record) {
                             if (Ext.isBoolean(record.data.hasChildren)) {
                                 record.set('leaf', !record.data.hasChildren);
                             }
                         });
-					}
-				}
-			}),
-			xable: function(values) {
-				for (var i = 0; i < values.length; i++) {
-					if (!!values[i]) {
-						this.disable();
-						return;
-					}
-				}
+                    }
+                }
+            }),
+            xable: function(values) {
+                for (var i = 0; i < values.length; i++) {
+                    if (!!values[i]) {
+                        this.disable();
+                        return;
+                    }
+                }
 
-				this.enable();
-			},
-			listeners: {
-				beforeitemexpand: function() {
-					if (!treePanel.isPending) {
-						treePanel.recordsToRestore = treePanel.getSelectionModel().getSelection();
-					}
-				},
-				itemexpand: function() {
-					if (!treePanel.isPending && treePanel.recordsToRestore.length) {
-						treePanel.getSelectionModel().select(treePanel.recordsToRestore);
-						treePanel.recordsToRestore = [];
-					}
-				},
-				render: function() {
-					this.rendered = true;
-				},
-				afterrender: function() {
-					this.getSelectionModel().select(0);
-				},
-				itemcontextmenu: function(v, r, h, i, e) {
-					v.getSelectionModel().select(r, false);
+                this.enable();
+            },
+            listeners: {
+                beforeitemexpand: function() {
+                    if (!treePanel.isPending) {
+                        treePanel.recordsToRestore = treePanel.getSelectionModel().getSelection();
+                    }
+                },
+                itemexpand: function() {
+                    if (!treePanel.isPending && treePanel.recordsToRestore.length) {
+                        treePanel.getSelectionModel().select(treePanel.recordsToRestore);
+                        treePanel.recordsToRestore = [];
+                    }
+                },
+                render: function() {
+                    this.rendered = true;
+                },
+                afterrender: function() {
+                    this.getSelectionModel().select(0);
+                },
+                itemcontextmenu: function(v, r, h, i, e) {
+                    v.getSelectionModel().select(r, false);
 
-					if (v.menu) {
-						v.menu.destroy();
-					}
-					v.menu = Ext.create('Ext.menu.Menu', {
-						id: 'treepanel-contextmenu',
-						showSeparator: false,
-						shadow: false
-					});
-					if (!r.data.leaf) {
-						v.menu.add({
-							id: 'treepanel-contextmenu-item',
-							text: NS.i18n.select_sub_units,
-							icon: 'images/node-select-child.png',
-							handler: function() {
-								r.expand(false, function() {
-									v.getSelectionModel().select(r.childNodes, true);
-									v.getSelectionModel().deselect(r);
-								});
-							}
-						});
-					}
-					else {
-						return;
-					}
+                    if (v.menu) {
+                        v.menu.destroy();
+                    }
+                    v.menu = Ext.create('Ext.menu.Menu', {
+                        id: 'treepanel-contextmenu',
+                        showSeparator: false,
+                        shadow: false
+                    });
+                    if (!r.data.leaf) {
+                        v.menu.add({
+                            id: 'treepanel-contextmenu-item',
+                            text: NS.i18n.select_sub_units,
+                            icon: 'images/node-select-child.png',
+                            handler: function() {
+                                r.expand(false, function() {
+                                    v.getSelectionModel().select(r.childNodes, true);
+                                    v.getSelectionModel().deselect(r);
+                                });
+                            }
+                        });
+                    }
+                    else {
+                        return;
+                    }
 
-					v.menu.showAt(e.xy);
-				}
-			}
-		});
+                    v.menu.showAt(e.xy);
+                }
+            }
+        });
 
-		userOrganisationUnit = Ext.create('Ext.form.field.Checkbox', {
-			columnWidth: 0.25,
-			style: 'padding-top: 3px; padding-left: 5px; margin-bottom: 0',
-			boxLabel: NS.i18n.user_organisation_unit,
-			labelWidth: ns.core.conf.layout.form_label_width,
-			handler: function(chb, checked) {
-				treePanel.xable([checked, userOrganisationUnitChildren.getValue(), userOrganisationUnitGrandChildren.getValue()]);
-			}
-		});
+        userOrganisationUnit = Ext.create('Ext.form.field.Checkbox', {
+            columnWidth: 0.25,
+            style: 'padding-top: 3px; padding-left: 5px; margin-bottom: 0',
+            boxLabel: NS.i18n.user_organisation_unit,
+            labelWidth: ns.core.conf.layout.form_label_width,
+            handler: function(chb, checked) {
+                treePanel.xable([checked, userOrganisationUnitChildren.getValue(), userOrganisationUnitGrandChildren.getValue()]);
+            }
+        });
 
-		userOrganisationUnitChildren = Ext.create('Ext.form.field.Checkbox', {
-			columnWidth: 0.26,
-			style: 'padding-top: 3px; margin-bottom: 0',
-			boxLabel: NS.i18n.user_sub_units,
-			labelWidth: ns.core.conf.layout.form_label_width,
-			handler: function(chb, checked) {
-				treePanel.xable([checked, userOrganisationUnit.getValue(), userOrganisationUnitGrandChildren.getValue()]);
-			}
-		});
+        userOrganisationUnitChildren = Ext.create('Ext.form.field.Checkbox', {
+            columnWidth: 0.26,
+            style: 'padding-top: 3px; margin-bottom: 0',
+            boxLabel: NS.i18n.user_sub_units,
+            labelWidth: ns.core.conf.layout.form_label_width,
+            handler: function(chb, checked) {
+                treePanel.xable([checked, userOrganisationUnit.getValue(), userOrganisationUnitGrandChildren.getValue()]);
+            }
+        });
 
-		userOrganisationUnitGrandChildren = Ext.create('Ext.form.field.Checkbox', {
-			columnWidth: 0.4,
-			style: 'padding-top: 3px; margin-bottom: 0',
-			boxLabel: NS.i18n.user_sub_x2_units,
-			labelWidth: ns.core.conf.layout.form_label_width,
-			handler: function(chb, checked) {
-				treePanel.xable([checked, userOrganisationUnit.getValue(), userOrganisationUnitChildren.getValue()]);
-			}
-		});
+        userOrganisationUnitGrandChildren = Ext.create('Ext.form.field.Checkbox', {
+            columnWidth: 0.4,
+            style: 'padding-top: 3px; margin-bottom: 0',
+            boxLabel: NS.i18n.user_sub_x2_units,
+            labelWidth: ns.core.conf.layout.form_label_width,
+            handler: function(chb, checked) {
+                treePanel.xable([checked, userOrganisationUnit.getValue(), userOrganisationUnitChildren.getValue()]);
+            }
+        });
 
-		organisationUnitLevel = Ext.create('Ext.form.field.ComboBox', {
-			cls: 'ns-combo',
-			multiSelect: true,
-			style: 'margin-bottom:0',
-			width: ns.core.conf.layout.west_fieldset_width - ns.core.conf.layout.west_width_padding - 37,
-			valueField: 'level',
-			displayField: 'name',
-			emptyText: NS.i18n.select_organisation_unit_levels,
-			editable: false,
-			hidden: true,
-			store: organisationUnitLevelStore
-		});
+        organisationUnitLevel = Ext.create('Ext.form.field.ComboBox', {
+            cls: 'ns-combo',
+            multiSelect: true,
+            style: 'margin-bottom:0',
+            width: ns.core.conf.layout.west_fieldset_width - ns.core.conf.layout.west_width_padding - 37,
+            valueField: 'level',
+            displayField: 'name',
+            emptyText: NS.i18n.select_organisation_unit_levels,
+            editable: false,
+            hidden: true,
+            store: organisationUnitLevelStore
+        });
 
-		organisationUnitGroup = Ext.create('Ext.form.field.ComboBox', {
-			cls: 'ns-combo',
-			multiSelect: true,
-			style: 'margin-bottom:0',
-			width: ns.core.conf.layout.west_fieldset_width - ns.core.conf.layout.west_width_padding - 37,
-			valueField: 'id',
-			displayField: 'name',
-			emptyText: NS.i18n.select_organisation_unit_groups,
-			editable: false,
-			hidden: true,
-			store: organisationUnitGroupStore
-		});
+        organisationUnitGroup = Ext.create('Ext.form.field.ComboBox', {
+            cls: 'ns-combo',
+            multiSelect: true,
+            style: 'margin-bottom:0',
+            width: ns.core.conf.layout.west_fieldset_width - ns.core.conf.layout.west_width_padding - 37,
+            valueField: 'id',
+            displayField: 'name',
+            emptyText: NS.i18n.select_organisation_unit_groups,
+            editable: false,
+            hidden: true,
+            store: organisationUnitGroupStore
+        });
 
-		toolMenu = Ext.create('Ext.menu.Menu', {
-			shadow: false,
-			showSeparator: false,
-			menuValue: 'orgunit',
-			clickHandler: function(param) {
-				if (!param) {
-					return;
-				}
+        toolMenu = Ext.create('Ext.menu.Menu', {
+            shadow: false,
+            showSeparator: false,
+            menuValue: 'orgunit',
+            clickHandler: function(param) {
+                if (!param) {
+                    return;
+                }
 
-				var items = this.items.items;
-				this.menuValue = param;
+                var items = this.items.items;
+                this.menuValue = param;
 
-				// Menu item icon cls
-				for (var i = 0; i < items.length; i++) {
-					if (items[i].setIconCls) {
-						if (items[i].param === param) {
-							items[i].setIconCls('ns-menu-item-selected');
-						}
-						else {
-							items[i].setIconCls('ns-menu-item-unselected');
-						}
-					}
-				}
+                // Menu item icon cls
+                for (var i = 0; i < items.length; i++) {
+                    if (items[i].setIconCls) {
+                        if (items[i].param === param) {
+                            items[i].setIconCls('ns-menu-item-selected');
+                        }
+                        else {
+                            items[i].setIconCls('ns-menu-item-unselected');
+                        }
+                    }
+                }
 
-				// Gui
-				if (param === 'orgunit') {
-					userOrganisationUnit.show();
-					userOrganisationUnitChildren.show();
-					userOrganisationUnitGrandChildren.show();
-					organisationUnitLevel.hide();
-					organisationUnitGroup.hide();
+                // Gui
+                if (param === 'orgunit') {
+                    userOrganisationUnit.show();
+                    userOrganisationUnitChildren.show();
+                    userOrganisationUnitGrandChildren.show();
+                    organisationUnitLevel.hide();
+                    organisationUnitGroup.hide();
 
-					if (userOrganisationUnit.getValue() || userOrganisationUnitChildren.getValue()) {
-						treePanel.disable();
-					}
-				}
-				else if (param === 'level') {
-					userOrganisationUnit.hide();
-					userOrganisationUnitChildren.hide();
-					userOrganisationUnitGrandChildren.hide();
-					organisationUnitLevel.show();
-					organisationUnitGroup.hide();
-					treePanel.enable();
-				}
-				else if (param === 'group') {
-					userOrganisationUnit.hide();
-					userOrganisationUnitChildren.hide();
-					userOrganisationUnitGrandChildren.hide();
-					organisationUnitLevel.hide();
-					organisationUnitGroup.show();
-					treePanel.enable();
-				}
-			},
-			items: [
-				{
-					xtype: 'label',
-					text: 'Selection mode',
-					style: 'padding:7px 5px 5px 7px; font-weight:bold; border:0 none'
-				},
-				{
-					text: NS.i18n.select_organisation_units + '&nbsp;&nbsp;',
-					param: 'orgunit',
-					iconCls: 'ns-menu-item-selected'
-				},
-				{
-					text: 'Select levels' + '&nbsp;&nbsp;',
-					param: 'level',
-					iconCls: 'ns-menu-item-unselected'
-				},
-				{
-					text: 'Select groups' + '&nbsp;&nbsp;',
-					param: 'group',
-					iconCls: 'ns-menu-item-unselected'
-				}
-			],
-			listeners: {
-				afterrender: function() {
-					this.getEl().addCls('ns-btn-menu');
-				},
-				click: function(menu, item) {
-					this.clickHandler(item.param);
-				}
-			}
-		});
+                    if (userOrganisationUnit.getValue() || userOrganisationUnitChildren.getValue()) {
+                        treePanel.disable();
+                    }
+                }
+                else if (param === 'level') {
+                    userOrganisationUnit.hide();
+                    userOrganisationUnitChildren.hide();
+                    userOrganisationUnitGrandChildren.hide();
+                    organisationUnitLevel.show();
+                    organisationUnitGroup.hide();
+                    treePanel.enable();
+                }
+                else if (param === 'group') {
+                    userOrganisationUnit.hide();
+                    userOrganisationUnitChildren.hide();
+                    userOrganisationUnitGrandChildren.hide();
+                    organisationUnitLevel.hide();
+                    organisationUnitGroup.show();
+                    treePanel.enable();
+                }
+            },
+            items: [
+                {
+                    xtype: 'label',
+                    text: 'Selection mode',
+                    style: 'padding:7px 5px 5px 7px; font-weight:bold; border:0 none'
+                },
+                {
+                    text: NS.i18n.select_organisation_units + '&nbsp;&nbsp;',
+                    param: 'orgunit',
+                    iconCls: 'ns-menu-item-selected'
+                },
+                {
+                    text: 'Select levels' + '&nbsp;&nbsp;',
+                    param: 'level',
+                    iconCls: 'ns-menu-item-unselected'
+                },
+                {
+                    text: 'Select groups' + '&nbsp;&nbsp;',
+                    param: 'group',
+                    iconCls: 'ns-menu-item-unselected'
+                }
+            ],
+            listeners: {
+                afterrender: function() {
+                    this.getEl().addCls('ns-btn-menu');
+                },
+                click: function(menu, item) {
+                    this.clickHandler(item.param);
+                }
+            }
+        });
 
-		tool = Ext.create('Ext.button.Button', {
-			cls: 'ns-button-organisationunitselection',
-			iconCls: 'ns-button-icon-gear',
-			width: 36,
-			height: 24,
-			menu: toolMenu
-		});
+        tool = Ext.create('Ext.button.Button', {
+            cls: 'ns-button-organisationunitselection',
+            iconCls: 'ns-button-icon-gear',
+            width: 36,
+            height: 24,
+            menu: toolMenu
+        });
 
-		toolPanel = Ext.create('Ext.panel.Panel', {
-			width: 36,
-			bodyStyle: 'border:0 none; text-align:right',
-			style: 'margin-right:1px',
-			items: tool
-		});
+        toolPanel = Ext.create('Ext.panel.Panel', {
+            width: 36,
+            bodyStyle: 'border:0 none; text-align:right',
+            style: 'margin-right:1px',
+            items: tool
+        });
 
-		organisationUnit = {
-			xtype: 'panel',
-			title: '<div class="ns-panel-title-organisationunit">' + NS.i18n.organisation_units + '</div>',
-			bodyStyle: 'padding:1px',
-			hideCollapseTool: true,
+        organisationUnit = {
+            xtype: 'panel',
+            title: '<div class="ns-panel-title-organisationunit">' + NS.i18n.organisation_units + '</div>',
+            bodyStyle: 'padding:1px',
+            hideCollapseTool: true,
             dimension: dimConf.organisationUnit.objectName,
-			collapsed: false,
-			getDimension: function() {
-				var r = treePanel.getSelectionModel().getSelection(),
-					config = {
-						dimension: ns.core.conf.finals.dimension.organisationUnit.objectName,
-						items: []
-					};
+            collapsed: false,
+            getDimension: function() {
+                var r = treePanel.getSelectionModel().getSelection(),
+                    config = {
+                        dimension: ns.core.conf.finals.dimension.organisationUnit.objectName,
+                        items: []
+                    };
 
-				if (toolMenu.menuValue === 'orgunit') {
-					if (userOrganisationUnit.getValue() || userOrganisationUnitChildren.getValue() || userOrganisationUnitGrandChildren.getValue()) {
-						if (userOrganisationUnit.getValue()) {
-							config.items.push({
-								id: 'USER_ORGUNIT',
-								name: ''
-							});
-						}
-						if (userOrganisationUnitChildren.getValue()) {
-							config.items.push({
-								id: 'USER_ORGUNIT_CHILDREN',
-								name: ''
-							});
-						}
-						if (userOrganisationUnitGrandChildren.getValue()) {
-							config.items.push({
-								id: 'USER_ORGUNIT_GRANDCHILDREN',
-								name: ''
-							});
-						}
-					}
-					else {
-						for (var i = 0; i < r.length; i++) {
-							config.items.push({id: r[i].data.id});
-						}
-					}
-				}
-				else if (toolMenu.menuValue === 'level') {
-					var levels = organisationUnitLevel.getValue();
+                if (toolMenu.menuValue === 'orgunit') {
+                    if (userOrganisationUnit.getValue() || userOrganisationUnitChildren.getValue() || userOrganisationUnitGrandChildren.getValue()) {
+                        if (userOrganisationUnit.getValue()) {
+                            config.items.push({
+                                id: 'USER_ORGUNIT',
+                                name: ''
+                            });
+                        }
+                        if (userOrganisationUnitChildren.getValue()) {
+                            config.items.push({
+                                id: 'USER_ORGUNIT_CHILDREN',
+                                name: ''
+                            });
+                        }
+                        if (userOrganisationUnitGrandChildren.getValue()) {
+                            config.items.push({
+                                id: 'USER_ORGUNIT_GRANDCHILDREN',
+                                name: ''
+                            });
+                        }
+                    }
+                    else {
+                        for (var i = 0; i < r.length; i++) {
+                            config.items.push({id: r[i].data.id});
+                        }
+                    }
+                }
+                else if (toolMenu.menuValue === 'level') {
+                    var levels = organisationUnitLevel.getValue();
 
-					for (var i = 0; i < levels.length; i++) {
-						config.items.push({
-							id: 'LEVEL-' + levels[i],
-							name: ''
-						});
-					}
+                    for (var i = 0; i < levels.length; i++) {
+                        config.items.push({
+                            id: 'LEVEL-' + levels[i],
+                            name: ''
+                        });
+                    }
 
-					for (var i = 0; i < r.length; i++) {
-						config.items.push({
-							id: r[i].data.id,
-							name: ''
-						});
-					}
-				}
-				else if (toolMenu.menuValue === 'group') {
-					var groupIds = organisationUnitGroup.getValue();
+                    for (var i = 0; i < r.length; i++) {
+                        config.items.push({
+                            id: r[i].data.id,
+                            name: ''
+                        });
+                    }
+                }
+                else if (toolMenu.menuValue === 'group') {
+                    var groupIds = organisationUnitGroup.getValue();
 
-					for (var i = 0; i < groupIds.length; i++) {
-						config.items.push({
-							id: 'OU_GROUP-' + groupIds[i],
-							name: ''
-						});
-					}
+                    for (var i = 0; i < groupIds.length; i++) {
+                        config.items.push({
+                            id: 'OU_GROUP-' + groupIds[i],
+                            name: ''
+                        });
+                    }
 
-					for (var i = 0; i < r.length; i++) {
-						config.items.push({
-							id: r[i].data.id,
-							name: ''
-						});
-					}
-				}
+                    for (var i = 0; i < r.length; i++) {
+                        config.items.push({
+                            id: r[i].data.id,
+                            name: ''
+                        });
+                    }
+                }
 
-				return config.items.length ? config : null;
-			},
+                return config.items.length ? config : null;
+            },
             onExpand: function() {
                 var h = ns.app.westRegion.hasScrollbar ?
                     ns.core.conf.layout.west_scrollbarheight_accordion_organisationunit : ns.core.conf.layout.west_maxheight_accordion_organisationunit;
@@ -3656,32 +3656,32 @@ Ext.onReady( function() {
             }
         };
 
-		// viewport
+        // viewport
 
-		update = function() {
-			var config = ns.core.web.report.getLayoutConfig(),
+        update = function() {
+            var config = ns.core.web.report.getLayoutConfig(),
                 layout = ns.core.api.layout.Layout(config);
 
-			if (!layout) {
-				return;
-			}
+            if (!layout) {
+                return;
+            }
 
-			ns.core.web.report.createReport(layout, false);
-		};
+            ns.core.web.report.createReport(layout, false);
+        };
 
-		accordionBody = Ext.create('Ext.panel.Panel', {
-			layout: 'accordion',
-			activeOnTop: true,
-			cls: 'ns-accordion',
-			bodyStyle: 'border:0 none; margin-bottom:2px',
-			height: 700,
-			items: function() {
-				var panels = [
+        accordionBody = Ext.create('Ext.panel.Panel', {
+            layout: 'accordion',
+            activeOnTop: true,
+            cls: 'ns-accordion',
+            bodyStyle: 'border:0 none; margin-bottom:2px',
+            height: 700,
+            items: function() {
+                var panels = [
                     data,
-					period,
-					organisationUnit
-				];
-				//dims = Ext.clone(ns.core.init.dimensions),
+                    period,
+                    organisationUnit
+                ];
+                //dims = Ext.clone(ns.core.init.dimensions),
                 //dimPanels = getDimensionPanels(dims, 'ns-panel-title-dimension');
 
                 //// idPanelMap
@@ -3692,246 +3692,246 @@ Ext.onReady( function() {
                 //}
 
                 //// panels
-				//panels = panels.concat(dimPanels);
+                //panels = panels.concat(dimPanels);
 
-				last = panels[panels.length - 1];
-				last.cls = 'ns-accordion-last';
+                last = panels[panels.length - 1];
+                last.cls = 'ns-accordion-last';
 
-				return panels;
-			}()
-		});
+                return panels;
+            }()
+        });
 
-		accordion = Ext.create('Ext.panel.Panel', {
-			bodyStyle: 'border-style:none; padding:1px; padding-bottom:0; overflow-y:scroll;',
-			items: accordionBody,
-			panels: accordionPanels,
-			setThisHeight: function(mx) {
-				var panelHeight = this.panels.length * 28,
-					height;
+        accordion = Ext.create('Ext.panel.Panel', {
+            bodyStyle: 'border-style:none; padding:1px; padding-bottom:0; overflow-y:scroll;',
+            items: accordionBody,
+            panels: accordionPanels,
+            setThisHeight: function(mx) {
+                var panelHeight = this.panels.length * 28,
+                    height;
 
-				if (westRegion.hasScrollbar) {
-					height = panelHeight + mx;
-					this.setHeight(viewport.getHeight() - 2);
-					accordionBody.setHeight(height - 2);
-				}
-				else {
-					height = westRegion.getHeight() - ns.core.conf.layout.west_fill;
-					mx += panelHeight;
-					accordion.setHeight((height > mx ? mx : height) - 2);
-					accordionBody.setHeight((height > mx ? mx : height) - 2);
-				}
-			},
-			getExpandedPanel: function() {
-				for (var i = 0, panel; i < this.panels.length; i++) {
-					if (!this.panels[i].collapsed) {
-						return this.panels[i];
-					}
-				}
+                if (westRegion.hasScrollbar) {
+                    height = panelHeight + mx;
+                    this.setHeight(viewport.getHeight() - 2);
+                    accordionBody.setHeight(height - 2);
+                }
+                else {
+                    height = westRegion.getHeight() - ns.core.conf.layout.west_fill;
+                    mx += panelHeight;
+                    accordion.setHeight((height > mx ? mx : height) - 2);
+                    accordionBody.setHeight((height > mx ? mx : height) - 2);
+                }
+            },
+            getExpandedPanel: function() {
+                for (var i = 0, panel; i < this.panels.length; i++) {
+                    if (!this.panels[i].collapsed) {
+                        return this.panels[i];
+                    }
+                }
 
-				return null;
-			},
-			getFirstPanel: function() {
-				return this.panels[0];
-			},
-			listeners: {
-				added: function() {
-					ns.app.accordion = this;
-				}
-			}
-		});
+                return null;
+            },
+            getFirstPanel: function() {
+                return this.panels[0];
+            },
+            listeners: {
+                added: function() {
+                    ns.app.accordion = this;
+                }
+            }
+        });
 
-		westRegion = Ext.create('Ext.panel.Panel', {
-			region: 'west',
-			preventHeader: true,
-			collapsible: true,
-			collapseMode: 'mini',
-			width: function() {
-				if (Ext.isWebKit) {
-					return ns.core.conf.layout.west_width + 8;
-				}
-				else {
-					if (Ext.isLinux && Ext.isGecko) {
-						return ns.core.conf.layout.west_width + 13;
-					}
-					return ns.core.conf.layout.west_width + 17;
-				}
-			}(),
-			items: accordion,
-			listeners: {
-				added: function() {
-					ns.app.westRegion = this;
-				}
-			}
-		});
+        westRegion = Ext.create('Ext.panel.Panel', {
+            region: 'west',
+            preventHeader: true,
+            collapsible: true,
+            collapseMode: 'mini',
+            width: function() {
+                if (Ext.isWebKit) {
+                    return ns.core.conf.layout.west_width + 8;
+                }
+                else {
+                    if (Ext.isLinux && Ext.isGecko) {
+                        return ns.core.conf.layout.west_width + 13;
+                    }
+                    return ns.core.conf.layout.west_width + 17;
+                }
+            }(),
+            items: accordion,
+            listeners: {
+                added: function() {
+                    ns.app.westRegion = this;
+                }
+            }
+        });
 
-		layoutButton = Ext.create('Ext.button.Button', {
-			text: 'Layout',
-			menu: {},
-			handler: function() {
-				if (!ns.app.layoutWindow) {
-					ns.app.layoutWindow = LayoutWindow();
-				}
-
-				ns.app.layoutWindow.show();
-			},
-			listeners: {
-				added: function() {
-					ns.app.layoutButton = this;
-				}
-			}
-		});
-
-		optionsButton = Ext.create('Ext.button.Button', {
-			text: NS.i18n.options,
-			menu: {},
-			handler: function() {
-				if (!ns.app.optionsWindow) {
-					ns.app.optionsWindow = OptionsWindow();
-				}
-
-				ns.app.optionsWindow.show();
-			},
-			listeners: {
-				added: function() {
-					ns.app.optionsButton = this;
-				}
-			}
-		});
-
-		aboutButton = Ext.create('Ext.button.Button', {
-			text: NS.i18n.about,
+        layoutButton = Ext.create('Ext.button.Button', {
+            text: 'Layout',
             menu: {},
-			handler: function() {
-				if (ns.app.aboutWindow && ns.app.aboutWindow.destroy) {
-					ns.app.aboutWindow.destroy();
-				}
+            handler: function() {
+                if (!ns.app.layoutWindow) {
+                    ns.app.layoutWindow = LayoutWindow();
+                }
 
-				ns.app.aboutWindow = AboutWindow();
-				ns.app.aboutWindow.show();
-			},
-			listeners: {
-				added: function() {
-					ns.app.aboutButton = this;
-				}
-			}
-		});
+                ns.app.layoutWindow.show();
+            },
+            listeners: {
+                added: function() {
+                    ns.app.layoutButton = this;
+                }
+            }
+        });
 
-		centerRegion = Ext.create('Ext.panel.Panel', {
-			region: 'center',
-			bodyStyle: 'padding:1px',
-			autoScroll: true,
-			fullSize: true,
-			//cmp: [defaultButton],
-			toggleCmp: function(show) {
-				//for (var i = 0; i < this.cmp.length; i++) {
-					//if (show) {
-						//this.cmp[i].show();
-					//}
-					//else {
-						//this.cmp[i].hide();
-					//}
-				//}
-			},
-			tbar: {
-				defaults: {
-					height: 26
-				},
-				items: [
-					{
-						text: '<<<',
-						handler: function(b) {
-							var text = b.getText();
-							text = text === '<<<' ? '>>>' : '<<<';
-							b.setText(text);
+        optionsButton = Ext.create('Ext.button.Button', {
+            text: NS.i18n.options,
+            menu: {},
+            handler: function() {
+                if (!ns.app.optionsWindow) {
+                    ns.app.optionsWindow = OptionsWindow();
+                }
 
-							westRegion.toggleCollapse();
-						}
-					},
-					{
-						text: '<b>' + NS.i18n.update + '</b>',
-						handler: function() {
-							update();
-						}
-					},
-					//layoutButton,
-					{
-						xtype: 'tbseparator',
-						height: 18,
-						style: 'border-color:transparent; border-right-color:#d1d1d1; margin-right:4px',
-					},
-					optionsButton,
-					//{
-						//xtype: 'tbseparator',
-						//height: 18,
-						//style: 'border-color:transparent; border-right-color:#d1d1d1; margin-right:4px',
-					//},
-					//favoriteButton,
-					//downloadButton,
-					//shareButton,
-					'->',
+                ns.app.optionsWindow.show();
+            },
+            listeners: {
+                added: function() {
+                    ns.app.optionsButton = this;
+                }
+            }
+        });
+
+        aboutButton = Ext.create('Ext.button.Button', {
+            text: NS.i18n.about,
+            menu: {},
+            handler: function() {
+                if (ns.app.aboutWindow && ns.app.aboutWindow.destroy) {
+                    ns.app.aboutWindow.destroy();
+                }
+
+                ns.app.aboutWindow = AboutWindow();
+                ns.app.aboutWindow.show();
+            },
+            listeners: {
+                added: function() {
+                    ns.app.aboutButton = this;
+                }
+            }
+        });
+
+        centerRegion = Ext.create('Ext.panel.Panel', {
+            region: 'center',
+            bodyStyle: 'padding:1px',
+            autoScroll: true,
+            fullSize: true,
+            //cmp: [defaultButton],
+            toggleCmp: function(show) {
+                //for (var i = 0; i < this.cmp.length; i++) {
+                    //if (show) {
+                        //this.cmp[i].show();
+                    //}
+                    //else {
+                        //this.cmp[i].hide();
+                    //}
+                //}
+            },
+            tbar: {
+                defaults: {
+                    height: 26
+                },
+                items: [
+                    {
+                        text: '<<<',
+                        handler: function(b) {
+                            var text = b.getText();
+                            text = text === '<<<' ? '>>>' : '<<<';
+                            b.setText(text);
+
+                            westRegion.toggleCollapse();
+                        }
+                    },
+                    {
+                        text: '<b>' + NS.i18n.update + '</b>',
+                        handler: function() {
+                            update();
+                        }
+                    },
+                    //layoutButton,
+                    {
+                        xtype: 'tbseparator',
+                        height: 18,
+                        style: 'border-color:transparent; border-right-color:#d1d1d1; margin-right:4px',
+                    },
+                    optionsButton,
+                    //{
+                        //xtype: 'tbseparator',
+                        //height: 18,
+                        //style: 'border-color:transparent; border-right-color:#d1d1d1; margin-right:4px',
+                    //},
+                    //favoriteButton,
+                    //downloadButton,
+                    //shareButton,
+                    '->',
                     aboutButton,
                     {
-						xtype: 'button',
-						text: NS.i18n.home,
-						handler: function() {
-							window.location.href = ns.core.init.contextPath + '/dhis-web-commons-about/redirect.action';
-						}
-					}
-				]
-			},
-			listeners: {
-				added: function() {
-					ns.app.centerRegion = this;
-				},
-				afterrender: function(p) {
-					var html = '';
+                        xtype: 'button',
+                        text: NS.i18n.home,
+                        handler: function() {
+                            window.location.href = ns.core.init.contextPath + '/dhis-web-commons-about/redirect.action';
+                        }
+                    }
+                ]
+            },
+            listeners: {
+                added: function() {
+                    ns.app.centerRegion = this;
+                },
+                afterrender: function(p) {
+                    var html = '';
 
-					html += '<div class="ns-viewport-text" style="padding:20px">';
-					html += '<h3>' + NS.i18n.example1 + '</h3>';
-					html += '<div>- ' + NS.i18n.example2 + '</div>';
-					html += '<div>- ' + NS.i18n.example3 + '</div>';
-					html += '<div>- ' + NS.i18n.example4 + '</div>';
-					html += '<div>- ' + NS.i18n.example5 + '</div>';
-					html += '</div>';
+                    html += '<div class="ns-viewport-text" style="padding:20px">';
+                    html += '<h3>' + NS.i18n.example1 + '</h3>';
+                    html += '<div>- ' + NS.i18n.example2 + '</div>';
+                    html += '<div>- ' + NS.i18n.example3 + '</div>';
+                    html += '<div>- ' + NS.i18n.example4 + '</div>';
+                    html += '<div>- ' + NS.i18n.example5 + '</div>';
+                    html += '</div>';
 
-					p.update(html);
-				},
-				resize: function() {
-					var width = this.getWidth();
+                    p.update(html);
+                },
+                resize: function() {
+                    var width = this.getWidth();
 
-					if (width < 768 && this.fullSize) {
-						this.toggleCmp(false);
-						this.fullSize = false;
-					}
-					else if (width >= 768 && !this.fullSize) {
-						this.toggleCmp(true);
-						this.fullSize = true;
-					}
-				}
-			}
-		});
+                    if (width < 768 && this.fullSize) {
+                        this.toggleCmp(false);
+                        this.fullSize = false;
+                    }
+                    else if (width >= 768 && !this.fullSize) {
+                        this.toggleCmp(true);
+                        this.fullSize = true;
+                    }
+                }
+            }
+        });
 
         setGui = function(layout) {
             var dimensions = Ext.Array.clean([].concat(layout.columns || [], layout.rows || [], layout.filters || [])),
-				dimMap = ns.core.service.layout.getObjectNameDimensionMapFromDimensionArray(dimensions),
-				recMap = ns.core.service.layout.getObjectNameDimensionItemsMapFromDimensionArray(dimensions),
-				graphMap = layout.parentGraphMap,
-				periodRecords,
-				fixedPeriodRecords = [],
-				isOu = false,
-				isOuc = false,
-				isOugc = false,
-				levels = [],
-				groups = [],
-				orgunits = [];
+                dimMap = ns.core.service.layout.getObjectNameDimensionMapFromDimensionArray(dimensions),
+                recMap = ns.core.service.layout.getObjectNameDimensionItemsMapFromDimensionArray(dimensions),
+                graphMap = layout.parentGraphMap,
+                periodRecords,
+                fixedPeriodRecords = [],
+                isOu = false,
+                isOuc = false,
+                isOugc = false,
+                levels = [],
+                groups = [],
+                orgunits = [];
 
             // dx
             dataSelectedStore.removeAll();
 
-			indicatorAvailableStore.removeAll();
+            indicatorAvailableStore.removeAll();
             indicatorGroup.clearValue();
 
-			dataElementAvailableStore.removeAll();
+            dataElementAvailableStore.removeAll();
             dataElementGroup.clearValue();
 
 
@@ -3939,143 +3939,143 @@ Ext.onReady( function() {
                 dataSelectedStore.addRecords(recMap['dx']);
             }
 
-			// pe
-			fixedPeriodSelectedStore.removeAll();
-			period.resetRelativePeriods();
-			periodRecords = recMap[dimConf.period.objectName] || [];
-			for (var i = 0, periodRecord, checkbox; i < periodRecords.length; i++) {
-				periodRecord = periodRecords[i];
-				checkbox = relativePeriod.valueComponentMap[periodRecord.id];
-				if (checkbox) {
-					checkbox.setValue(true);
-				}
-				else {
-					fixedPeriodRecords.push(periodRecord);
-				}
-			}
-			fixedPeriodSelectedStore.add(fixedPeriodRecords);
-			ns.core.web.multiSelect.filterAvailable({store: fixedPeriodAvailableStore}, {store: fixedPeriodSelectedStore});
+            // pe
+            fixedPeriodSelectedStore.removeAll();
+            period.resetRelativePeriods();
+            periodRecords = recMap[dimConf.period.objectName] || [];
+            for (var i = 0, periodRecord, checkbox; i < periodRecords.length; i++) {
+                periodRecord = periodRecords[i];
+                checkbox = relativePeriod.valueComponentMap[periodRecord.id];
+                if (checkbox) {
+                    checkbox.setValue(true);
+                }
+                else {
+                    fixedPeriodRecords.push(periodRecord);
+                }
+            }
+            fixedPeriodSelectedStore.add(fixedPeriodRecords);
+            ns.core.web.multiSelect.filterAvailable({store: fixedPeriodAvailableStore}, {store: fixedPeriodSelectedStore});
 
             // ou
-			if (recMap[dimConf.organisationUnit.objectName]) {
-				for (var i = 0, ouRecords = recMap[dimConf.organisationUnit.objectName]; i < ouRecords.length; i++) {
+            if (recMap[dimConf.organisationUnit.objectName]) {
+                for (var i = 0, ouRecords = recMap[dimConf.organisationUnit.objectName]; i < ouRecords.length; i++) {
 
-					if (ouRecords[i].id === 'USER_ORGUNIT') {
-						isOu = true;
-					}
-					else if (ouRecords[i].id === 'USER_ORGUNIT_CHILDREN') {
-						isOuc = true;
-					}
-					else if (ouRecords[i].id === 'USER_ORGUNIT_GRANDCHILDREN') {
-						isOugc = true;
-					}
-					else if (ouRecords[i].id.indexOf('LEVEL') != -1) {
-						levels.push(parseInt(ouRecords[i].id.split('-')[1]));
-					}
-					else if (ouRecords[i].id.indexOf('OU_GROUP') != -1) {
-						groups.push(ouRecords[i].id.split('-')[1]);
-					}
-					else {
-						orgunits.push(ouRecords[i].id);
-					}
-				}
+                    if (ouRecords[i].id === 'USER_ORGUNIT') {
+                        isOu = true;
+                    }
+                    else if (ouRecords[i].id === 'USER_ORGUNIT_CHILDREN') {
+                        isOuc = true;
+                    }
+                    else if (ouRecords[i].id === 'USER_ORGUNIT_GRANDCHILDREN') {
+                        isOugc = true;
+                    }
+                    else if (ouRecords[i].id.indexOf('LEVEL') != -1) {
+                        levels.push(parseInt(ouRecords[i].id.split('-')[1]));
+                    }
+                    else if (ouRecords[i].id.indexOf('OU_GROUP') != -1) {
+                        groups.push(ouRecords[i].id.split('-')[1]);
+                    }
+                    else {
+                        orgunits.push(ouRecords[i].id);
+                    }
+                }
 
-				if (levels.length) {
-					toolMenu.clickHandler('level');
-					organisationUnitLevel.setValue(levels);
-				}
-				else if (groups.length) {
-					toolMenu.clickHandler('group');
-					organisationUnitGroup.setValue(groups);
-				}
-				else {
-					toolMenu.clickHandler('orgunit');
-					userOrganisationUnit.setValue(isOu);
-					userOrganisationUnitChildren.setValue(isOuc);
-					userOrganisationUnitGrandChildren.setValue(isOugc);
-				}
+                if (levels.length) {
+                    toolMenu.clickHandler('level');
+                    organisationUnitLevel.setValue(levels);
+                }
+                else if (groups.length) {
+                    toolMenu.clickHandler('group');
+                    organisationUnitGroup.setValue(groups);
+                }
+                else {
+                    toolMenu.clickHandler('orgunit');
+                    userOrganisationUnit.setValue(isOu);
+                    userOrganisationUnitChildren.setValue(isOuc);
+                    userOrganisationUnitGrandChildren.setValue(isOugc);
+                }
 
-				if (!(isOu || isOuc || isOugc)) {
-					if (Ext.isObject(graphMap)) {
-						treePanel.selectGraphMap(graphMap);
-					}
+                if (!(isOu || isOuc || isOugc)) {
+                    if (Ext.isObject(graphMap)) {
+                        treePanel.selectGraphMap(graphMap);
+                    }
                     else {
                         treePanel.selectRoot();
                     }
-				}
-			}
-			else {
-				treePanel.reset();
-			}
-		};
+                }
+            }
+            else {
+                treePanel.reset();
+            }
+        };
 
-		viewport = Ext.create('Ext.container.Viewport', {
-			layout: 'border',
-			period: period,
-			treePanel: treePanel,
-			setGui: setGui,
+        viewport = Ext.create('Ext.container.Viewport', {
+            layout: 'border',
+            period: period,
+            treePanel: treePanel,
+            setGui: setGui,
             westRegion: westRegion,
             centerRegion: centerRegion,
-			items: [
-				westRegion,
-				centerRegion
-			],
-			listeners: {
-				render: function() {
-					ns.app.viewport = this;
+            items: [
+                westRegion,
+                centerRegion
+            ],
+            listeners: {
+                render: function() {
+                    ns.app.viewport = this;
 
                     //ns.app.layoutWindow = LayoutWindow();
                     //ns.app.layoutWindow.hide();
 
                     ns.app.optionsWindow = OptionsWindow();
                     ns.app.optionsWindow.hide();
-				},
-				afterrender: function() {
+                },
+                afterrender: function() {
 
-					// resize event handler
-					westRegion.on('resize', function() {
-						var panel = accordion.getExpandedPanel();
+                    // resize event handler
+                    westRegion.on('resize', function() {
+                        var panel = accordion.getExpandedPanel();
 
-						if (panel) {
-							panel.onExpand();
-						}
-					});
+                        if (panel) {
+                            panel.onExpand();
+                        }
+                    });
 
-					// left gui
-					var viewportHeight = westRegion.getHeight(),
-						numberOfTabs = (ns.core.init.dimensions ? ns.core.init.dimensions.length : 0) + 3,
-						tabHeight = 28,
-						minPeriodHeight = 380;
+                    // left gui
+                    var viewportHeight = westRegion.getHeight(),
+                        numberOfTabs = (ns.core.init.dimensions ? ns.core.init.dimensions.length : 0) + 3,
+                        tabHeight = 28,
+                        minPeriodHeight = 380;
 
-					if (viewportHeight > numberOfTabs * tabHeight + minPeriodHeight) {
-						if (!Ext.isIE) {
-							accordion.setAutoScroll(false);
-							westRegion.setWidth(ns.core.conf.layout.west_width);
-							accordion.doLayout();
-						}
-					}
-					else {
-						westRegion.hasScrollbar = true;
-					}
+                    if (viewportHeight > numberOfTabs * tabHeight + minPeriodHeight) {
+                        if (!Ext.isIE) {
+                            accordion.setAutoScroll(false);
+                            westRegion.setWidth(ns.core.conf.layout.west_width);
+                            accordion.doLayout();
+                        }
+                    }
+                    else {
+                        westRegion.hasScrollbar = true;
+                    }
 
-					// expand first panel
-					accordion.getFirstPanel().expand();
+                    // expand first panel
+                    accordion.getFirstPanel().expand();
 
-					// look for url params
-					var id = ns.core.web.url.getParam('id'),
-						session = ns.core.web.url.getParam('s'),
-						layout;
+                    // look for url params
+                    var id = ns.core.web.url.getParam('id'),
+                        session = ns.core.web.url.getParam('s'),
+                        layout;
 
-					if (id) {
-						ns.core.web.report.loadTable(id);
-					}
-					else if (Ext.isString(session) && NS.isSessionStorage && Ext.isObject(JSON.parse(sessionStorage.getItem('dhis2'))) && session in JSON.parse(sessionStorage.getItem('dhis2'))) {
-						layout = ns.core.api.layout.Layout(JSON.parse(sessionStorage.getItem('dhis2'))[session]);
+                    if (id) {
+                        ns.core.web.report.loadTable(id);
+                    }
+                    else if (Ext.isString(session) && NS.isSessionStorage && Ext.isObject(JSON.parse(sessionStorage.getItem('dhis2'))) && session in JSON.parse(sessionStorage.getItem('dhis2'))) {
+                        layout = ns.core.api.layout.Layout(JSON.parse(sessionStorage.getItem('dhis2'))[session]);
 
-						if (layout) {
-							ns.core.web.report.getData(layout, true);
-						}
-					}
+                        if (layout) {
+                            ns.core.web.report.getData(layout, true);
+                        }
+                    }
 
                     var initEl = document.getElementById('init');
                     initEl.parentNode.removeChild(initEl);
@@ -4083,40 +4083,40 @@ Ext.onReady( function() {
                     Ext.getBody().setStyle('background', '#fff');
                     Ext.getBody().setStyle('opacity', 0);
 
-					// fade in
-					Ext.defer( function() {
-						Ext.getBody().fadeIn({
-							duration: 600
-						});
-					}, 300 );
-				}
-			}
-		});
+                    // fade in
+                    Ext.defer( function() {
+                        Ext.getBody().fadeIn({
+                            duration: 600
+                        });
+                    }, 300 );
+                }
+            }
+        });
 
-		// add listeners
-		(function() {
-			ns.app.stores.indicatorAvailable.on('load', function() {
-				ns.core.web.multiSelect.filterAvailable(indicatorAvailable, indicatorSelected);
-			});
+        // add listeners
+        (function() {
+            ns.app.stores.indicatorAvailable.on('load', function() {
+                ns.core.web.multiSelect.filterAvailable(indicatorAvailable, indicatorSelected);
+            });
 
-			ns.app.stores.dataElementAvailable.on('load', function() {
-				ns.core.web.multiSelect.filterAvailable(dataElementAvailable, dataElementSelected);
-			});
+            ns.app.stores.dataElementAvailable.on('load', function() {
+                ns.core.web.multiSelect.filterAvailable(dataElementAvailable, dataElementSelected);
+            });
 
-			ns.app.stores.dataSetAvailable.on('load', function(s) {
-				ns.core.web.multiSelect.filterAvailable(dataSetAvailable, dataSetSelected);
-				s.sort('name', 'ASC');
-			});
-		}());
+            ns.app.stores.dataSetAvailable.on('load', function(s) {
+                ns.core.web.multiSelect.filterAvailable(dataSetAvailable, dataSetSelected);
+                s.sort('name', 'ASC');
+            });
+        }());
 
-		return viewport;
-	};
+        return viewport;
+    };
 
-	// initialize
-	(function() {
-		var requests = [],
-			callbacks = 0,
-			init = {},
+    // initialize
+    (function() {
+        var requests = [],
+            callbacks = 0,
+            init = {},
             ajaxConfig,
             ajax,
             updateInitDiv,
@@ -4124,16 +4124,16 @@ Ext.onReady( function() {
             pathCommons,
             fn;
 
-		fn = function() {
-			if (++callbacks === requests.length) {
+        fn = function() {
+            if (++callbacks === requests.length) {
 
-				ns.core = NS.getCore(init);
+                ns.core = NS.getCore(init);
                 ns.alert = ns.core.webAlert;
                 ns.ajax = ajax;
-				extendCore(ns.core);
+                extendCore(ns.core);
 
-				dimConf = ns.core.conf.finals.dimension;
-				ns.app.viewport = createViewport();
+                dimConf = ns.core.conf.finals.dimension;
+                ns.app.viewport = createViewport();
 
                 ns.core.app.getViewportWidth = function() { return ns.app.viewport.getWidth(); };
                 ns.core.app.getViewportHeight = function() { return ns.app.viewport.getHeight(); };
@@ -4141,8 +4141,8 @@ Ext.onReady( function() {
                 ns.core.app.getCenterRegionHeight = function() { return ns.app.viewport.centerRegion.getHeight(); };
 
                 NS.instances.push(ns);
-			}
-		};
+            }
+        };
 
         ajax = function(requestConfig, authConfig, skipRequest) {
             requestConfig = requestConfig || {};
@@ -4160,7 +4160,7 @@ Ext.onReady( function() {
             Ext.Ajax.request(requestConfig);
         };
 
-		// manifest
+        // manifest
         Ext.Ajax.request({
             url: 'manifest.webapp',
             success: function(r) {
@@ -4380,5 +4380,5 @@ Ext.onReady( function() {
                 });
             }
         });
-	}());
+    }());
 });
