@@ -202,7 +202,9 @@ Period.prototype.getItemsByTypeByFinancialJuly = function(type, isAll) {
     else if (type === 'FinancialOct') {
         return this.getItemifiedPeriods(this.gen(type, this.offset - 1 + this.yearOffset).slice(0, 2));
     }
-    else if (type === 'Yearly') {
+    else if (type === 'Yearly') {
+console.log(this.gen, type, this.offset, this.yearOffset);
+console.log(this.gen(type, this.offset + this.yearOffset));
         thisYear = this.gen(type, this.offset + this.yearOffset)[0];
         nextYear = this.gen(type, this.offset + 1 + this.yearOffset)[0];
 

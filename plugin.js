@@ -39,8 +39,8 @@ var plugin = {
     url: null,
     username: null,
     password: null,
-    load: function(...layouts) {
-        if (!layouts.length) {
+    load: function(...layouts) {
+        if (!layouts.length) {
             return;
         }
 
@@ -96,8 +96,8 @@ periodConfig.setI18nManager(i18nManager);
 appManager.applyTo(arrayTo(api));
 optionConfig.applyTo(arrayTo(api));
 
-function _load(layouts) {
-    if (!layouts.length) {
+function _load(layouts) {
+    if (!layouts.length) {
         return;
     }
 
@@ -115,12 +115,12 @@ function _load(layouts) {
         requestManager.run();
     });
 
-    function _initialize(layouts) {
-        layouts.forEach(function(layout) {
+    function _initialize(layouts) {
+        layouts.forEach(function(layout) {
 
             layout = new api.Layout(layout);
 
-            if (plugin.spinner) {
+            if (plugin.spinner) {
                 $('#' + layout.el).append('<div class="spinner"></div>');
             }
 
@@ -147,21 +147,21 @@ function _load(layouts) {
             instanceManager.apiResource = 'reportTables';
             instanceManager.applyTo(arrayTo(api));
 
-			instanceManager.setFn(function(table) {
-				table.update = function(isSorting) {
-					uiManager.update(table.generateHtml());
-					table.addHeaderClickListeners();
-					table.addOuClickListeners();
-					table.addPeClickListeners();
-				};
+            instanceManager.setFn(function(table) {
+                table.update = function(isSorting) {
+                    uiManager.update(table.generateHtml());
+                    table.addHeaderClickListeners();
+                    table.addOuClickListeners();
+                    table.addPeClickListeners();
+                };
 
-				table.update();
-				
-				uiManager.unmask();
-			});
+                table.update();
 
-            if (layout.id) {
-                instanceManager.getById(layout.id, function(_layout) {
+                uiManager.unmask();
+            });
+
+            if (layout.id) {
+                instanceManager.getById(layout.id, function(_layout) {
                     _layout.el = layout.el;
                     instanceManager.getReport(_layout);
                 });
@@ -172,5 +172,3 @@ function _load(layouts) {
         });
     }
 }
-
-

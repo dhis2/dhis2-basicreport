@@ -239,10 +239,10 @@ table.pivot {
 }
 
 table.pivot.displaydensity-comfortable td {
-    padding: 7px;
+    padding: 8px;
 }
 table.pivot.displaydensity-compact td {
-    padding: 3px;
+    padding: 4px;
 }
 
 table.pivot.fontsize-large td {
@@ -253,7 +253,7 @@ table.pivot.fontsize-small td {
 }
 
 .pivot td {
-    padding: 5px;
+    padding: 6px;
     border: 1px solid #b2b2b2;
 }
 
@@ -304,6 +304,9 @@ table.pivot.fontsize-small td {
 }
 .pivot-value.highlighted {
     background-color: #f1f1f1;
+}
+.pivot-value.clickable {
+    color: #394c77;
 }
 .pivot-value.clickable:hover {
     background-color: #f1f1f1;
