@@ -109,6 +109,9 @@ function _load(layouts) {
     $.getJSON(appManager.path + '/api/me/user-account.json').done(function(userAccount) {
         appManager.userAccount = userAccount;
 
+        calendarManager.setBaseUrl(appManager.getPath());
+        calendarManager.init();
+
         requestManager.add(new api.Request(init.legendSetsInit(refs)));
         requestManager.add(new api.Request(init.organisationUnitLevelsInit(refs)));
         requestManager.add(new api.Request(init.dimensionsInit(refs)));
@@ -151,7 +154,7 @@ function _load(layouts) {
 
             instanceManager.setFn(function(table) {
                 table.update = function(isSorting) {
-                    uiManager.update(table.generateHtml());
+                    uiManager.update(table.generateHtml(), layout.el);
                     table.addHeaderClickListeners();
                     table.addOuClickListeners();
                     table.addPeClickListeners();
