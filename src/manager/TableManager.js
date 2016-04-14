@@ -2,7 +2,6 @@ import isNumeric from 'd2-utilizr/lib/isNumeric';
 import isArray from 'd2-utilizr/lib/isArray';
 import isObject from 'd2-utilizr/lib/isObject';
 import arrayTo from 'd2-utilizr/lib/arrayTo';
-import clone from 'd2-utilizr/lib/clone';
 
 import {DataObject} from '../api/DataObject';
 import {Response} from '../api/Response';
@@ -14,6 +13,7 @@ import {PeriodTableCell} from '../api/TableCell.Period';
 import {Table} from '../api/Table';
 import {Period} from '../api/Period';
 import {OrganisationUnit} from '../api/OrganisationUnit';
+import {OrganisationUnitLevel} from '../api/OrganisationUnitLevel';
 
 export var TableManager;
 
@@ -266,7 +266,8 @@ TableManager.prototype.getHtml = function(layout, fCallback) {
             // ou headers
             (function() {
                 for (var level; startOuLevel < maxOuLevel; startOuLevel++) {
-                    level = clone(t.appManager.organisationUnitLevels[startOuLevel]);
+console.log(t.appManager.organisationUnitLevels, startOuLevel);
+                    level = new OrganisationUnitLevel(t.appManager.organisationUnitLevels[startOuLevel]);
                     level.objectName = 'ou';
                     level.cls = 'pivot-dim';
                     level.index = index++;

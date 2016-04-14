@@ -1,3 +1,5 @@
+import isNumeric from 'd2-utilizr/lib/isNumeric';
+
 export var TableHeader;
 
 TableHeader = function(config) {
@@ -8,7 +10,7 @@ TableHeader = function(config) {
     t.name = config.name;
     t.objectName = config.objectName;
 
-    if (Ext.isNumeric(config.level)) {
+    if (isNumeric(config.level)) {
         t.level = parseInt(config.level);
     }
 

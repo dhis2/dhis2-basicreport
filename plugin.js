@@ -95,6 +95,7 @@ periodConfig.setI18nManager(i18nManager);
 
 appManager.applyTo(arrayTo(api));
 optionConfig.applyTo(arrayTo(api));
+calendarManager.applyTo(arrayTo(api));
 
 function _load(layouts) {
     if (!layouts.length) {
@@ -109,6 +110,7 @@ function _load(layouts) {
         appManager.userAccount = userAccount;
 
         requestManager.add(new api.Request(init.legendSetsInit(refs)));
+        requestManager.add(new api.Request(init.organisationUnitLevelsInit(refs)));
         requestManager.add(new api.Request(init.dimensionsInit(refs)));
 
         requestManager.set(_initialize, layouts);

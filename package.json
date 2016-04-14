@@ -6,8 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack-dev-server",
-    "build": "rm -rf build && webpack --config webpack.config.prod.js && cp ./index.html build && cp ./node_modules/babel-polyfill/dist/polyfill.min.js build && cp ./jquery.min.js build && cp ./manifest.webapp build && cp -r i18n build && cp -r dhis2 build && cp -r extjs build && cp jquery.min.js basicreport.js && more build/basicreport.js >> basicreport.js && mv -f basicreport.js build",
-    "zip": "cd build && zip -rq ./dhis2-basicreport.zip index.html manifest.webapp jquery.min.js polyfill.min.js app.js app.js.map dhis2 extjs i18n ../icon/*"
+    "build": "rm -rf build && webpack --config webpack.config.prod.js && cp ./index.html build && cp ./node_modules/babel-polyfill/dist/polyfill.min.js build && cp ./jquery.min.js build && cp ./manifest.webapp build && cp -r i18n build && cp -r dhis2 build && cp -r extjs build && cp -r icon/* build",
+    "zip": "cd build && zip -rq ./dhis2-basicreport.zip index.html manifest.webapp jquery.min.js polyfill.min.js app.js app.js.map dhis2 extjs i18n *.png"
   },
   "repository": {
     "type": "git",
@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/dhis2/dhis2-basicreport#readme",
   "dependencies": {
-    "d2-utilizr": "^0.2.7",
+    "d2-utilizr": "^0.2.8",
     "d2-analysis": "^0.1.0"
   },
   "devDependencies": {
