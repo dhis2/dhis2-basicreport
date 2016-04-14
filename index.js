@@ -208,5 +208,5 @@ function initialize() {
     uiManager.reg(OptionsWindow(refs), 'optionsWindow').hide();
 
     // viewport
-    Viewport(refs);
+    uiManager.reg(Viewport(refs), 'viewport');
 }

@@ -2188,7 +2188,7 @@ Viewport = function(c) {
                 height = westRegion.getHeight() - uiConfig.west_fill;
                 mx += panelHeight;
                 accordion.setHeight((height > mx ? mx : height) - 2);
-                accordionBody.setHeight((height > mx ? mx : height) - 2);
+                accordionBody.setHeight((height > mx ? mx : height) - 4);
             }
         },
         getExpandedPanel: function() {

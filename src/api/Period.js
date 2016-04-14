@@ -89,6 +89,9 @@ Period.prototype.getItemsByTypeByFinancialApril = function(type, isAll) {
     var nextPeriods = this.gen(type, this.offset + 1);
     var nextSliceEndIndex;
 
+    var thisYear;
+    var nextYear;
+
     if (type === 'FinancialApril') {
         if (isAll) {
             return this.getItemifiedPeriods(this.gen(type, this.offset - 1 + this.yearOffset).slice(0, 2));
@@ -189,6 +192,9 @@ Period.prototype.getItemsByTypeByFinancialJuly = function(type, isAll) {
     var nextPeriods = this.gen(type, this.offset + 1);
     var nextSliceEndIndex;
 
+    var thisYear;
+    var nextYear;
+
     if (type === 'FinancialApril') {
         return this.getItemifiedPeriods(this.gen(type, this.offset + this.yearOffset).slice(0, 2));
     }
@@ -203,8 +209,6 @@ Period.prototype.getItemsByTypeByFinancialJuly = function(type, isAll) {
         return this.getItemifiedPeriods(this.gen(type, this.offset - 1 + this.yearOffset).slice(0, 2));
     }
     else if (type === 'Yearly') {
-console.log(this.gen, type, this.offset, this.yearOffset);
-console.log(this.gen(type, this.offset + this.yearOffset));
         thisYear = this.gen(type, this.offset + this.yearOffset)[0];
         nextYear = this.gen(type, this.offset + 1 + this.yearOffset)[0];
 
@@ -290,6 +294,9 @@ Period.prototype.getItemsByTypeByFinancialOct = function(type, isAll) {
     var thisSliceStartIndex;
     var nextPeriods = this.gen(type, this.offset + 1);
     var nextSliceEndIndex;
+
+    var thisYear;
+    var nextYear;
 
     if (type === 'FinancialApril') {
         return this.getItemifiedPeriods(this.gen(type, this.offset + this.yearOffset).slice(0, 2));
