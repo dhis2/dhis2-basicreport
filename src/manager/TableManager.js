@@ -57,7 +57,7 @@ TableManager.prototype.getHtml = function(layout, fCallback) {
 
     oDimNameReqItemArrayMap[peDimName] = aPeReqIds;
     oDimNameReqItemArrayMap[ouDimName] = aOuReqIds;
-
+console.log("gethtml layout: ", layout.getDataDimensionItems());
     // columns (data)
     (function() {
         var ddi = layout.getDataDimensionItems(),

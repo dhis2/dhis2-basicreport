@@ -2340,7 +2340,12 @@ Viewport = function(c) {
                     // dataDimensionItems
                     dim.items.forEach(function(item) {
                         var ddi = {};
-
+console.log(item);
+console.log(item.objectName);
+console.log(map);
+console.log(map[item.objectName]);
+console.log(map[item.objectName].value);
+console.log(' ');
                         ddi[map[item.objectName].value] = item;
 
                         config.dataDimensionItems.push(ddi);
