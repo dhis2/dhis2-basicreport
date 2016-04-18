@@ -85,7 +85,7 @@ OrganisationUnitTableCell.prototype.showContextMenu = function(row, menuFn) {
 
                 layout.parentGraphMap = this.parentGraphMap;
 
-                instanceManager.getReport(layout);
+                instanceManager.getReport(layout, true);
             }
         });
     }

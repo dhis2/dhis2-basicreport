@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack-dev-server",
     "build": "rm -rf build && webpack --config webpack.config.prod.js && cp ./index.html build && cp ./node_modules/babel-polyfill/dist/polyfill.min.js build && cp ./jquery.min.js build && cp ./manifest.webapp build && cp -r i18n build && cp -r dhis2 build && cp -r extjs build && cp -r icons build",
-    "zip": "cd build && zip -rq ./dhis2-basicreport.zip index.html manifest.webapp jquery.min.js polyfill.min.js app.js app.js.map dhis2 extjs i18n *.png"
+    "plugin": "cat dhis2/jquery.calendars.min.js dhis2/jquery.calendars.plus.min.js dhis2/dhis2.util.js dhis2/date.js >> dhis2-date.js && mv dhis2-date.js build",
+    "zip": "cd build && zip -rq ./dhis2-basicreport.zip index.html manifest.webapp jquery.min.js polyfill.min.js app.js* dhis2 extjs i18n icons"
   },
   "repository": {
     "type": "git",

@@ -2413,7 +2413,7 @@ Viewport = function(c) {
                     layout = new api.Layout(sessionStorageManager.get(session));
 
                     if (layout) {
-                        instanceManager.getReport(layout);
+                        instanceManager.getReport(layout, true);
                     }
                 }
 

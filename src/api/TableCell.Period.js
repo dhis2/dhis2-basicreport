@@ -46,7 +46,7 @@ PeriodTableCell.prototype.showContextMenu = function(menuFn) {
                     items: this.peReqItems
                 });
 
-                instanceManager.getReport(layout);
+                instanceManager.getReport(layout, true);
             }
         });
     }

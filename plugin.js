@@ -94,8 +94,8 @@ optionConfig.setI18nManager(i18nManager);
 periodConfig.setI18nManager(i18nManager);
 
 appManager.applyTo(arrayTo(api));
-optionConfig.applyTo(arrayTo(api));
 calendarManager.applyTo(arrayTo(api));
+optionConfig.applyTo(arrayTo(api));
 
 function _load(layouts) {
     if (!layouts.length) {
@@ -146,6 +146,7 @@ function _load(layouts) {
 
             var tableManager = new manager.TableManager(instanceRefs);
             instanceRefs.tableManager = tableManager;
+            tableManager.applyTo([Table]);
 
             var instanceManager = new manager.InstanceManager(instanceRefs);
             instanceRefs.instanceManager = instanceManager;

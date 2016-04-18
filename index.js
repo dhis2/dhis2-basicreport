@@ -103,18 +103,6 @@ optionConfig.setI18nManager(i18nManager);
 periodConfig.setI18nManager(i18nManager);
 uiManager.setI18nManager(i18nManager);
 
-    // static
-appManager.applyTo(arrayTo(api));
-instanceManager.applyTo(arrayTo(api));
-uiManager.applyTo(arrayTo(api));
-optionConfig.applyTo(arrayTo(api));
-
-// set i18n
-dimensionConfig.setI18nManager(i18nManager);
-optionConfig.setI18nManager(i18nManager);
-periodConfig.setI18nManager(i18nManager);
-uiManager.setI18nManager(i18nManager);
-
 // apply to
 appManager.applyTo(arrayTo(api));
 instanceManager.applyTo(arrayTo(api));
