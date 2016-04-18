@@ -4,8 +4,8 @@
     "description": "Basic Report",
     "launch_path": "/index.html",
     "icons": {
-        "48": "br-48.png",
-        "128": "br-128.png"
+        "48": "icons/br-48.png",
+        "128": "icons/br-128.png"
     },
     "developer": {
         "name": "Greg Rowles / Jan Henrik Overland",
