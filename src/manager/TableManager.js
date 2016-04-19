@@ -22,6 +22,14 @@ TableManager = function(c) {
 
     t.appManager = c.appManager;
     t.dimensionConfig = c.dimensionConfig;
+
+    t.mask = function(el) {
+        $('#' + el).css('opacity', '0.5');
+    };
+
+    t.unmask = function(el) {
+        $('#' + el).css('opacity', '1');
+    };
 };
 
 TableManager.prototype.applyTo = function(modules) {

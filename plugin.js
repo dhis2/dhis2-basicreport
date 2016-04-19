@@ -163,7 +163,7 @@ function _load(layouts) {
 
                 table.update();
 
-                uiManager.unmask();
+                tableManager.unmask(layout.el);
             });
 
             if (layout.id) {

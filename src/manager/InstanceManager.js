@@ -13,7 +13,7 @@ InstanceManager.prototype.getReport = function(layout, isFavorite) {
         }
     }
 
-    t.uiManager.mask();
+    t.tableManager.mask(layout.el);
 
     t.setState(layout, isFavorite);
 
