@@ -189,7 +189,7 @@ function initialize() {
 
         table.update();
 
-        uiManager.unmask();
+        tableManager.unmask();
     });
 
     // windows

@@ -21,14 +21,34 @@ TableManager = function(c) {
     var t = this;
 
     t.appManager = c.appManager;
+    t.uiManager = c.uiManager;
     t.dimensionConfig = c.dimensionConfig;
 
-    t.mask = function(el) {
-        $('#' + el).css('opacity', '0.5');
+    // transient
+    t.loadMask;
+
+    t.mask = function(elId) {
+        var el = Ext.get(elId) || t.uiManager.getUpdateComponent();
+
+        var tableEl = el.child('table');
+
+        if (elId && !tableEl) {
+            return;
+        }
+
+        t.loadMask = new Ext.create('Ext.LoadMask', (tableEl || el), {
+            shadow: false,
+            msg: 'Loading..',
+            style: 'box-shadow:0',
+            bodyStyle: 'box-shadow:0'
+        });
+
+        t.loadMask.show();     
     };
 
     t.unmask = function(el) {
-        $('#' + el).css('opacity', '1');
+        t.loadMask && t.loadMask.hide();
+        t.loadMask = null;
     };
 };
 
