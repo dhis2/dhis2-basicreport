@@ -46,8 +46,8 @@ Viewport = function(c) {
         displayProperty = appManager.getDisplayProperty(),
         displayPropertyUrl = appManager.getDisplayPropertyUrl(),
 
-        dimensionPanelMap = {};
-
+        dimensionPanelMap = {},
+        westRegionPanels = [];
 
     var indicatorAvailableStore = Ext.create('Ext.data.Store', {
         fields: ['id', 'name', 'objectName'],
@@ -99,7 +99,11 @@ Viewport = function(c) {
         loadPage: function(uid, filter, append, noPaging, fn) {
             var store = this,
                 params = {},
-                url;
+                baseUrl = path + '/api/indicators.json?',
+                fieldsUrl = 'fields=dimensionItem|rename(id),' + displayPropertyUrl,
+                filterUrl = filter ? '&filter=' + displayProperty + ':ilike:' + filter : '';
+
+            var url = baseUrl + fieldsUrl + filterUrl;
 
             uid = (isString(uid) || isNumber(uid)) ? uid : indicatorGroup.getValue();
             filter = filter || indicatorFilter.getValue() || null;
@@ -114,14 +118,7 @@ Viewport = function(c) {
             }
 
             if (isString(uid)) {
-                url = '/indicators.json?fields=dimensionItem|rename(id),' + displayPropertyUrl + '&filter=indicatorGroups.id:eq:' + uid + (filter ? '&filter=' + displayProperty + ':ilike:' + filter : '');
-            }
-            else if (uid === 0) {
-                url = '/indicators.json?fields=dimensionItem|rename(id),' + displayPropertyUrl + '' + (filter ? '&filter=' + displayProperty + ':ilike:' + filter : '');
-            }
-
-            if (!url) {
-                return;
+                url += '&filter=indicatorGroups.id:eq:' + uid;
             }
 
             if (noPaging) {
@@ -135,7 +132,7 @@ Viewport = function(c) {
             store.isPending = true;
             uiManager.mask(indicatorAvailable.boundList);
 
-            $.getJSON(path + '/api' + url, params, function(response) {
+            $.getJSON(encodeURI(url), params, function(response) {
                 var data = response.indicators || [],
                     pager = response.pager;
 
@@ -159,8 +156,6 @@ Viewport = function(c) {
 
             this.isPending = false;
 
-            //uiManager.msFilterAvailable({store: this}, {store: indicatorSelectedStore});
-
             if (fn) {
                 fn();
             }
@@ -176,7 +171,7 @@ Viewport = function(c) {
         fields: ['id', 'name', 'index'],
         proxy: {
             type: 'ajax',
-            url: path + '/api/indicatorGroups.json?fields=id,displayName|rename(name)&paging=false',
+            url: encodeURI(path + '/api/indicatorGroups.json?fields=id,displayName|rename(name)&paging=false'),
             reader: {
                 type: 'json',
                 root: 'indicatorGroups'
@@ -269,21 +264,18 @@ Viewport = function(c) {
         loadTotalsPage: function(uid, filter, append, noPaging, fn) {
             var store = this,
                 params = {},
-                url;
+                baseUrl = path + '/api/dataElements.json?',
+                fieldsUrl = 'fields=dimensionItem|rename(id),' + displayPropertyUrl,
+                filterUrl = '&filter=domainType:eq:AGGREGATE' + (filter ? '&filter=' + displayProperty + ':ilike:' + filter : '');
+
+            var url = baseUrl + fieldsUrl + filterUrl;
 
             if (store.nextPage === store.lastPage) {
                 return;
             }
 
             if (isString(uid)) {
-                url = '/dataElements.json?fields=dimensionItem|rename(id),' + displayPropertyUrl + '&filter=dataElementGroups.id:eq:' + uid + (filter ? '&filter=' + displayProperty + ':ilike:' + filter : '');
-            }
-            else if (uid === 0) {
-                url = '/dataElements.json?fields=dimensionItem|rename(id),' + displayPropertyUrl + '&filter=domainType:eq:AGGREGATE' + '' + (filter ? '&filter=' + displayProperty + ':ilike:' + filter : '');
-            }
-
-            if (!url) {
-                return;
+                url += '&filter=dataElementGroups.id:eq:' + uid;
             }
 
             if (noPaging) {
@@ -297,7 +289,7 @@ Viewport = function(c) {
             store.isPending = true;
             uiManager.mask(dataElementAvailable.boundList);
 
-            $.getJSON(path + '/api' + url, params, function(response) {
+            $.getJSON(encodeURI(url), params, function(response) {
                 var data = response.dataElements || [],
                     pager = response.pager;
 
@@ -377,7 +369,7 @@ Viewport = function(c) {
         fields: ['id', 'name', 'index'],
         proxy: {
             type: 'ajax',
-            url: path + '/api/dataElementGroups.json?fields=id,' + displayPropertyUrl + '&paging=false',
+            url: encodeURI(path + '/api/dataElementGroups.json?fields=id,' + displayPropertyUrl + '&paging=false'),
             reader: {
                 type: 'json',
                 root: 'dataElementGroups'
@@ -963,7 +955,7 @@ Viewport = function(c) {
     var dataElementGroup = Ext.create('Ext.form.field.ComboBox', {
         cls: 'ns-combo',
         style: 'margin:0 1px 1px 0',
-        width: uiConfig.west_fieldset_width - uiConfig.west_width_padding - 90,
+        width: uiConfig.west_fieldset_width - uiConfig.west_width_padding,
         valueField: 'id',
         displayField: 'name',
         emptyText: i18n['select_data_element_group'],
@@ -1064,8 +1056,11 @@ Viewport = function(c) {
             dataElement
         ],
         listeners: {
-            expand: function(p) {
-                p.onExpand();
+            added: function() {
+                westRegionPanels.push(this);
+            },
+            expand: function() {
+                this.onExpand();
             }
         }
     };
@@ -1597,6 +1592,9 @@ Viewport = function(c) {
             relativePeriod
         ],
         listeners: {
+            added: function() {
+                westRegionPanels.push(this);
+            },
             expand: function(p) {
                 p.onExpand();
             }
@@ -2138,6 +2136,9 @@ Viewport = function(c) {
             treePanel
         ],
         listeners: {
+            added: function() {
+                westRegionPanels.push(this);
+            },
             expand: function(p) {
                 p.onExpand();
             }
@@ -2145,8 +2146,6 @@ Viewport = function(c) {
     };
 
     // viewport
-
-    var westRegionPanels = [];
 
     var accordionBody = Ext.create('Ext.panel.Panel', {
         layout: 'accordion',
@@ -2164,8 +2163,6 @@ Viewport = function(c) {
 
             // last cls
             panels[panels.length - 1].cls = 'ns-accordion-last';
-
-            westRegionPanels = panels;
 
             return panels;
         }()
@@ -2399,7 +2396,7 @@ Viewport = function(c) {
                 }
 
                 // expand first panel
-                //westRegionPanels[0].expand();
+                westRegionPanels[0].expand();
 
                 // look for url params
                 var id = appManager.getUrlParam('id'),
