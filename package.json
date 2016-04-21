@@ -1,7 +1,7 @@
 {
   "name": "dhis2-basicreport",
   "version": "1.0.0",
-  "description": "NHIRD 2 Basic Report",
+  "description": "Basic Report",
   "main": "webpack-base-config.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -15,7 +15,7 @@
     "url": "git+https://github.com/dhis2/dhis2-basicreport.git"
   },
   "author": "Greg Rowles / Jan Henrik Øverland",
-  "license": "ISC",
+  "license": "BSD-3-Clause",
   "bugs": {
     "url": "https://github.com/dhis2/dhis2-basicreport/issues"
   },
