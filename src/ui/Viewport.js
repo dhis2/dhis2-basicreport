@@ -2189,9 +2189,11 @@ Viewport = function(c) {
             }
         },
         getExpandedPanel: function() {
-            for (var i = 0, panel; i < this.panels.length; i++) {
-                if (!this.panels[i].collapsed) {
-                    return this.panels[i];
+            for (var i = 0, panel; i < westRegionPanels.length; i++) {
+                panel = westRegionPanels[i];
+
+                if (!panel.collapsed) {
+                    return panel;
                 }
             }
 
