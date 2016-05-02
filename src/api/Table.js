@@ -195,7 +195,6 @@ Table.prototype.getTableColumns = function() {
         column = new TableColumn();
         cells = [];
 
-        column.index = header.index;
         column.addTableHeader(header);
 
         t.tableRows.forEach(function(row) {

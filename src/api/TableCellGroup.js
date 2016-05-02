@@ -17,15 +17,16 @@ TableCellGroup.prototype.getFirst = function() {
     return this.cells[0];
 };
 
-
-TableCellGroup.prototype.setSpan = function() {
-    this.getFirst().span = this.cells.length;
-};
-
 TableCellGroup.prototype.setDisplay = function() {
     this.cells.forEach(function(cell, index) {
-        if (index) {
+        if (index !== 0) {
             cell.hidden = true;
         }
     });
+};
+
+// dep 2
+
+TableCellGroup.prototype.setSpan = function() {
+    this.getFirst().span = this.cells.length;
 };

@@ -26,10 +26,6 @@ TableColumn.prototype.addTableCells = function(param) {
     this.tableCells = this.tableCells.concat(arrayFrom(param));
 };
 
-//TableColumn.prototype.getUnique = function() {
-    //return arrayUnique(this.tableCells).length;
-//};
-
 TableColumn.prototype.getTotalIndex = function() {
     return this.tableHeader && isNumber(this.index) ? (this.tableHeader.index + this.index) : null;
 };
