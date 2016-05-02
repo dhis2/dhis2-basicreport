@@ -563,6 +563,9 @@ TableManager.prototype.getTable = function(layout, fCallback) {
         table.addOptionsCls(layout);
         table.sortData();
 
+        table.reduce();
+        //table.getTableColumns();
+
         if (fCallback) {
             fCallback(table);
         }

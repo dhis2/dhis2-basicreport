@@ -37,15 +37,13 @@ TableColumn.prototype.getTotalIndex = function() {
 // dep 2
 
 TableColumn.prototype.createGroups = function() {
-    var cells = this.tableCells;
-    var groups = this.tableCellGroups;
-    var lastName;
+    var prevName;
     var group;
 
-    cells.forEach(function(cell) {
-        if (cell.name !== lastName) {
+    this.tableCells.forEach(function(cell) {
+        if (cell.name !== prevName) {
             if (group) {
-                groups.push(group);
+                this.tableCellGroups.push(group);
             }
 
             group = new TableCellGroup();
@@ -56,7 +54,7 @@ TableColumn.prototype.createGroups = function() {
 };
 
 TableColumn.prototype.analyzeGroups = function() {
-    this.groups.forEach(function(group) {
+    this.tableCellGroups.forEach(function(group) {
         group.setSpan();
         group.setDisplay();
     });

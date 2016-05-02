@@ -4,6 +4,7 @@ import isEmpty from 'd2-utilizr/lib/isEmpty';
 
 import {OrganisationUnitTableCell} from './TableCell.OrganisationUnit';
 import {PeriodTableCell} from './TableCell.Period';
+import {TableColumn} from './TableColumn';
 
 export var Table;
 
@@ -36,8 +37,6 @@ Table = function(config) {
 
     t.update;
 };
-
-// base
 
 Table.prototype.getCellIdRowMap = function() {
     if (this.cellIdRowMap) {
@@ -182,6 +181,34 @@ Table.prototype.addHeaderClickListeners = function() {
     }
 };
 
+Table.prototype.getTableColumns = function() {
+    var t = this;
+
+    var columns = [];
+
+    var column;
+    var cells;
+
+    t.tableHeaders.forEach(function(header) {
+        column = new TableColumn();
+        cells = [];
+
+        column.index = header.index;
+        column.addTableHeader(header);
+
+        t.tableRows.forEach(function(row) {
+            cells.push(row.getCellById(header.id));
+        });
+
+        column.addTableCells(cells);
+
+        columns.push(column);
+    });
+
+    console.log("columns", columns);
+    return columns;
+};
+
 // dep 1
 Table.prototype.getRowByCellId = function(cellId) {
     return this.getCellIdRowMap()[cellId];
@@ -232,4 +259,9 @@ Table.prototype.addPeClickListeners = function(layout, tableFn) {
             });
         });
     }
+};
+
+
+Table.prototype.reduce = function() {
+    var columns = this.getTableColumns();
 };
