@@ -43,7 +43,7 @@ TableManager = function(c) {
             bodyStyle: 'box-shadow:0'
         });
 
-        t.loadMask.show();     
+        t.loadMask.show();
     };
 
     t.unmask = function(el) {
@@ -60,7 +60,7 @@ TableManager.prototype.applyTo = function(modules) {
     });
 };
 
-TableManager.prototype.getHtml = function(layout, fCallback) {
+TableManager.prototype.getTable = function(layout, fCallback) {
     var t = this;
 
     var path = t.appManager.getPath();

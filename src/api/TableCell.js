@@ -24,7 +24,7 @@ TableCell = function(config) {
     t.html;
 };
 
-TableCell.prototype.generateHtml = function() {
+TableCell.prototype.getHtml = function() {
     if (this.html) {
         return this.html;
     }

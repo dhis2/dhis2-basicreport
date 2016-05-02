@@ -1,7 +1,7 @@
 {
-    "version": "0.1",
+    "version": "22",
     "name": "Basic Report",
-    "description": "Basic Report",
+    "description": "Basic report app",
     "launch_path": "/index.html",
     "icons": {
         "48": "icons/br-48.png",

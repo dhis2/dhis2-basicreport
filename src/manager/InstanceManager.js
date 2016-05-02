@@ -17,7 +17,7 @@ InstanceManager.prototype.getReport = function(layout, isFavorite) {
 
     t.setState(layout, isFavorite);
 
-    t.tableManager.getHtml(layout, function(table) {
+    t.tableManager.getTable(layout, function(table) {
         t.getFn()(table);
     });
 };

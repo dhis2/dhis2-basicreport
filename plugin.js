@@ -155,7 +155,7 @@ function _load(layouts) {
 
             instanceManager.setFn(function(table) {
                 table.update = function(isSorting) {
-                    uiManager.update(table.generateHtml(), layout.el);
+                    uiManager.update(table.getHtml(), layout.el);
                     table.addHeaderClickListeners();
                     table.addOuClickListeners();
                     table.addPeClickListeners();

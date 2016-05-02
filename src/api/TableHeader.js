@@ -20,7 +20,7 @@ TableHeader = function(config) {
     t.html;
 };
 
-TableHeader.prototype.generateHtml = function() {
+TableHeader.prototype.getHtml = function() {
     this.html = '<td';
     this.html += this.elementId ? (' id="' + this.elementId + '"') : '';
     this.html += this.cls ? (' class="' + this.cls + '"') : '';

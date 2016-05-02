@@ -21,6 +21,9 @@ Table = function(config) {
         direction: 'ASC'
     };
 
+    // static
+    t.sortId = 'sortId';
+
     // transient
     t.cellIdRowMap;
 
@@ -65,11 +68,13 @@ Table.prototype.getSortDirection = function(id) {
 };
 
 Table.prototype.sortData = function() {
-    var sorting = this.sorting;
+    var t = this;
 
-    this.tableRows.sort( function(a, b) {
-        a = a.getCellById(sorting.id)['sortId'];
-        b = b.getCellById(sorting.id)['sortId'];
+    var sorting = t.sorting;
+
+    t.tableRows.sort(function(a, b) {
+        a = a.getCellById(sorting.id)[t.sortId];
+        b = b.getCellById(sorting.id)[t.sortId];
 
         // string
         if (isString(a) && isString(b)) {
@@ -112,13 +117,13 @@ Table.prototype.addOptionsCls = function(config) {
     return this.cls;
 };
 
-Table.prototype.generateHtml = function() {
+Table.prototype.getHtml = function() {
     var html = '<table class="pivot ' + this.cls + '">';
 
     html += '<tr>';
 
     for (var i = 0; i < this.tableHeaders.length; i++) {
-        html += this.tableHeaders[i].generateHtml();
+        html += this.tableHeaders[i].getHtml();
     }
 
     html += '</tr>';
@@ -129,7 +134,7 @@ Table.prototype.generateHtml = function() {
 
         for (var k = 0, th; k < this.tableHeaders.length; k++) {
             th = this.tableHeaders[k];
-            html += row.getCellById(th.id).generateHtml();
+            html += row.getCellById(th.id).getHtml();
         }
 
         html += '</tr>';

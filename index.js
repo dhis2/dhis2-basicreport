@@ -181,7 +181,7 @@ function initialize() {
     // instance manager
     instanceManager.setFn(function(table) {
         table.update = function(isSorting) {
-            uiManager.update(table.generateHtml());
+            uiManager.update(table.getHtml());
             table.addHeaderClickListeners();
             table.addOuClickListeners();
             table.addPeClickListeners();
