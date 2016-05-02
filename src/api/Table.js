@@ -131,9 +131,11 @@ Table.prototype.getHtml = function() {
         row = this.tableRows[j];
         html += '<tr>';
 
-        for (var k = 0, th; k < this.tableHeaders.length; k++) {
+        for (var k = 0, th, tc; k < this.tableHeaders.length; k++) {
             th = this.tableHeaders[k];
-            html += row.getCellById(th.id).getHtml();
+            tc = row.getCellById(th.id);
+console.log("tc", tc);
+            html += tc.getHtml();
         }
 
         html += '</tr>';
@@ -264,4 +266,9 @@ Table.prototype.addPeClickListeners = function(layout, tableFn) {
 
 Table.prototype.reduce = function() {
     var columns = this.getTableColumns();
+
+    columns.forEach(function(column) {
+        column.createGroups();
+        column.analyzeGroups();
+    });
 };

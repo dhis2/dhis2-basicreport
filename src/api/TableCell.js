@@ -22,6 +22,7 @@ TableCell = function(config) {
 
     // transient
     t.span;
+    t.display;
     t.html;
 };
 
@@ -30,10 +31,13 @@ TableCell.prototype.getHtml = function() {
         return this.html;
     }
 
+    var cls = (this.cls ? this.cls : '') + (this.hidden ? ' td-hidden' : '') + (this.span > 1 ? ' td-aligntop' : '');
+
     this.html = '<td';
     this.html += this.elementId ? (' id="' + this.elementId + '"') : '';
-    this.html += this.cls ? (' class="' + this.cls + '"') : '';
+    this.html += cls ? (' class="' + cls + '"') : '';
     this.html += this.style ? (' style="' + this.style + '"') : '';
+    this.html += this.span ? (' rowspan="' + this.span + '"') : '';
     this.html += '>' + this.name + '</td>';
 
     return this.html;

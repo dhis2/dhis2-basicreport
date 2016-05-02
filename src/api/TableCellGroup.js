@@ -25,7 +25,7 @@ TableCellGroup.prototype.setSpan = function() {
 TableCellGroup.prototype.setDisplay = function() {
     this.cells.forEach(function(cell, index) {
         if (index) {
-            cell.display = 'none';
+            cell.hidden = true;
         }
     });
 };

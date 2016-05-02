@@ -153,6 +153,10 @@ body,
     display: none;
 }
 
+.td-aligntop {
+    vertical-align: top;
+}
+
 .td-collapsed {
     display: none;
 }
