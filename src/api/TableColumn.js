@@ -1,6 +1,8 @@
 import arrayFrom from 'd2-utilizr/lib/arrayFrom';
 import arrayUnique from 'd2-utilizr/lib/arrayUnique';
 
+import {TableCellGroup} from './TableCellGroup';
+
 export var TableColumn;
 
 TableColumn = function(config) {
@@ -10,6 +12,10 @@ TableColumn = function(config) {
 
     t.tableHeader = config.tableHeader || null;
     t.tableCells = config.tableCells || [];
+
+    // transient
+    t.index = config.index || null;
+    t.tableCellGroups = [];
 };
 
 TableColumn.prototype.addTableHeader = function(header) {
@@ -20,6 +26,38 @@ TableColumn.prototype.addTableCells = function(param) {
     this.tableCells = this.tableCells.concat(arrayFrom(param));
 };
 
-TableColumn.prototype.getUnique = function() {
-    return arrayUnique(this.tableCells).length;
+//TableColumn.prototype.getUnique = function() {
+    //return arrayUnique(this.tableCells).length;
+//};
+
+TableColumn.prototype.getTotalIndex = function() {
+    return this.tableHeader && isNumber(this.index) ? (this.tableHeader.index + this.index) : null;
+};
+
+// dep 2
+
+TableColumn.prototype.createGroups = function() {
+    var cells = this.tableCells;
+    var groups = this.tableCellGroups;
+    var lastName;
+    var group;
+
+    cells.forEach(function(cell) {
+        if (cell.name !== lastName) {
+            if (group) {
+                groups.push(group);
+            }
+
+            group = new TableCellGroup();
+        }
+
+        group.add(cell);
+    });
+};
+
+TableColumn.prototype.analyzeGroups = function() {
+    this.groups.forEach(function(group) {
+        group.setSpan();
+        group.setDisplay();
+    });
 };

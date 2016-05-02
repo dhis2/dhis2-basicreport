@@ -21,6 +21,7 @@ TableCell = function(config) {
     }
 
     // transient
+    t.span;
     t.html;
 };
 

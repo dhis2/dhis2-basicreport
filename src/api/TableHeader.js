@@ -9,6 +9,7 @@ TableHeader = function(config) {
     t.elementId = Ext.data.IdGenerator.get('uuid').generate();
     t.name = config.name;
     t.objectName = config.objectName;
+    t.index = config.index;
 
     if (isNumeric(config.level)) {
         t.level = parseInt(config.level);
