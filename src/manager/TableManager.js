@@ -24,6 +24,13 @@ TableManager = function(c) {
     t.uiManager = c.uiManager;
     t.dimensionConfig = c.dimensionConfig;
 
+    // config
+    t.excludeReduce = [
+        'dx-numerator',
+        'dx-denominator',
+        'dx-value'
+    ];
+
     // transient
     t.loadMask;
 
@@ -564,7 +571,6 @@ TableManager.prototype.getTable = function(layout, fCallback) {
         table.sortData();
 
         table.reduce();
-        //table.getTableColumns();
 
         if (fCallback) {
             fCallback(table);

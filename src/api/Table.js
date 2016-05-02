@@ -1,6 +1,7 @@
 import isString from 'd2-utilizr/lib/isString';
 import isNumber from 'd2-utilizr/lib/isNumber';
 import isEmpty from 'd2-utilizr/lib/isEmpty';
+import arrayContains from 'd2-utilizr/lib/arrayContains';
 
 import {OrganisationUnitTableCell} from './TableCell.OrganisationUnit';
 import {PeriodTableCell} from './TableCell.Period';
@@ -134,7 +135,6 @@ Table.prototype.getHtml = function() {
         for (var k = 0, th, tc; k < this.tableHeaders.length; k++) {
             th = this.tableHeaders[k];
             tc = row.getCellById(th.id);
-console.log("tc", tc);
             html += tc.getHtml();
         }
 
@@ -207,13 +207,26 @@ Table.prototype.getTableColumns = function() {
         columns.push(column);
     });
 
-    console.log("columns", columns);
     return columns;
 };
 
 // dep 1
 Table.prototype.getRowByCellId = function(cellId) {
     return this.getCellIdRowMap()[cellId];
+};
+
+Table.prototype.reduce = function() {
+    var columns = this.getTableColumns(),
+        keys = this.klass.tableManager.excludeReduce;
+
+    columns.forEach(function(column) {
+        if (arrayContains(keys, column.tableHeader.id)) {
+            return;
+        }
+
+        column.createGroups();
+        column.analyzeGroups();
+    });
 };
 
 // dep 2
@@ -263,12 +276,3 @@ Table.prototype.addPeClickListeners = function(layout, tableFn) {
     }
 };
 
-
-Table.prototype.reduce = function() {
-    var columns = this.getTableColumns();
-
-    columns.forEach(function(column) {
-        column.createGroups();
-        column.analyzeGroups();
-    });
-};
