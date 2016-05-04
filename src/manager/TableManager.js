@@ -2,6 +2,7 @@ import isNumeric from 'd2-utilizr/lib/isNumeric';
 import isArray from 'd2-utilizr/lib/isArray';
 import isObject from 'd2-utilizr/lib/isObject';
 import arrayTo from 'd2-utilizr/lib/arrayTo';
+import arraySort from 'd2-utilizr/lib/arraySort';
 
 import {DataObject} from '../api/DataObject';
 import {Response} from '../api/Response';
@@ -25,7 +26,7 @@ TableManager = function(c) {
     t.dimensionConfig = c.dimensionConfig;
 
     // config
-    t.excludeReduce = [
+    t.excludeReduceKeys = [
         'dx-numerator',
         'dx-denominator',
         'dx-value'
@@ -357,7 +358,8 @@ TableManager.prototype.getTable = function(layout, fCallback) {
                     id: 'dx-datatype',
                     name: 'Data type',
                     objectName: 'dx',
-                    cls: 'pivot-dim'
+                    cls: 'pivot-dim',
+                    index: index++
                 }));
             }
 
@@ -365,7 +367,8 @@ TableManager.prototype.getTable = function(layout, fCallback) {
                 id: 'dx-type',
                 name: 'Type',
                 objectName: 'dx',
-                cls: 'pivot-dim'
+                cls: 'pivot-dim',
+                index: index++
             }));
 
             if (layout.showDataDescription) {
@@ -373,7 +376,8 @@ TableManager.prototype.getTable = function(layout, fCallback) {
                     id: 'dx-description',
                     name: 'Description',
                     objectName: 'dx',
-                    cls: 'pivot-dim'
+                    cls: 'pivot-dim',
+                    index: index++
                 }));
             }
 
@@ -405,6 +409,8 @@ TableManager.prototype.getTable = function(layout, fCallback) {
         // table rows
 
         (function() {
+
+            arraySort(tableHeaders, 'index', 'ASC');
 
             for (var i = 0, idComb, dxId, peId, ouId, row, dataObject, allOuSortId, numeratorTotal, denominatorTotal, period, orgUnit, value; i < idCombinations.length; i++) {
                 idComb = idCombinations[i];

@@ -15,7 +15,8 @@ TableColumn = function(config) {
 
     // transient
     t.index = config.index || null;
-    t.tableCellGroups = [];
+    t.tableCellGroups;
+    t.tableCellGroupsLength;
 };
 
 TableColumn.prototype.addTableHeader = function(header) {
@@ -30,17 +31,21 @@ TableColumn.prototype.getTotalIndex = function() {
     return this.tableHeader && isNumber(this.index) ? (this.tableHeader.index + this.index) : null;
 };
 
-// dep 2
-
-TableColumn.prototype.createGroups = function() {
+TableColumn.prototype.getGroups = function() {
     var t = this;
+
+    if (t.tableCellGroups) {
+        return t.tableCellGroups;
+    }
+
+    var groups = [];
     var prevName;
     var group;
 
     t.tableCells.forEach(function(cell) {
         if (cell.name !== prevName) {
             if (group) {
-                t.tableCellGroups.push(group);
+                groups.push(group);
             }
 
             group = new TableCellGroup();
@@ -51,12 +56,27 @@ TableColumn.prototype.createGroups = function() {
         prevName = cell.name;
     });
 
-    t.tableCellGroups.push(group);
+    groups.push(group);
+
+    t.tableCellGroupsLength = groups.length;
+    return t.tableCellGroups = groups;
 };
 
-TableColumn.prototype.analyzeGroups = function() {
-    this.tableCellGroups.forEach(function(group) {
+// dep 2
+
+TableColumn.prototype.setCellAttributes = function() {
+    var t = this;
+
+console.log("setCellAttributes");
+
+    this.getGroups().forEach(function(group) {
+
+console.log(t.tableCellGroupsLength, t.tableCellGroups);
+
         group.setSpan();
         group.setDisplay();
     });
 };
+
+
+

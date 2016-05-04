@@ -18,6 +18,7 @@ TableHeader = function(config) {
     t.cls = 'pivot-dim td-sortable pointer';
 
     // transient
+    t.reduceIndex;
     t.html;
 };
 

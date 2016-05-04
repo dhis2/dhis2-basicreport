@@ -2,6 +2,7 @@ import isString from 'd2-utilizr/lib/isString';
 import isNumber from 'd2-utilizr/lib/isNumber';
 import isEmpty from 'd2-utilizr/lib/isEmpty';
 import arrayContains from 'd2-utilizr/lib/arrayContains';
+import arraySort from 'd2-utilizr/lib/arraySort';
 
 import {OrganisationUnitTableCell} from './TableCell.OrganisationUnit';
 import {PeriodTableCell} from './TableCell.Period';
@@ -191,7 +192,14 @@ Table.prototype.getTableColumns = function() {
     var column;
     var cells;
 
+    arraySort(t.tableHeaders, 'index', 'ASC');
+
+console.log("getTableColumns");
+
     t.tableHeaders.forEach(function(header) {
+
+console.log(header.index, header);
+
         column = new TableColumn();
         cells = [];
 
@@ -216,16 +224,30 @@ Table.prototype.getRowByCellId = function(cellId) {
 
 Table.prototype.reduce = function() {
     var columns = this.getTableColumns(),
-        keys = this.klass.tableManager.excludeReduce;
+        keys = this.klass.tableManager.excludeReduceKeys,
+        groups;
 
+    // create groups, set span/display
     columns.forEach(function(column) {
         if (arrayContains(keys, column.tableHeader.id)) {
             return;
         }
 
-        column.createGroups();
-        column.analyzeGroups();
+        column.getGroups();
+        column.setCellAttributes();
     });
+
+    // index
+    //arraySort(columns, 'tableCellGroupsLength', 'ASC');
+    columns = arraySort(columns, 'tableCellGroupsLength', 'ASC');
+
+    columns.forEach(function(column, i) {
+console.log(column.tableHeader.id, column.tableCellGroupsLength, column);
+        column.tableHeader.reduceIndex = i;
+    });
+
+    arraySort(this.tableHeaders, 'reduceIndex', 'ASC', true);
+console.log("this.tableHeaders", this.tableHeaders);
 };
 
 // dep 2
