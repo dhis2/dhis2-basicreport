@@ -31,12 +31,8 @@ TableColumn.prototype.getTotalIndex = function() {
     return this.tableHeader && isNumber(this.index) ? (this.tableHeader.index + this.index) : null;
 };
 
-TableColumn.prototype.getGroups = function() {
+TableColumn.prototype.createGroups = function() {
     var t = this;
-
-    if (t.tableCellGroups) {
-        return t.tableCellGroups;
-    }
 
     var groups = [];
     var prevName;
@@ -59,7 +55,9 @@ TableColumn.prototype.getGroups = function() {
     groups.push(group);
 
     t.tableCellGroupsLength = groups.length;
-    return t.tableCellGroups = groups;
+    t.tableCellGroups = groups;
+
+    return groups;
 };
 
 // dep 2
@@ -67,16 +65,8 @@ TableColumn.prototype.getGroups = function() {
 TableColumn.prototype.setCellAttributes = function() {
     var t = this;
 
-console.log("setCellAttributes");
-
-    this.getGroups().forEach(function(group) {
-
-console.log(t.tableCellGroupsLength, t.tableCellGroups);
-
+    this.createGroups().forEach(function(group) {
         group.setSpan();
         group.setDisplay();
     });
 };
-
-
-

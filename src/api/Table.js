@@ -1,4 +1,5 @@
 import isString from 'd2-utilizr/lib/isString';
+import isObject from 'd2-utilizr/lib/isObject';
 import isNumber from 'd2-utilizr/lib/isNumber';
 import isEmpty from 'd2-utilizr/lib/isEmpty';
 import arrayContains from 'd2-utilizr/lib/arrayContains';
@@ -192,14 +193,9 @@ Table.prototype.getTableColumns = function() {
     var column;
     var cells;
 
-    arraySort(t.tableHeaders, 'index', 'ASC');
-
-console.log("getTableColumns");
+    arraySort(t.tableHeaders, 'ASC', 'index');
 
     t.tableHeaders.forEach(function(header) {
-
-console.log(header.index, header);
-
         column = new TableColumn();
         cells = [];
 
@@ -229,25 +225,25 @@ Table.prototype.reduce = function() {
 
     // create groups, set span/display
     columns.forEach(function(column) {
+
+        // if excluded, push to the right
         if (arrayContains(keys, column.tableHeader.id)) {
+            column.tableCellGroupsLength = (column.tableCells.length + column.tableHeader.index);
             return;
         }
 
-        column.getGroups();
+        column.createGroups();
         column.setCellAttributes();
     });
 
     // index
-    //arraySort(columns, 'tableCellGroupsLength', 'ASC');
-    columns = arraySort(columns, 'tableCellGroupsLength', 'ASC');
+    arraySort(columns, 'ASC', 'tableCellGroupsLength');
 
     columns.forEach(function(column, i) {
-console.log(column.tableHeader.id, column.tableCellGroupsLength, column);
         column.tableHeader.reduceIndex = i;
     });
 
-    arraySort(this.tableHeaders, 'reduceIndex', 'ASC', true);
-console.log("this.tableHeaders", this.tableHeaders);
+    arraySort(this.tableHeaders, 'ASC', 'reduceIndex');
 };
 
 // dep 2

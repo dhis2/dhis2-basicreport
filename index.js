@@ -147,8 +147,6 @@ requestManager.add(new api.Request(init.rootNodesInit(refs)));
 requestManager.add(new api.Request(init.organisationUnitLevelsInit(refs)));
 requestManager.add(new api.Request(init.legendSetsInit(refs)));
 
-global.refs = refs;
-
 requestManager.set(initialize);
 requestManager.run();
 
@@ -197,4 +195,6 @@ function initialize() {
 
     // viewport
     uiManager.reg(Viewport(refs), 'viewport');
+
+    global.refs = refs;
 }
