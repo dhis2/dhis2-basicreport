@@ -61,29 +61,19 @@ Table.prototype.getCellIdRowMap = function() {
     return this.cellIdRowMap;
 };
 
-//Table.prototype.getSortDirection = function(id) {
-    //if (id === this.lastSorting.id) {
-        //return this.lastSorting.direction === 'ASC' ? 'DESC' : 'ASC';
-    //}
-
-    //return 'ASC';
-//};
-
 Table.prototype.sortData = function() {
     var t = this;
 
-    var sorting = t.sorting;
-
     t.tableRows.sort(function(a, b) {
-        a = a.getCellById(sorting.id)[t.sortId];
-        b = b.getCellById(sorting.id)[t.sortId];
+        a = a.getCellById(t.sorting.id)[t.sortId];
+        b = b.getCellById(t.sorting.id)[t.sortId];
 
         // string
         if (isString(a) && isString(b)) {
             a = a.toLowerCase();
             b = b.toLowerCase();
 
-            if (sorting.direction === 'DESC') {
+            if (t.sorting.direction === 'DESC') {
                 return a < b ? 1 : (a > b ? -1 : 0);
             }
             else {
@@ -93,15 +83,15 @@ Table.prototype.sortData = function() {
 
         // number
         else if (isNumber(a) && isNumber(b)) {
-            return sorting.direction === 'DESC' ? b - a : a - b;
+            return t.sorting.direction === 'DESC' ? b - a : a - b;
         }
 
         else if (isEmpty(a)) {
-            return sorting.emptyFirst ? -1 : 1;
+            return t.sorting.emptyFirst ? -1 : 1;
         }
 
         else if (isEmpty(b)) {
-            return sorting.emptyFirst ? 1 : -1;
+            return t.sorting.emptyFirst ? 1 : -1;
         }
 
         return -1;
@@ -168,9 +158,9 @@ Table.prototype.addHeaderClickListeners = function() {
     var t = this;
 
     var instanceManager = t.klass.instanceManager;
+    var el;
 
-    for (var i = 0, th, el; i < t.tableHeaders.length; i++) {
-        th = t.tableHeaders[i];
+    t.tableHeaders.forEach(function(th) {
         el = Ext.get(th.elementId);
         el.tableHeaderId = th.id;
 
@@ -181,7 +171,7 @@ Table.prototype.addHeaderClickListeners = function() {
                 }, true)
             );
         });
-    }
+    });
 };
 
 Table.prototype.getTableColumns = function() {
