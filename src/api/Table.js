@@ -20,7 +20,7 @@ Table = function(config) {
     t.tableRows = config.tableRows;
     t.cls = config.cls;
 
-    t.sorting = {
+    t.sorting = config.sorting || {
         id: 'pe',
         direction: 'ASC'
     };
@@ -61,13 +61,13 @@ Table.prototype.getCellIdRowMap = function() {
     return this.cellIdRowMap;
 };
 
-Table.prototype.getSortDirection = function(id) {
-    if (id === this.lastSorting.id) {
-        return this.lastSorting.direction === 'ASC' ? 'DESC' : 'ASC';
-    }
+//Table.prototype.getSortDirection = function(id) {
+    //if (id === this.lastSorting.id) {
+        //return this.lastSorting.direction === 'ASC' ? 'DESC' : 'ASC';
+    //}
 
-    return 'ASC';
-};
+    //return 'ASC';
+//};
 
 Table.prototype.sortData = function() {
     var t = this;
@@ -167,20 +167,19 @@ Table.prototype.getTableCellsByInstance = function(type) {
 Table.prototype.addHeaderClickListeners = function() {
     var t = this;
 
+    var instanceManager = t.klass.instanceManager;
+
     for (var i = 0, th, el; i < t.tableHeaders.length; i++) {
         th = t.tableHeaders[i];
         el = Ext.get(th.elementId);
         el.tableHeaderId = th.id;
 
         el.on('click', function() {
-            t.sorting.id = this.tableHeaderId;
-            t.sorting.direction = t.getSortDirection(this.tableHeaderId);
-
-            t.sortData();
-            t.update();
-
-            t.lastSorting.id = t.sorting.id;
-            t.lastSorting.direction = t.sorting.direction;
+            instanceManager.getReport(instanceManager.getStateCurrent().setOrToggleSorting({
+                    id: this.tableHeaderId,
+                    direction: 'DESC'
+                }, true)
+            );
         });
     }
 };

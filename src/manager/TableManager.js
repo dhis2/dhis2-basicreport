@@ -570,10 +570,12 @@ TableManager.prototype.getTable = function(layout, fCallback) {
 
         var table = new Table({
             tableHeaders: tableHeaders,
-            tableRows: tableRows
+            tableRows: tableRows,
+            sorting: layout.sorting
         });
 
         table.addOptionsCls(layout);
+
         table.sortData();
 
         table.reduce();
