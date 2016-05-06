@@ -16,12 +16,12 @@ OptionsWindow = function(c) {
         showHierarchy,
         displayDensity,
         fontSize,
-        digitGroupSeparator,
-        legendSet,
+        reduceLayout,
 
         data,
         organisationUnits,
         style,
+        layout,
 
         comboboxWidth = 262,
         comboBottomMargin = 1,
@@ -81,6 +81,12 @@ OptionsWindow = function(c) {
             })
         });
 
+        reduceLayout = Ext.create('Ext.form.field.Checkbox', {
+            boxLabel: i18n.reduce_layout,
+            style: 'margin-bottom:' + checkboxBottomMargin + 'px',
+            checked: true
+        });
+
         data = {
             bodyStyle: 'border:0 none',
             style: 'margin-left:14px',
@@ -107,6 +113,14 @@ OptionsWindow = function(c) {
             ]
         };
 
+        layout = {
+            bodyStyle: 'border:0 none',
+            style: 'margin-left:14px',
+            items: [
+                reduceLayout
+            ]
+        };
+
         window = Ext.create('Ext.window.Window', {
             title: i18n.table_options,
             bodyStyle: 'background-color:#fff; padding:2px 2px 1px',
@@ -121,7 +135,8 @@ OptionsWindow = function(c) {
                     hideEmptyRows: hideEmptyRows.getValue(),
                     showHierarchy: showHierarchy.getValue(),
                     displayDensity: displayDensity.getValue(),
-                    fontSize: fontSize.getValue()
+                    fontSize: fontSize.getValue(),
+                    reduceLayout: reduceLayout.getValue()
                 };
             },
             setOptions: function(layout) {
@@ -130,6 +145,7 @@ OptionsWindow = function(c) {
                 showHierarchy.setValue(Ext.isBoolean(layout.showHierarchy) ? layout.showHierarchy : false);
                 displayDensity.setValue(isString(layout.displayDensity) ? layout.displayDensity : optionConfig.getDisplayDensity('normal').id);
                 fontSize.setValue(isString(layout.fontSize) ? layout.fontSize : optionConfig.getFontSize('normal').id);
+                reduceLayout.setValue(Ext.isBoolean(layout.reduceLayout) ? layout.reduceLayout : false);
             },
             items: [
                 {
@@ -147,6 +163,15 @@ OptionsWindow = function(c) {
                     html: i18n.organisation_units
                 },
                 organisationUnits,
+                {
+                    bodyStyle: 'border:0 none; padding:7px'
+                },
+                {
+                    bodyStyle: 'border:0 none; color:#222; font-size:12px; font-weight:bold',
+                    style: 'margin-bottom:6px; margin-left:5px',
+                    html: i18n.layout
+                },
+                layout,
                 {
                     bodyStyle: 'border:0 none; padding:7px'
                 },
@@ -192,6 +217,7 @@ OptionsWindow = function(c) {
                     w.showHierarchy = showHierarchy;
                     w.displayDensity = displayDensity;
                     w.fontSize = fontSize;
+                    w.reduceLayout = reduceLayout;
                 }
             }
         });

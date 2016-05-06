@@ -410,7 +410,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
 
         (function() {
 
-            arraySort(tableHeaders, 'index', 'ASC');
+            arraySort(tableHeaders, 'ASC', 'index');
 
             for (var i = 0, idComb, dxId, peId, ouId, row, dataObject, allOuSortId, numeratorTotal, denominatorTotal, period, orgUnit, value; i < idCombinations.length; i++) {
                 idComb = idCombinations[i];
@@ -578,7 +578,9 @@ TableManager.prototype.getTable = function(layout, fCallback) {
 
         table.sortData();
 
-        table.reduce();
+        if (layout.reduceLayout) {
+            table.reduce();
+        }
 
         if (fCallback) {
             fCallback(table);
