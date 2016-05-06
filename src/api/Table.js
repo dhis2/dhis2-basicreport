@@ -166,10 +166,9 @@ Table.prototype.addHeaderClickListeners = function() {
 
         el.on('click', function() {
             instanceManager.getReport(instanceManager.getStateCurrent().setOrToggleSorting({
-                    id: this.tableHeaderId,
-                    direction: 'DESC'
-                }, true)
-            );
+                id: this.tableHeaderId,
+                direction: 'ASC'
+            }, true));
         });
     });
 };
