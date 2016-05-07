@@ -5,6 +5,8 @@ import isEmpty from 'd2-utilizr/lib/isEmpty';
 import arrayContains from 'd2-utilizr/lib/arrayContains';
 import arraySort from 'd2-utilizr/lib/arraySort';
 
+import {Sorting} from 'd2-analysis';
+
 import {OrganisationUnitTableCell} from './TableCell.OrganisationUnit';
 import {PeriodTableCell} from './TableCell.Period';
 import {TableColumn} from './TableColumn';
@@ -165,10 +167,10 @@ Table.prototype.addHeaderClickListeners = function() {
         el.tableHeaderId = th.id;
 
         el.on('click', function() {
-            instanceManager.getReport(instanceManager.getStateCurrent().setOrToggleSorting({
+            instanceManager.getReport(instanceManager.getStateCurrent().setOrToggleSorting(new Sorting({
                 id: this.tableHeaderId,
                 direction: 'ASC'
-            }, true));
+            }), true));
         });
     });
 };

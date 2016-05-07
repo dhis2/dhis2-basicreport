@@ -17,6 +17,8 @@ import {PeriodTableCell} from './src/api/TableCell.Period';
 import {TableHeader} from './src/api/TableHeader';
 import {TableRow} from './src/api/TableRow';
 
+import {Layout} from './src/api/Layout';
+
 import {InstanceManager} from './src/manager/InstanceManager';
 import {TableManager} from './src/manager/TableManager';
 
@@ -31,6 +33,10 @@ api.OrganisationUnitTableCell = OrganisationUnitTableCell;
 api.PeriodTableCell = PeriodTableCell;
 api.TableHeader = TableHeader;
 api.TableRow = TableRow;
+
+// override
+api.Layout = Layout;
+
 manager.InstanceManager = InstanceManager;
 manager.TableManager = TableManager;
 

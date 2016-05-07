@@ -18,13 +18,15 @@ import {PeriodTableCell} from './src/api/TableCell.Period';
 import {TableHeader} from './src/api/TableHeader';
 import {TableRow} from './src/api/TableRow';
 
+import {Layout} from './src/api/Layout';
+
 import {InstanceManager} from './src/manager/InstanceManager';
 import {TableManager} from './src/manager/TableManager';
 
 import {OptionsWindow} from './src/ui/OptionsWindow';
 import {Viewport} from './src/ui/Viewport';
 
-// extends
+// extend
 api.DataObject = DataObject;
 api.OrganisationUnit = OrganisationUnit;
 api.Period = Period;
@@ -35,6 +37,9 @@ api.OrganisationUnitTableCell = OrganisationUnitTableCell;
 api.PeriodTableCell = PeriodTableCell;
 api.TableHeader = TableHeader;
 api.TableRow = TableRow;
+
+// override
+api.Layout = Layout;
 
 manager.InstanceManager = InstanceManager;
 manager.TableManager = TableManager;
