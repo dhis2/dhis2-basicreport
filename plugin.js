@@ -159,6 +159,8 @@ function _load(layouts) {
             instanceManager.apiResource = 'reportTables';
             instanceManager.applyTo(arrayTo(api));
 
+            tableManager.instanceManager = instanceManager;
+
             instanceManager.setFn(function(table) {
                 table.update = function(isSorting) {
                     uiManager.update(table.getHtml(), layout.el);

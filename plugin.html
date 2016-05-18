@@ -1,57 +1,100 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <script src="//localhost:8080/dhis-web-commons/javascripts/ext/ext-all.js"></script>
-    <script src="scripts/table.js"></script>
-
-    <style type="text/css">
-        body {font-family:sans-serif; margin:0 60px;}
-        h1 {font-size:20px; margin:20px 0;}
-        #table1, #table2 {margin-bottom:40px;}
-    </style>
-
-    <script>
-        Ext.onReady(function() {
-            //var url = 'http://localhost:8080',
-            var url = 'https://apps.dhis2.org/demo',
-                username = 'admin',
-                password = 'district';
-
-            DHIS.getTable({
-                url: url,
-                crossDomain: true,
-                username: username,
-                password: password,
-                el: 'table1',
-                uid: 'tWg9OiyV7mu',
-                showDimensionLabels: true,
-                displayDensity: 'compact'
-            });
-
-            DHIS.getTable({
-                url: url,
-                el: 'table2',
-                crossDomain: true,
-                username: username,
-                password: password,
-                columns: [
-                    {dimension: 'pe', items: [{id: 'LAST_12_MONTHS'}]}
-                ],
-                rows: [
-                    {dimension: 'ou', items: [{id: 'USER_ORGUNIT_CHILDREN'}]}
-                ],
-                hideEmptyRows: true,
-                userOrgUnit: ['fdc6uOvgoji', 'e1eIKM1GIF3']
-            });
-        });
-    </script>
+    <script src="./build/extjs/ext-all.js"></script>
+    <script src="./jquery.min.js"></script>
+    <script src="./build/dhis2-date.js"></script>
+    <script src="./build/basicreport.js"></script>
 </head>
 
-<body>
-    <h1>TABLE BY ID</h1>
-    <div id="table1"></div>
+<body><h2 style="font-size:16px; margin:20px">Normal table</h2>
+    <div id="table1" style="margin:20px"></div>
 
-    <h1>TABLE BY CONFIG</h1>
-    <div id="table2"></div>
+    <h2 style="font-size:16px; margin:20px">Reduced table</h2>
+    <div id="table2" style="margin:20px"></div>
+
+
+    <script>
+        basicReportPlugin.url = 'http://localhost:8080';
+        basicReportPlugin.username = 'system';
+        basicReportPlugin.password = 'System123';
+        basicReportPlugin.spinner = true;
+
+        var table1 = {
+            "columns": [{
+                "dimension": "dx",
+                "items": [{
+                    "id": "FbKK4ofIv5R"
+                }, {
+                    "id": "d9thHOJMROr"
+                }]
+            }],
+            "rows": [{
+                "dimension": "pe",
+                "items": [{
+                    "id": "LAST_12_MONTHS",
+                }, {
+                    "id": "LAST_4_QUARTERS",
+                }]
+            }, {
+                "dimension": "ou",
+                "items": [{
+                    "id": "ImspTQPwCqd"
+                }]
+            }],
+            "dataDimensionItems": [{
+                "indicator": {
+                    "id": "FbKK4ofIv5R"
+                }
+            }, {
+                "indicator": {
+                    "id": "d9thHOJMROr"
+                }
+            }],
+            "el": "table1",
+            "showHierarchy": true,
+            "displayDensity": "COMFORTABLE"
+        };
+
+        var table2 = {
+            "columns": [{
+                "dimension": "dx",
+                "items": [{
+                    "id": "FbKK4ofIv5R"
+                }, {
+                    "id": "d9thHOJMROr"
+                }]
+            }],
+            "rows": [{
+                "dimension": "pe",
+                "items": [{
+                    "id": "LAST_12_MONTHS",
+                }, {
+                    "id": "LAST_4_QUARTERS",
+                }]
+            }, {
+                "dimension": "ou",
+                "items": [{
+                    "id": "ImspTQPwCqd"
+                }]
+            }],
+            "dataDimensionItems": [{
+                "indicator": {
+                    "id": "FbKK4ofIv5R"
+                }
+            }, {
+                "indicator": {
+                    "id": "d9thHOJMROr"
+                }
+            }],
+            "el": "table2",
+            "showHierarchy": true,
+            "displayDensity": "COMFORTABLE",
+            "reduceLayout": true
+        };
+
+        basicReportPlugin.load([table1, table2]);
+
+    </script>
 </body>
 </html>

@@ -18,6 +18,8 @@ Table = function(config) {
 
     t.klass = Table;
 
+    t.instanceManager;
+
     t.tableHeaders = config.tableHeaders;
     t.tableRows = config.tableRows;
     t.cls = config.cls;
@@ -41,6 +43,10 @@ Table = function(config) {
     t.html;
 
     t.update;
+
+    t.getInstanceManager = function() {
+        return t.instanceManager || config.instanceManager || t.klass.instanceManager;
+    };
 };
 
 Table.prototype.getCellIdRowMap = function() {
@@ -159,7 +165,7 @@ Table.prototype.getTableCellsByInstance = function(type) {
 Table.prototype.addHeaderClickListeners = function() {
     var t = this;
 
-    var instanceManager = t.klass.instanceManager;
+    var instanceManager = t.getInstanceManager();
     var el;
 
     t.tableHeaders.forEach(function(th) {

@@ -25,6 +25,12 @@ TableManager = function(c) {
     t.uiManager = c.uiManager;
     t.dimensionConfig = c.dimensionConfig;
 
+    t.instanceManager;
+
+    t.getInstanceManager = function() {
+        return t.instanceManager || c.instanceManager;
+    };
+
     // config
     t.excludeReduceKeys = [
         'dx-numerator',
@@ -571,8 +577,10 @@ TableManager.prototype.getTable = function(layout, fCallback) {
         var table = new Table({
             tableHeaders: tableHeaders,
             tableRows: tableRows,
-            sorting: layout.sorting
+            sorting: layout.sorting,
+            instanceManager: t.getInstanceManager()
         });
+
 
         table.addOptionsCls(layout);
 
