@@ -469,13 +469,15 @@ TableManager.prototype.getTable = function(layout, fCallback) {
                     // ou
                     if (th.objectName === 'ou') {
                         row.addCell(th.id, new OrganisationUnitTableCell(th.level > orgUnit.level ? {
-                            isEmpty: true
+                            isEmpty: true,
+                            instanceManager: t.getInstanceManager()
                         } : {
                             name: orgUnit.getParentNameByLevel(th.level),
                             sortId: ouSortId + period.typeSortId + period.sortId + dataObject.groupName + dataObject.name,
                             cls: 'pivot-value clickable',
                             level: th.level,
-                            organisationUnit: orgUnit
+                            organisationUnit: orgUnit,
+                            instanceManager: t.getInstanceManager()
                         }));
                     }
 
@@ -502,7 +504,8 @@ TableManager.prototype.getTable = function(layout, fCallback) {
                                 name: period.displayName,
                                 sortId: period.typeSortId + period.sortId + dataObject.groupName + dataObject.name + allOuSortId,
                                 cls: 'pivot-value clickable',
-                                period: period
+                                period: period,
+                                instanceManager: t.getInstanceManager()
                             }));
                         }
                     }
@@ -578,7 +581,8 @@ TableManager.prototype.getTable = function(layout, fCallback) {
             tableHeaders: tableHeaders,
             tableRows: tableRows,
             sorting: layout.sorting,
-            instanceManager: t.getInstanceManager()
+            instanceManager: t.getInstanceManager(),
+            tableManager: t
         });
 
 

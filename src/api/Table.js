@@ -19,6 +19,7 @@ Table = function(config) {
     t.klass = Table;
 
     t.instanceManager;
+    t.tableManager;
 
     t.tableHeaders = config.tableHeaders;
     t.tableRows = config.tableRows;
@@ -46,6 +47,10 @@ Table = function(config) {
 
     t.getInstanceManager = function() {
         return t.instanceManager || config.instanceManager || t.klass.instanceManager;
+    };
+
+    t.getTableManager = function() {
+        return t.tableManager || config.tableManager || t.klass.tableManager;
     };
 };
 
@@ -216,7 +221,7 @@ Table.prototype.getRowByCellId = function(cellId) {
 
 Table.prototype.reduce = function() {
     var columns = this.getTableColumns(),
-        keys = this.klass.tableManager.excludeReduceKeys,
+        keys = this.getTableManager().excludeReduceKeys,
         groups;
 
     // create groups, set span/display
@@ -260,7 +265,7 @@ Table.prototype.addOuClickListeners = function() {
 
         el.on('click', function(event) {
             this.cell.showContextMenu(this.row, function(items) {
-                return t.klass.tableManager.getContextMenu(items);
+                return t.getTableManager().getContextMenu(items);
             });
         });
     }
@@ -283,7 +288,7 @@ Table.prototype.addPeClickListeners = function(layout, tableFn) {
 
         el.on('click', function(event) {
             this.cell.showContextMenu(function(items) {
-                return t.klass.tableManager.getContextMenu(items);
+                return t.getTableManager().getContextMenu(items);
             });
         });
     }

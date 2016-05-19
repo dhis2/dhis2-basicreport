@@ -11,13 +11,19 @@ PeriodTableCell = function(config) {
 
     t.klass = PeriodTableCell;
 
+    t.instanceManager;
+
     this.period = config.period;
+
+    t.getInstanceManager = function() {
+        return t.instanceManager || config.instanceManager || t.klass.instanceManager;
+    };
 };
 
 PeriodTableCell.prototype.showContextMenu = function(menuFn) {
     var t = this;
 
-    var instanceManager = t.klass.instanceManager;
+    var instanceManager = t.getInstanceManager();
 
     var itemsConfig = t.period.getContextMenuItemsConfig(),
         items = [];

@@ -11,14 +11,20 @@ OrganisationUnitTableCell = function(config) {
 
     t.klass = OrganisationUnitTableCell;
 
+    t.instanceManager;
+
     this.level = config.level;
     this.organisationUnit = config.organisationUnit;
+
+    t.getInstanceManager = function() {
+        return t.instanceManager || config.instanceManager || t.klass.instanceManager;
+    };
 };
 
 OrganisationUnitTableCell.prototype.showContextMenu = function(row, menuFn) {
     var t = this;
 
-    var instanceManager = t.klass.instanceManager;
+    var instanceManager = t.getInstanceManager();
 
     var itemsConfig = t.organisationUnit.getContextMenuItemsConfig(t.level),
         items = [];
