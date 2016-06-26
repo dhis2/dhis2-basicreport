@@ -436,7 +436,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
                 // period
                 period = new Period({
                     id: peId,
-                    name: response.getNameById(peId)
+                    name: response.getNameById(peId, true)
                 });
 
                 period.generateDisplayProperties();

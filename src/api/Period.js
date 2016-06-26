@@ -75,6 +75,60 @@ Period.prototype.genRev = function(type, offset) {
     return this.generator.generateReversedPeriods(type, offset);
 };
 
+Period.prototype.getTypeById = function(id) {
+    if (!isNumeric(id.slice(0, 4))) {
+        return;
+    }
+
+    if (id.length === 4) {
+        return 'Yearly';
+    }
+    else if (id.length === 6) {
+        if (isNumeric(id)) {
+            return 'Monthly';
+        }
+        else if (id.indexOf('W') !== -1) {
+            return 'Weekly';
+        }
+        else if (id.indexOf('Q') !== -1) {
+            return 'Quarterly';
+        }
+        else if (id.indexOf('S') !== -1) {
+            return 'SixMonthly';
+        }
+    }
+    else if (id.length === 7) {
+        if (id.indexOf('B') !== -1) {
+            return 'BiMonthly';
+        }
+        else if (id.indexOf('Oct') !== -1) {
+            return 'FinancialOct';
+        }
+    }
+    else if (id.length === 8) {
+        if (isNumeric(id.slice(4, 8))) {
+            return 'Daily';
+        }
+        else if (id.indexOf('July') !== -1) {
+            return 'FinancialJuly';
+        }
+    }
+    else if (id.length === 9) {
+        if (id.indexOf('April') !== -1) {
+            return 'FinancialApril';
+        }
+    }
+    else if (id.length === 11) {
+        if (id.indexOf('AprilS') !== -1) {
+            return 'SixMonthlyApril';
+        }
+    }
+    else {
+        return;
+    }
+};
+
+
 // dep 1
 
 Period.prototype.getItemsByTypeByFinancialApril = function(type, isAll) {
@@ -1317,428 +1371,135 @@ Period.prototype.generateDisplayProperties = function() {
             return array.length > 1 ? 's' : '';
         };
 
-    if (isNumeric(id)) {
+    var type = p.getTypeById(id);
 
-        // yearly
-        if (id.length === 4) {
-            this.sortId = id + '0000';
-            this.typeSortId = '08';
-            this.typeName = 'Yearly';
-            this.displayName = this.name;
+    if (type === 'Daily') {
+        this.sortId = id;
+        this.typeSortId = '01';
+        this.typeName = 'Daily';
+        this.displayName = months[(new Date(this.name)).getMonth()] + ' ' + parseInt(this.name.split('-')[2]);
 
-            this.getContextMenuItemsConfig = function() {
-                var items = [];
+        this.getContextMenuItemsConfig = function() {
+            var items = [];
 
-                // drill up
+            // drill up
+            items.push({
+                isSubtitle: true,
+                text: 'Drill up'
+            });
+
+            // financial april
+            (function() {
                 items.push({
-                    isSubtitle: true,
-                    text: 'Drill up'
-                });
-
-                // financial april
-                (function() {
-                    var periods = p.getItemsByTypeByYear('FinancialApril');
-
-                    items.push({
-                        items: periods,
-                        text: 'Show parent <span class="name">financial April' + getSuffix(periods) + '</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                // financial july
-                (function() {
-                    var periods = p.getItemsByTypeByYear('FinancialJuly');
-
-                    items.push({
-                        items: periods,
-                        text: 'Show parent <span class="name">financial July' + getSuffix(periods) + '</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                // financial october
-                (function() {
-                    var periods = p.getItemsByTypeByYear('FinancialOct');
-
-                    items.push({
-                        items: periods,
-                        text: 'Show parent <span class="name">financial October' + getSuffix(periods) + '</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                // same level
-                items.push({
-                    isSubtitle: true,
-                    text: 'Yearly'
-                });
-
-                items.push({
-                    items: p.getItemsByTypeByYear('Yearly'),
-                    text: 'Show <span class="name">' + p.displayName + '</span> only',
+                    items: p.getItemsByTypeByDay('FinancialApril'),
+                    text: 'Show parent <span class="name">financial April</span>',
                     iconCls: 'ns-menu-item-float'
                 });
+            })();
 
-                // drill down
+            // financial july
+            (function() {
                 items.push({
-                    isSubtitle: true,
-                    text: 'Drill down'
-                });
-
-                // six-monthly april
-                (function() {
-                    items.push({
-                        items: p.getItemsByTypeByYear('SixMonthlyApril'),
-                        text: 'Show <span class="name">six-month Aprils</span> in <span class="name">' + p.name + '</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                // six-monthly
-                (function() {
-                    items.push({
-                        items: p.getItemsByTypeByYear('SixMonthly'),
-                        text: 'Show <span class="name">six-months</span> in <span class="name">' + p.name + '</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                // quarterly
-                (function() {
-                    items.push({
-                        items: p.getItemsByTypeByYear('Quarterly'),
-                        text: 'Show <span class="name">quarters</span> in <span class="name">' + p.name + '</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                // bi-monthly
-                (function() {
-                    items.push({
-                        items: p.getItemsByTypeByYear('BiMonthly'),
-                        text: 'Show <span class="name">bi-months</span> in <span class="name">' + p.name + '</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                // monthly
-                (function() {
-                    items.push({
-                        items: p.getItemsByTypeByYear('Monthly'),
-                        text: 'Show <span class="name">months</span> in <span class="name">' + p.name + '</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                // weekly
-                (function() {
-                    items.push({
-                        items: p.getItemsByTypeByYear('Weekly'),
-                        text: 'Show <span class="name">weeks</span> in <span class="name">' + p.name + '</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                // daily
-                (function() {
-                    items.push({
-                        items: p.getItemsByTypeByYear('Daily'),
-                        text: 'Show <span class="name">days</span> in <span class="name">' + p.name + '</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                return items;
-            };
-
-            return;
-        }
-
-        // monthly
-        if (id.length === 6) {
-            this.sortId = this.year + '00' + id.slice(4,6);
-            this.typeSortId = '03';
-            this.typeName = 'Monthly';
-            this.displayName = this.name.split(' ')[0];
-
-            this.getContextMenuItemsConfig = function() {
-                var items = [];
-
-                // drill up
-                items.push({
-                    isSubtitle: true,
-                    text: 'Drill up'
-                });
-
-                // financial april
-                (function() {
-                    var periods = p.getItemsByTypeByMonth('FinancialApril');
-
-                    items.push({
-                        items: periods,
-                        text: 'Show parent <span class="name">financial April' + getSuffix(periods) + '</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                // financial july
-                (function() {
-                    var periods = p.getItemsByTypeByMonth('FinancialJuly');
-
-                    items.push({
-                        items: periods,
-                        text: 'Show parent <span class="name">financial July' + getSuffix(periods) + '</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                // financial october
-                (function() {
-                    var periods = p.getItemsByTypeByMonth('FinancialOct');
-
-                    items.push({
-                        items: periods,
-                        text: 'Show parent <span class="name">financial October' + getSuffix(periods) + '</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                // yearly
-                (function() {
-                    var periods = p.getItemsByTypeByMonth('Yearly');
-
-                    items.push({
-                        items: periods,
-                        text: 'Show parent <span class="name">year' + getSuffix(periods) + '</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                // six-monthly april
-                (function() {
-                    var periods = p.getItemsByTypeByMonth('SixMonthlyApril');
-
-                    items.push({
-                        items: periods,
-                        text: 'Show parent <span class="name">six-month April' + getSuffix(periods) + '</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                // six-monthly
-                (function() {
-                    var periods = p.getItemsByTypeByMonth('SixMonthly');
-
-                    items.push({
-                        items: periods,
-                        text: 'Show parent <span class="name">six-month' + getSuffix(periods) + '</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                // quarterly
-                (function() {
-                    var periods = p.getItemsByTypeByMonth('Quarterly');
-
-                    items.push({
-                        items: periods,
-                        text: 'Show parent <span class="name">quarter' + getSuffix(periods) + '</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                // bi-monthly
-                (function() {
-                    var periods = p.getItemsByTypeByMonth('BiMonthly');
-
-                    items.push({
-                        items: periods,
-                        text: 'Show parent <span class="name">bi-month' + getSuffix(periods) + '</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                // same level
-                items.push({
-                    isSubtitle: true,
-                    text: 'Monthly'
-                });
-
-                items.push({
-                    items: p.getItemsByTypeByMonth('Monthly'),
-                    text: 'Show <span class="name">' + p.displayName + '</span> only',
+                    items: p.getItemsByTypeByDay('FinancialJuly'),
+                    text: 'Show parent <span class="name">financial July</span>',
                     iconCls: 'ns-menu-item-float'
                 });
+            })();
 
+            // financial october
+            (function() {
                 items.push({
-                    items: p.getItemsByTypeByMonth('Monthly', true),
-                    text: 'Show all <span class="name">months</span> in <span class="name">' + p.year + '</span>',
+                    items: p.getItemsByTypeByDay('FinancialOct'),
+                    text: 'Show parent <span class="name">financial October</span>',
                     iconCls: 'ns-menu-item-float'
                 });
+            })();
 
-                // drill down
+            // yearly
+            (function() {
                 items.push({
-                    isSubtitle: true,
-                    text: 'Drill down'
-                });
-
-                // weekly
-                (function() {
-                    items.push({
-                        items: p.getItemsByTypeByMonth('Weekly'),
-                        text: 'Show <span class="name">weeks</span> in <span class="name">' + p.name + '</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                // daily
-                (function() {
-                    items.push({
-                        items: p.getItemsByTypeByMonth('Daily'),
-                        text: 'Show <span class="name">days</span> in <span class="name">' + p.name + '</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                return items;
-            };
-
-            //return;
-        }
-
-        // daily
-        if (id.length === 8) {
-            this.sortId = id;
-            this.typeSortId = '01';
-            this.typeName = 'Daily';
-            this.displayName = months[(new Date(this.name)).getMonth()] + ' ' + parseInt(this.name.split('-')[2]);
-
-            this.getContextMenuItemsConfig = function() {
-                var items = [];
-
-                // drill up
-                items.push({
-                    isSubtitle: true,
-                    text: 'Drill up'
-                });
-
-                // financial april
-                (function() {
-                    items.push({
-                        items: p.getItemsByTypeByDay('FinancialApril'),
-                        text: 'Show parent <span class="name">financial April</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                // financial july
-                (function() {
-                    items.push({
-                        items: p.getItemsByTypeByDay('FinancialJuly'),
-                        text: 'Show parent <span class="name">financial July</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                // financial october
-                (function() {
-                    items.push({
-                        items: p.getItemsByTypeByDay('FinancialOct'),
-                        text: 'Show parent <span class="name">financial October</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                // yearly
-                (function() {
-                    items.push({
-                        items: p.getItemsByTypeByDay('Yearly'),
-                        text: 'Show parent <span class="name">year</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                // six-monthly april
-                (function() {
-                    items.push({
-                        items: p.getItemsByTypeByDay('SixMonthlyApril'),
-                        text: 'Show parent <span class="name">six-month April</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                // six-monthly
-                (function() {
-                    items.push({
-                        items: p.getItemsByTypeByDay('SixMonthly'),
-                        text: 'Show parent <span class="name">six-month</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                // quarterly
-                (function() {
-                    items.push({
-                        items: p.getItemsByTypeByDay('Quarterly'),
-                        text: 'Show parent <span class="name">quarter</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                // bi-monthly
-                (function() {
-                    items.push({
-                        items: p.getItemsByTypeByDay('BiMonthly'),
-                        text: 'Show parent <span class="name">bi-month</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                // monthly
-                (function() {
-                    items.push({
-                        items: p.getItemsByTypeByDay('Monthly'),
-                        text: 'Show parent <span class="name">month</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                // weekly
-                (function() {
-                    items.push({
-                        items: p.getItemsByTypeByDay('Weekly'),
-                        text: 'Show parent <span class="name">week</span>',
-                        iconCls: 'ns-menu-item-float'
-                    });
-                })();
-
-                // same level
-                items.push({
-                    isSubtitle: true,
-                    text: 'Daily'
-                });
-
-                items.push({
-                    items: p.getItemsByTypeByDay('Daily'),
-                    text: 'Show <span class="name">' + p.displayName + '</span> only',
+                    items: p.getItemsByTypeByDay('Yearly'),
+                    text: 'Show parent <span class="name">year</span>',
                     iconCls: 'ns-menu-item-float'
                 });
+            })();
 
+            // six-monthly april
+            (function() {
                 items.push({
-                    items: p.getItemsByTypeByDay('Daily', true),
-                    text: 'Show all <span class="name">days</span> in <span class="name">' + p.year + '</span>',
+                    items: p.getItemsByTypeByDay('SixMonthlyApril'),
+                    text: 'Show parent <span class="name">six-month April</span>',
                     iconCls: 'ns-menu-item-float'
                 });
+            })();
 
-                return items;
-            };
-            //return;
-        }
+            // six-monthly
+            (function() {
+                items.push({
+                    items: p.getItemsByTypeByDay('SixMonthly'),
+                    text: 'Show parent <span class="name">six-month</span>',
+                    iconCls: 'ns-menu-item-float'
+                });
+            })();
+
+            // quarterly
+            (function() {
+                items.push({
+                    items: p.getItemsByTypeByDay('Quarterly'),
+                    text: 'Show parent <span class="name">quarter</span>',
+                    iconCls: 'ns-menu-item-float'
+                });
+            })();
+
+            // bi-monthly
+            (function() {
+                items.push({
+                    items: p.getItemsByTypeByDay('BiMonthly'),
+                    text: 'Show parent <span class="name">bi-month</span>',
+                    iconCls: 'ns-menu-item-float'
+                });
+            })();
+
+            // monthly
+            (function() {
+                items.push({
+                    items: p.getItemsByTypeByDay('Monthly'),
+                    text: 'Show parent <span class="name">month</span>',
+                    iconCls: 'ns-menu-item-float'
+                });
+            })();
+
+            // weekly
+            (function() {
+                items.push({
+                    items: p.getItemsByTypeByDay('Weekly'),
+                    text: 'Show parent <span class="name">week</span>',
+                    iconCls: 'ns-menu-item-float'
+                });
+            })();
+
+            // same level
+            items.push({
+                isSubtitle: true,
+                text: 'Daily'
+            });
+
+            items.push({
+                items: p.getItemsByTypeByDay('Daily'),
+                text: 'Show <span class="name">' + p.displayName + '</span> only',
+                iconCls: 'ns-menu-item-float'
+            });
+
+            items.push({
+                items: p.getItemsByTypeByDay('Daily', true),
+                text: 'Show all <span class="name">days</span> in <span class="name">' + p.year + '</span>',
+                iconCls: 'ns-menu-item-float'
+            });
+
+            return items;
+        };
     }
-
-    // weekly
-    if (id.indexOf('W') !== -1) {
+    else if (type === 'Weekly') {
         this.sortId = function() {
             var a = id.split('W');
             return a[0] + (a[1].length === 1 ? '000' : '00') + a[1];
@@ -1876,12 +1637,156 @@ Period.prototype.generateDisplayProperties = function() {
 
             return items;
         };
-
-        //return;
     }
+    else if (type === 'Monthly') {
+        this.sortId = this.year + '00' + id.slice(4,6);
+        this.typeSortId = '03';
+        this.typeName = 'Monthly';
+        this.displayName = this.name.split(' ')[0];
 
-    // bi-monthly
-    if (id.indexOf('B') !== -1) {
+        this.getContextMenuItemsConfig = function() {
+            var items = [];
+
+            // drill up
+            items.push({
+                isSubtitle: true,
+                text: 'Drill up'
+            });
+
+            // financial april
+            (function() {
+                var periods = p.getItemsByTypeByMonth('FinancialApril');
+
+                items.push({
+                    items: periods,
+                    text: 'Show parent <span class="name">financial April' + getSuffix(periods) + '</span>',
+                    iconCls: 'ns-menu-item-float'
+                });
+            })();
+
+            // financial july
+            (function() {
+                var periods = p.getItemsByTypeByMonth('FinancialJuly');
+
+                items.push({
+                    items: periods,
+                    text: 'Show parent <span class="name">financial July' + getSuffix(periods) + '</span>',
+                    iconCls: 'ns-menu-item-float'
+                });
+            })();
+
+            // financial october
+            (function() {
+                var periods = p.getItemsByTypeByMonth('FinancialOct');
+
+                items.push({
+                    items: periods,
+                    text: 'Show parent <span class="name">financial October' + getSuffix(periods) + '</span>',
+                    iconCls: 'ns-menu-item-float'
+                });
+            })();
+
+            // yearly
+            (function() {
+                var periods = p.getItemsByTypeByMonth('Yearly');
+
+                items.push({
+                    items: periods,
+                    text: 'Show parent <span class="name">year' + getSuffix(periods) + '</span>',
+                    iconCls: 'ns-menu-item-float'
+                });
+            })();
+
+            // six-monthly april
+            (function() {
+                var periods = p.getItemsByTypeByMonth('SixMonthlyApril');
+
+                items.push({
+                    items: periods,
+                    text: 'Show parent <span class="name">six-month April' + getSuffix(periods) + '</span>',
+                    iconCls: 'ns-menu-item-float'
+                });
+            })();
+
+            // six-monthly
+            (function() {
+                var periods = p.getItemsByTypeByMonth('SixMonthly');
+
+                items.push({
+                    items: periods,
+                    text: 'Show parent <span class="name">six-month' + getSuffix(periods) + '</span>',
+                    iconCls: 'ns-menu-item-float'
+                });
+            })();
+
+            // quarterly
+            (function() {
+                var periods = p.getItemsByTypeByMonth('Quarterly');
+
+                items.push({
+                    items: periods,
+                    text: 'Show parent <span class="name">quarter' + getSuffix(periods) + '</span>',
+                    iconCls: 'ns-menu-item-float'
+                });
+            })();
+
+            // bi-monthly
+            (function() {
+                var periods = p.getItemsByTypeByMonth('BiMonthly');
+
+                items.push({
+                    items: periods,
+                    text: 'Show parent <span class="name">bi-month' + getSuffix(periods) + '</span>',
+                    iconCls: 'ns-menu-item-float'
+                });
+            })();
+
+            // same level
+            items.push({
+                isSubtitle: true,
+                text: 'Monthly'
+            });
+
+            items.push({
+                items: p.getItemsByTypeByMonth('Monthly'),
+                text: 'Show <span class="name">' + p.displayName + '</span> only',
+                iconCls: 'ns-menu-item-float'
+            });
+
+            items.push({
+                items: p.getItemsByTypeByMonth('Monthly', true),
+                text: 'Show all <span class="name">months</span> in <span class="name">' + p.year + '</span>',
+                iconCls: 'ns-menu-item-float'
+            });
+
+            // drill down
+            items.push({
+                isSubtitle: true,
+                text: 'Drill down'
+            });
+
+            // weekly
+            (function() {
+                items.push({
+                    items: p.getItemsByTypeByMonth('Weekly'),
+                    text: 'Show <span class="name">weeks</span> in <span class="name">' + p.name + '</span>',
+                    iconCls: 'ns-menu-item-float'
+                });
+            })();
+
+            // daily
+            (function() {
+                items.push({
+                    items: p.getItemsByTypeByMonth('Daily'),
+                    text: 'Show <span class="name">days</span> in <span class="name">' + p.name + '</span>',
+                    iconCls: 'ns-menu-item-float'
+                });
+            })();
+
+            return items;
+        };
+    }
+    else if (type === 'BiMonthly') {
         this.sortId = id.slice(0, 4) + '00' + id.slice(4,6);
         this.typeSortId = '04';
         this.typeName = 'Bi-monthly';
@@ -2028,9 +1933,7 @@ Period.prototype.generateDisplayProperties = function() {
             return items;
         };
     }
-
-    // quarterly
-    if (id.indexOf('Q') !== -1) {
+    else if (type === 'Quarterly') {
         this.sortId = function() {
             var a = id.split('Q');
             return a[0] + (a[1].length === 1 ? '000' : '00') + a[1];
@@ -2157,9 +2060,7 @@ Period.prototype.generateDisplayProperties = function() {
             return items;
         };
     }
-
-    // six-monthly
-    if (id.indexOf('S') !== -1 && id.length === 6) {
+    else if (type === 'SixMonthly') {
         this.sortId = function() {
             var a = id.split('S');
             return a[0] + (a[1].length === 1 ? '000' : '00') + a[1];
@@ -2297,9 +2198,7 @@ Period.prototype.generateDisplayProperties = function() {
         };
         //return;
     }
-
-    // six-monthly april
-    if (id.indexOf('AprilS') !== -1) {
+    else if (type === 'SixMonthlyApril') {
         this.sortId = function() {
             var a = id.split('AprilS');
             return a[0] + (a[1].length === 1 ? '000' : '00') + a[1];
@@ -2436,9 +2335,139 @@ Period.prototype.generateDisplayProperties = function() {
             return items;
         };
     }
+    else if (type === 'Yearly') {
+        this.sortId = id + '0000';
+        this.typeSortId = '08';
+        this.typeName = 'Yearly';
+        this.displayName = this.name;
 
-    // financial october
-    if (id.indexOf('Oct') !== -1) {
+        this.getContextMenuItemsConfig = function() {
+            var items = [];
+
+            // drill up
+            items.push({
+                isSubtitle: true,
+                text: 'Drill up'
+            });
+
+            // financial april
+            (function() {
+                var periods = p.getItemsByTypeByYear('FinancialApril');
+
+                items.push({
+                    items: periods,
+                    text: 'Show parent <span class="name">financial April' + getSuffix(periods) + '</span>',
+                    iconCls: 'ns-menu-item-float'
+                });
+            })();
+
+            // financial july
+            (function() {
+                var periods = p.getItemsByTypeByYear('FinancialJuly');
+
+                items.push({
+                    items: periods,
+                    text: 'Show parent <span class="name">financial July' + getSuffix(periods) + '</span>',
+                    iconCls: 'ns-menu-item-float'
+                });
+            })();
+
+            // financial october
+            (function() {
+                var periods = p.getItemsByTypeByYear('FinancialOct');
+
+                items.push({
+                    items: periods,
+                    text: 'Show parent <span class="name">financial October' + getSuffix(periods) + '</span>',
+                    iconCls: 'ns-menu-item-float'
+                });
+            })();
+
+            // same level
+            items.push({
+                isSubtitle: true,
+                text: 'Yearly'
+            });
+
+            items.push({
+                items: p.getItemsByTypeByYear('Yearly'),
+                text: 'Show <span class="name">' + p.displayName + '</span> only',
+                iconCls: 'ns-menu-item-float'
+            });
+
+            // drill down
+            items.push({
+                isSubtitle: true,
+                text: 'Drill down'
+            });
+
+            // six-monthly april
+            (function() {
+                items.push({
+                    items: p.getItemsByTypeByYear('SixMonthlyApril'),
+                    text: 'Show <span class="name">six-month Aprils</span> in <span class="name">' + p.name + '</span>',
+                    iconCls: 'ns-menu-item-float'
+                });
+            })();
+
+            // six-monthly
+            (function() {
+                items.push({
+                    items: p.getItemsByTypeByYear('SixMonthly'),
+                    text: 'Show <span class="name">six-months</span> in <span class="name">' + p.name + '</span>',
+                    iconCls: 'ns-menu-item-float'
+                });
+            })();
+
+            // quarterly
+            (function() {
+                items.push({
+                    items: p.getItemsByTypeByYear('Quarterly'),
+                    text: 'Show <span class="name">quarters</span> in <span class="name">' + p.name + '</span>',
+                    iconCls: 'ns-menu-item-float'
+                });
+            })();
+
+            // bi-monthly
+            (function() {
+                items.push({
+                    items: p.getItemsByTypeByYear('BiMonthly'),
+                    text: 'Show <span class="name">bi-months</span> in <span class="name">' + p.name + '</span>',
+                    iconCls: 'ns-menu-item-float'
+                });
+            })();
+
+            // monthly
+            (function() {
+                items.push({
+                    items: p.getItemsByTypeByYear('Monthly'),
+                    text: 'Show <span class="name">months</span> in <span class="name">' + p.name + '</span>',
+                    iconCls: 'ns-menu-item-float'
+                });
+            })();
+
+            // weekly
+            (function() {
+                items.push({
+                    items: p.getItemsByTypeByYear('Weekly'),
+                    text: 'Show <span class="name">weeks</span> in <span class="name">' + p.name + '</span>',
+                    iconCls: 'ns-menu-item-float'
+                });
+            })();
+
+            // daily
+            (function() {
+                items.push({
+                    items: p.getItemsByTypeByYear('Daily'),
+                    text: 'Show <span class="name">days</span> in <span class="name">' + p.name + '</span>',
+                    iconCls: 'ns-menu-item-float'
+                });
+            })();
+
+            return items;
+        };
+    }
+    else if (type === 'FinancialOct') {
         this.sortId = id.slice(0, 4) + '0003';
         this.typeSortId = '11';
         this.typeName = 'Financial October';
@@ -2575,9 +2604,7 @@ Period.prototype.generateDisplayProperties = function() {
             return items;
         };
     }
-
-    // financial july
-    if (id.indexOf('July') !== -1) {
+    else if (type === 'FinancialJuly') {
         this.sortId = id.slice(0, 4) + '0002';
         this.typeSortId = '10';
         this.typeName = 'Financial July';
@@ -2712,9 +2739,7 @@ Period.prototype.generateDisplayProperties = function() {
             return items;
         };
     }
-
-    // financial april
-    if (id.indexOf('April') !== -1 && id.indexOf('S') === -1) {
+    else if (type === 'FinancialApril') {
         this.sortId = id.slice(0, 4) + '0001';
         this.typeSortId = '09';
         this.typeName = 'Financial April';

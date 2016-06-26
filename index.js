@@ -117,7 +117,14 @@ uiManager.applyTo(arrayTo(api));
 optionConfig.applyTo(arrayTo(api));
 
 // requests
-var manifestReq = $.getJSON('manifest.webapp');
+var manifestReq = $.ajax({
+    url: 'manifest.webapp',
+    dataType: 'text',
+    headers: {
+        'Accept': 'text/plain; charset=utf-8'
+    }
+});
+
 var systemInfoUrl = '/api/system/info.json';
 var systemSettingsUrl = '/api/systemSettings.json?key=keyCalendar&key=keyDateFormat&key=keyAnalysisRelativePeriod&key=keyHideUnapprovedDataInAnalytics';
 var userAccountUrl = '/api/me/user-account.json';
@@ -126,8 +133,8 @@ var systemInfoReq;
 var systemSettingsReq;
 var userAccountReq;
 
-manifestReq.done(function(manifest) {
-    appManager.manifest = manifest;
+manifestReq.done(function(text) {
+    appManager.manifest = JSON.parse(text);;
     appManager.env = process.env.NODE_ENV;
     appManager.setAuth();
     systemInfoReq = $.getJSON(appManager.getPath() + systemInfoUrl);
@@ -165,6 +172,7 @@ function initialize() {
 
     // instance manager
     instanceManager.apiResource = 'reportTables';
+    instanceManager.dataStatisticsEventType = 'DATA_TABLE_VIEW';
 
     // ui manager
     uiManager.disableRightClick();
@@ -200,6 +208,6 @@ function initialize() {
 
     // viewport
     uiManager.reg(Viewport(refs), 'viewport');
-
-    global.refs = refs;
 }
+
+global.refs = refs;

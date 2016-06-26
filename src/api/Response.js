@@ -4,6 +4,7 @@ import isArray from 'd2-utilizr/lib/isArray';
 import isObject from 'd2-utilizr/lib/isObject';
 import arrayFrom from 'd2-utilizr/lib/arrayFrom';
 import arrayClean from 'd2-utilizr/lib/arrayClean';
+import arrayContains from 'd2-utilizr/lib/arrayContains';
 import arrayMax from 'd2-utilizr/lib/arrayMax';
 import arrayMin from 'd2-utilizr/lib/arrayMin';
 import clone from 'd2-utilizr/lib/clone';
@@ -58,10 +59,6 @@ Response.prototype.getHeaderByName = function(name) {
 
 Response.prototype.getHeaderIndexByName = function(name) {
     return this.nameHeaderMap[name].index;
-};
-
-Response.prototype.getNameById = function(ouId) {
-    return this.metaData.names[ouId];
 };
 
 Response.prototype.getIdByIdComb = function(idComb, dataType) {
@@ -168,6 +165,59 @@ Response.prototype.getPeGroupNameByPeId = function(peId) {
     }
 
     return (uniqueNumerics.length === 1) ? uniqueNumerics[0] : ('Financial ' + monthMap[a[0]]);
+};
+
+Response.prototype.getPeTypeByPeId = function(peId) {
+    if (!isNumeric(peId.slice(0, 4))) {
+        return;
+    }
+
+    if (peId.length === 4) {
+        return 'Yearly';
+    }
+    else if (peId.length === 6) {
+        if (isNumeric(peId)) {
+            return 'Monthly';
+        }
+        else if (peId.indexOf('W') !== -1) {
+            return 'Weekly';
+        }
+        else if (peId.indexOf('Q') !== -1) {
+            return 'Quarterly';
+        }
+        else if (peId.indexOf('S') !== -1) {
+            return 'SixMonthly';
+        }
+    }
+    else if (peId.length === 7) {
+        if (peId.indexOf('B') !== -1) {
+            return 'BiMonthly';
+        }
+        else if (peId.indexOf('Oct') !== -1) {
+            return 'FinancialOct';
+        }
+    }
+    else if (peId.length === 8) {
+        if (isNumeric(peId.slice(4, 8))) {
+            return 'Daily';
+        }
+        else if (peId.indexOf('July') !== -1) {
+            return 'FinancialJuly';
+        }
+    }
+    else if (peId.length === 9) {
+        if (peId.indexOf('April') !== -1) {
+            return 'FinancialApril';
+        }
+    }
+    else if (peId.length === 11) {
+        if (peId.indexOf('AprilS') !== -1) {
+            return 'SixMonthlyApril';
+        }
+    }
+    else {
+        return;
+    }
 };
 
 Response.prototype.generateIdValueMap = function() {
@@ -286,4 +336,16 @@ Response.prototype.isHideRow = function(dataObject, layout, numeratorTotal, deno
     }
 
     return false;
+};
+
+// dep 2
+
+Response.prototype.getNameById = function(id, addYearToName) {
+    var name = this.metaData.names[id];
+
+    if (addYearToName && arrayContains(['Daily', 'Weekly', 'Monthly'], this.getPeTypeByPeId(id))) {
+        name += (' ' + id.slice(0, 4));
+    }
+
+    return name;
 };
