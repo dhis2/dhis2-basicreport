@@ -1,4 +1,5 @@
 import isNumeric from 'd2-utilizr/lib/isNumeric';
+import arrayContains from 'd2-utilizr/lib/arrayContains';
 import arrayFrom from 'd2-utilizr/lib/arrayFrom';
 import arrayUnique from 'd2-utilizr/lib/arrayUnique';
 import stringTrim from 'd2-utilizr/lib/stringTrim';
@@ -83,7 +84,7 @@ Period.prototype.getTypeById = function(id) {
     if (id.length === 4) {
         return 'Yearly';
     }
-    else if (id.length === 6) {
+    else if (arrayContains([6, 7], id.length)) {
         if (isNumeric(id)) {
             return 'Monthly';
         }
@@ -122,9 +123,6 @@ Period.prototype.getTypeById = function(id) {
         if (id.indexOf('AprilS') !== -1) {
             return 'SixMonthlyApril';
         }
-    }
-    else {
-        return;
     }
 };
 
@@ -1377,7 +1375,7 @@ Period.prototype.generateDisplayProperties = function() {
         this.sortId = id;
         this.typeSortId = '01';
         this.typeName = 'Daily';
-        this.displayName = months[(new Date(this.name)).getMonth()] + ' ' + parseInt(this.name.split('-')[2]);
+        this.displayName = parseInt(this.name.split('-')[2]) + ' ' + months[(new Date(this.name)).getMonth()] + ', ' + this.year;
 
         this.getContextMenuItemsConfig = function() {
             var items = [];
@@ -1506,7 +1504,7 @@ Period.prototype.generateDisplayProperties = function() {
         }();
         this.typeSortId = '02';
         this.typeName = 'Weekly';
-        this.displayName = 'Week ' + id.split('W')[1];
+        this.displayName = 'Week ' + id.split('W')[1] + ', ' + this.year;
 
         this.getContextMenuItemsConfig = function() {
             var items = [];
@@ -1642,7 +1640,7 @@ Period.prototype.generateDisplayProperties = function() {
         this.sortId = this.year + '00' + id.slice(4,6);
         this.typeSortId = '03';
         this.typeName = 'Monthly';
-        this.displayName = this.name.split(' ')[0];
+        this.displayName = this.name.split(' ')[0] + ' ' + this.year;
 
         this.getContextMenuItemsConfig = function() {
             var items = [];

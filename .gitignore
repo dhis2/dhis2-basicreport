@@ -4,4 +4,4 @@ lib/
 npm-debug.log
 .idea
 *.gzip
-build/*
+build/

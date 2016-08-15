@@ -436,7 +436,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
                 // period
                 period = new Period({
                     id: peId,
-                    name: response.getNameById(peId, true)
+                    name: response.getNameById(peId)
                 });
 
                 period.generateDisplayProperties();
@@ -483,6 +483,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
 
                     // pe
                     else if (th.objectName === 'pe') {
+console.log("period", period.typeName, period.displayName, period);
                         if (th.id === 'pe-type') {
                             row.addCell(th.id, new TableCell({
                                 name: period.typeName,
@@ -589,7 +590,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
         table.addOptionsCls(layout);
 
         table.sortData();
-
+console.log("table", table);
         if (layout.reduceLayout) {
             table.reduce();
         }

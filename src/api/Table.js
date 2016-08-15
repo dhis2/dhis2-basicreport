@@ -223,7 +223,7 @@ Table.prototype.reduce = function() {
     var columns = this.getTableColumns(),
         keys = this.getTableManager().excludeReduceKeys,
         groups;
-
+console.log("columns", columns);
     // create groups, set span/display
     columns.forEach(function(column) {
 
