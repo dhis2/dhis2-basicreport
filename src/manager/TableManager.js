@@ -32,7 +32,7 @@ TableManager = function(c) {
     };
 
     // config
-    t.excludeReduceKeys = [
+    t.excludedReduceKeys = [
         'dx-numerator',
         'dx-denominator',
         'dx-value'
@@ -483,7 +483,6 @@ TableManager.prototype.getTable = function(layout, fCallback) {
 
                     // pe
                     else if (th.objectName === 'pe') {
-console.log("period", period.typeName, period.displayName, period);
                         if (th.id === 'pe-type') {
                             row.addCell(th.id, new TableCell({
                                 name: period.typeName,

@@ -133,15 +133,16 @@ Table.prototype.getHtml = function() {
 
     html += '</tr>';
 
-    for (var j = 0, row; j < this.tableRows.length; j++) {
+    for (var j = 0, row, tc; j < this.tableRows.length; j++) {
         row = this.tableRows[j];
         html += '<tr>';
 
-        for (var k = 0, th, tc; k < this.tableHeaders.length; k++) {
-            th = this.tableHeaders[k];
+        this.tableHeaders.filter(function(header) {
+            return !header.hidden;
+        }).forEach(function(th) {
             tc = row.getCellById(th.id);
             html += tc.getHtml();
-        }
+        });
 
         html += '</tr>';
     }
@@ -173,7 +174,9 @@ Table.prototype.addHeaderClickListeners = function() {
     var instanceManager = t.getInstanceManager();
     var el;
 
-    t.tableHeaders.forEach(function(th) {
+    t.tableHeaders.filter(function(header) {
+        return !header.hidden;
+    }).forEach(function(th) {
         el = Ext.get(th.elementId);
         el.tableHeaderId = th.id;
 
@@ -221,9 +224,11 @@ Table.prototype.getRowByCellId = function(cellId) {
 
 Table.prototype.reduce = function() {
     var columns = this.getTableColumns(),
-        keys = this.getTableManager().excludeReduceKeys,
+        keys = this.getTableManager().excludedReduceKeys,
         groups;
+
 console.log("columns", columns);
+
     // create groups, set span/display
     columns.forEach(function(column) {
 

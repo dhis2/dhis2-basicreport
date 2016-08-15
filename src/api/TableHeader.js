@@ -10,6 +10,7 @@ TableHeader = function(config) {
     t.name = config.name;
     t.objectName = config.objectName;
     t.index = config.index;
+    t.hidden = config.hidden || false;
 
     if (isNumeric(config.level)) {
         t.level = parseInt(config.level);
@@ -19,15 +20,17 @@ TableHeader = function(config) {
 
     // transient
     t.reduceIndex;
-    t.html;
+    t.html = '';
 };
 
 TableHeader.prototype.getHtml = function() {
-    this.html = '<td';
-    this.html += this.elementId ? (' id="' + this.elementId + '"') : '';
-    this.html += this.cls ? (' class="' + this.cls + '"') : '';
-    this.html += this.style ? (' style="' + this.style + '"') : '';
-    this.html += '>' + this.name + '</td>';
+    if (!this.hidden) {
+        this.html = '<td';
+        this.html += this.elementId ? (' id="' + this.elementId + '"') : '';
+        this.html += this.cls ? (' class="' + this.cls + '"') : '';
+        this.html += this.style ? (' style="' + this.style + '"') : '';
+        this.html += '>' + this.name + '</td>';
+    }
 
     return this.html;
 };
