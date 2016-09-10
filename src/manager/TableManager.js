@@ -3,6 +3,7 @@ import isArray from 'd2-utilizr/lib/isArray';
 import isObject from 'd2-utilizr/lib/isObject';
 import arrayTo from 'd2-utilizr/lib/arrayTo';
 import arraySort from 'd2-utilizr/lib/arraySort';
+import arrayUnique from 'd2-utilizr/lib/arrayUnique';
 
 import {DataObject} from '../api/DataObject';
 import {Response} from '../api/Response';
@@ -574,6 +575,42 @@ TableManager.prototype.getTable = function(layout, fCallback) {
                 }
 
                 tableRows.push(row);
+            }
+        })();
+
+        // interceptor
+
+        (function() {
+            if (layout.reduceLayout) {
+
+                // pe-year
+                var peYearId = 'pe-year';
+                var peYearIndex;
+                var peYearValues = [];
+                var peYearUnique;
+
+                tableHeaders.forEach(function(header, index) {
+                    if (header.id === peYearId) {
+                        peYearIndex = index;
+                    }
+                });
+
+                tableRows.forEach(function(row) {
+                    peYearValues.push(row.period.year);
+                });
+
+                peYearUnique = arrayUnique(peYearValues).length < 2;
+
+                if (peYearUnique) {
+
+                    // update headers
+                    tableHeaders = [].concat(tableHeaders.slice(0, peYearIndex), tableHeaders.slice(peYearIndex + 1));
+
+                    // update rows
+                    tableRows.forEach(function(row) {
+                        delete row[peYearId];
+                    });
+                }
             }
         })();
 
