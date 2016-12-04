@@ -1,5 +1,5 @@
 {
-    "version": "22",
+    "version": "25",
     "name": "Basic Report",
     "description": "Basic report app",
     "launch_path": "/index.html",

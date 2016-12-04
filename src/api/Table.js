@@ -224,16 +224,14 @@ Table.prototype.getRowByCellId = function(cellId) {
 
 Table.prototype.reduce = function() {
     var columns = this.getTableColumns(),
-        keys = this.getTableManager().excludedReduceKeys,
+        excludedKeys = this.getTableManager().excludedReduceKeys,
         groups;
-
-console.log("columns", columns);
 
     // create groups, set span/display
     columns.forEach(function(column) {
 
         // if excluded, push to the right
-        if (arrayContains(keys, column.tableHeader.id)) {
+        if (arrayContains(excludedKeys, column.tableHeader.id)) {
             column.tableCellGroupsLength = (column.tableCells.length + column.tableHeader.index);
             return;
         }

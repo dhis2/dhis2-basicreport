@@ -43,7 +43,7 @@ OrganisationUnit.prototype.getParentNameArray = function() {
         return this.parentNameArray;
     }
 
-    return this.parentNameArray = arrayClean((this.metaData.ouNameHierarchy[this.name] || '').split('/'));
+    return this.parentNameArray = arrayClean((this.metaData.ouNameHierarchy[this.id] || '').split('/'));
 };
 
 OrganisationUnit.prototype.getParentGraphById = function(id) {

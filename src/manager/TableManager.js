@@ -626,7 +626,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
         table.addOptionsCls(layout);
 
         table.sortData();
-console.log("table", table);
+
         if (layout.reduceLayout) {
             table.reduce();
         }

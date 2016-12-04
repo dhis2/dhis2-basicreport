@@ -234,12 +234,12 @@ table.pivot {
     border-spacing: 0px;
     border: 0 none;
 
-    -webkit-touch-callout: all;
-    -webkit-user-select: all;
-    -khtml-user-select: all;
-    -moz-user-select: all;
-    -ms-user-select: all;
-    user-select: all;
+    -webkit-touch-callout: text;
+    -webkit-user-select: text;
+    -khtml-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+    user-select: text;
 }
 
 table.pivot.displaydensity-comfortable td {
