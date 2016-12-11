@@ -14,5 +14,5 @@ UiManager.prototype.getContextMenuXY = function(extElement) {
 };
 
 UiManager.prototype.getElTitleByLegend = function(legend) {
-    return `${legend.name} (${legend.startValue}-${legend.endValue})`;
+    return legend ? `${legend.name} (${legend.startValue}-${legend.endValue})` : '';
 };
