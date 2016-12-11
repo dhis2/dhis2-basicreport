@@ -53,36 +53,11 @@ OrganisationUnitTableCell.prototype.showContextMenu = function(row, menuFn) {
             handler: function() {
                 var layout = instanceManager.getStateCurrent();
 
-                    //columns = [],
-                    //rows = [];
-
-                // dx
-                //columns.push({
-                    //dimension: 'dx',
-                    //items: [{
-                        //id: this.dxReqId,
-                        //name: this.dxReqName,
-                        //objectName: this.dxObjectName
-                    //}]
-                //});
-
-                // pe
-                //rows.push({
-                    //dimension: 'pe',
-                    //items: [{
-                        //id: this.peReqId,
-                        //name: this.peReqName
-                    //}]
-                //});
-
-                // ou
-
                 var ouDimension = {
                     dimension: 'ou',
                     items: [{id: this.ouReqId}]
                 };
 
-                //layout.columns = new Axis(columns);
                 layout.rows = new Axis([
                     layout.rows[0],
                     ouDimension

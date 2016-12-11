@@ -290,7 +290,7 @@ Table.prototype.addPeClickListeners = function(layout, tableFn) {
         el.row = t.getRowByCellId(cell.id);
 
         el.on('click', function(event) {
-            this.cell.showContextMenu(function(items) {
+            this.cell.showContextMenu(this.row, function(items) {
                 return t.getTableManager().getContextMenu(items);
             });
         });

@@ -25,7 +25,7 @@ PeriodTableCell = function(config) {
     };
 };
 
-PeriodTableCell.prototype.showContextMenu = function(menuFn) {
+PeriodTableCell.prototype.showContextMenu = function(row, menuFn) {
     var t = this;
 
     var instanceManager = t.getInstanceManager(),
@@ -61,6 +61,16 @@ PeriodTableCell.prototype.showContextMenu = function(menuFn) {
                     peDimension,
                     layout.rows[1]
                 ]);
+
+                layout.setDataDimensionItems(function() {
+                    var obj = {};
+
+                    obj[row.dataObject.dataType] = {
+                        id: row.dataObject.id
+                    };
+
+                    return [obj];
+                }());
 
                 instanceManager.getReport(layout, false, false, true);
             }
