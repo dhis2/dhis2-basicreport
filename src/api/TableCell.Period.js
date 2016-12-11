@@ -12,18 +12,24 @@ PeriodTableCell = function(config) {
     t.klass = PeriodTableCell;
 
     t.instanceManager;
+    t.uiManager;
 
     this.period = config.period;
 
     t.getInstanceManager = function() {
         return t.instanceManager || config.instanceManager || t.klass.instanceManager;
     };
+
+    t.getUiManager = function() {
+        return t.uiManager || config.uiManager || t.klass.uiManager;
+    };
 };
 
 PeriodTableCell.prototype.showContextMenu = function(menuFn) {
     var t = this;
 
-    var instanceManager = t.getInstanceManager();
+    var instanceManager = t.getInstanceManager(),
+        uiManager = t.getUiManager();
 
     var itemsConfig = t.period.getContextMenuItemsConfig(),
         items = [];
@@ -61,15 +67,5 @@ PeriodTableCell.prototype.showContextMenu = function(menuFn) {
         items: items
     });
 
-    menu.showAt(function() {
-        var el = Ext.get(t.elementId),
-            height = el.getHeight(),
-            width = el.getWidth(),
-            xy = el.getXY();
-
-        xy[0] += width - (height / 2);
-        xy[1] += height - (height / 2);
-
-        return xy;
-    }());
+    menu.showAt(uiManager.getContextMenuXY(Ext.get(t.elementId)));
 };

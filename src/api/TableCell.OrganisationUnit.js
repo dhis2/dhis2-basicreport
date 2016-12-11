@@ -12,6 +12,7 @@ OrganisationUnitTableCell = function(config) {
     t.klass = OrganisationUnitTableCell;
 
     t.instanceManager;
+    t.uiManager;
 
     this.level = config.level;
     this.organisationUnit = config.organisationUnit;
@@ -19,19 +20,22 @@ OrganisationUnitTableCell = function(config) {
     t.getInstanceManager = function() {
         return t.instanceManager || config.instanceManager || t.klass.instanceManager;
     };
+
+    t.getUiManager = function() {
+        return t.uiManager || config.uiManager || t.klass.uiManager;
+    };
 };
 
 OrganisationUnitTableCell.prototype.showContextMenu = function(row, menuFn) {
     var t = this;
 
-    var instanceManager = t.getInstanceManager();
+    var instanceManager = t.getInstanceManager(),
+        uiManager = t.getUiManager();
 
     var itemsConfig = t.organisationUnit.getContextMenuItemsConfig(t.level),
         items = [];
 
-    for (var i = 0, conf; i < itemsConfig.length; i++) {
-        conf = itemsConfig[i];
-
+    itemsConfig.forEach(conf => {
         items.push(conf.isSubtitle ? {
             xtype: 'label',
             html: conf.text,
@@ -94,21 +98,11 @@ OrganisationUnitTableCell.prototype.showContextMenu = function(row, menuFn) {
                 instanceManager.getReport(layout, true);
             }
         });
-    }
+    });
 
     var menu = menuFn({
         items: items
     });
 
-    menu.showAt(function() {
-        var el = Ext.get(t.elementId),
-            height = el.getHeight(),
-            width = el.getWidth(),
-            xy = el.getXY();
-
-        xy[0] += width - (height / 2);
-        xy[1] += height - (height / 2);
-
-        return xy;
-    }());
+    menu.showAt(uiManager.getContextMenuXY(Ext.get(t.elementId)));
 };

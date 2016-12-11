@@ -22,6 +22,7 @@ import {Layout} from './src/api/Layout';
 
 import {InstanceManager} from './src/manager/InstanceManager';
 import {TableManager} from './src/manager/TableManager';
+import {UiManager} from './src/manager/UiManager';
 
 import {OptionsWindow} from './src/ui/OptionsWindow';
 import {Viewport} from './src/ui/Viewport';
@@ -43,6 +44,7 @@ api.Layout = Layout;
 
 manager.InstanceManager = InstanceManager;
 manager.TableManager = TableManager;
+manager.UiManager = UiManager;
 
 // references
 var refs = {
