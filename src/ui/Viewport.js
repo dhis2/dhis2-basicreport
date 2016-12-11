@@ -2400,27 +2400,6 @@ Viewport = function(c) {
                 // expand first panel
                 westRegionPanels[0].expand();
 
-                // look for url params
-                var id = appManager.getUrlParam('id'),
-                    session = appManager.getUrlParam('s'),
-                    layout;
-
-                if (id) {
-                    instanceManager.getById(id);
-                }
-                else if (isString(session) && sessionStorageManager.get(session)) {
-                    layout = new api.Layout(sessionStorageManager.get(session));
-
-                    if (layout) {
-                        instanceManager.getReport(layout, true);
-                    }
-                }
-
-                // remove params from url
-                if (id || session) {
-                    history.pushState(null, null, '.')
-                }
-
                 var initEl = document.getElementById('init');
                 initEl.parentNode.removeChild(initEl);
 

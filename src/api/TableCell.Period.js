@@ -1,5 +1,5 @@
-import {Dimension} from 'd2-analysis';
-import {TableCell} from './TableCell';
+import { Axis } from 'd2-analysis';
+import { TableCell } from './TableCell';
 
 export var PeriodTableCell;
 
@@ -52,13 +52,17 @@ PeriodTableCell.prototype.showContextMenu = function(menuFn) {
             handler: function() {
                 var layout = instanceManager.getStateCurrent();
 
-                // pe
-                layout.rows[0] = new Dimension({
+                var peDimension = {
                     dimension: 'pe',
                     items: this.peReqItems
-                });
+                };
 
-                instanceManager.getReport(layout, true);
+                layout.rows = new Axis([
+                    peDimension,
+                    layout.rows[1]
+                ]);
+
+                instanceManager.getReport(layout, false, false, true);
             }
         });
     }

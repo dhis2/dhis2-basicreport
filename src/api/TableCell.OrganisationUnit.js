@@ -51,37 +51,42 @@ OrganisationUnitTableCell.prototype.showContextMenu = function(row, menuFn) {
             ouReqId: conf.id,
             parentGraphMap: conf.parentGraphMap,
             handler: function() {
-                var layout = instanceManager.getStateCurrent(),
-                    columns = [],
-                    rows = [];
+                var layout = instanceManager.getStateCurrent();
+
+                    //columns = [],
+                    //rows = [];
 
                 // dx
-                columns.push({
-                    dimension: 'dx',
-                    items: [{
-                        id: this.dxReqId,
-                        name: this.dxReqName,
-                        objectName: this.dxObjectName
-                    }]
-                });
+                //columns.push({
+                    //dimension: 'dx',
+                    //items: [{
+                        //id: this.dxReqId,
+                        //name: this.dxReqName,
+                        //objectName: this.dxObjectName
+                    //}]
+                //});
 
                 // pe
-                rows.push({
-                    dimension: 'pe',
-                    items: [{
-                        id: this.peReqId,
-                        name: this.peReqName
-                    }]
-                });
+                //rows.push({
+                    //dimension: 'pe',
+                    //items: [{
+                        //id: this.peReqId,
+                        //name: this.peReqName
+                    //}]
+                //});
 
                 // ou
-                rows.push({
+
+                var ouDimension = {
                     dimension: 'ou',
                     items: [{id: this.ouReqId}]
-                });
+                };
 
-                layout.columns = new Axis(columns);
-                layout.rows = new Axis(rows);
+                //layout.columns = new Axis(columns);
+                layout.rows = new Axis([
+                    layout.rows[0],
+                    ouDimension
+                ]);
 
                 layout.setDataDimensionItems(function() {
                     var obj = {};
@@ -95,7 +100,7 @@ OrganisationUnitTableCell.prototype.showContextMenu = function(row, menuFn) {
 
                 layout.parentGraphMap = this.parentGraphMap;
 
-                instanceManager.getReport(layout, true);
+                instanceManager.getReport(layout, false, false, true);
             }
         });
     });
