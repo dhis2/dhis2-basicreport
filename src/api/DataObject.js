@@ -1,3 +1,5 @@
+import isObject from 'd2-utilizr/lib/isObject';
+
 export var DataObject;
 
 DataObject = function(config, dataType) {
@@ -54,6 +56,7 @@ DataObject = function(config, dataType) {
     t.typeName = t.type + (config.annualized ? ' (annualized)' : '');
 
     t.defaultBgColor = '#fff';
+    t.defaultName = '';
     t.defaultLegendSet = {
         name: 'Default percentage legend set',
         legends: [
@@ -135,22 +138,22 @@ DataObject.prototype.getDenominatorIds = function() {
     return this.denominatorIds = this.getIdsFromFormula(this.denominator);
 };
 
-// dynamic
+DataObject.prototype.getLegendSet = function() {
+    return this.legendSet || (this.isIndicator ? this.defaultLegendSet : null);
+};
 
-DataObject.prototype.getBgColorByValue = function(value) {
-    var set = this.legendSet || (this.isIndicator ? this.defaultLegendSet : null);
+// dep 1
 
-    if (!set) {
-        return this.defaultBgColor;
-    }
+DataObject.prototype.getLegendByValue = function(value) {
+    return (this.getLegendSet() || []).legends.filter(legend => (legend.startValue < value && legend.endValue >= value))[0];
+};
 
-    for (var i = 0, legend; i < set.legends.length; i++) {
-        legend = set.legends[i];
+// dep 2
 
-        if (value > legend.startValue && value <= legend.endValue) {
-            return legend.color;
-        }
-    }
+DataObject.prototype.getLegendColorByValue = function(value) {
+    return (this.getLegendByValue(value) || {}).color || this.defaultBgColor;
+};
 
-    return this.defaultBgColor;
+DataObject.prototype.getLegendNameByValue = function(value) {
+    return (this.getLegendByValue(value) || {}).name || this.defaultName;
 };

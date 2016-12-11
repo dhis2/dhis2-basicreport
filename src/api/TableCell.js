@@ -10,6 +10,7 @@ TableCell = function(config) {
     t.sortId = config.sortId;
     t.cls = config.cls;
     t.style = config.style;
+    t.title = config.title;
     t.isEmpty = !!config.isEmpty;
 
     // auto
@@ -38,6 +39,7 @@ TableCell.prototype.getHtml = function() {
     this.html += cls ? (' class="' + cls + '"') : '';
     this.html += this.style ? (' style="' + this.style + '"') : '';
     this.html += this.span ? (' rowspan="' + this.span + '"') : '';
+    this.html += this.title ? (' title="' + this.title + '"') : '';
     this.html += '>' + this.name + '</td>';
 
     return this.html;
