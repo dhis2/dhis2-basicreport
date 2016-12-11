@@ -569,7 +569,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
                                 sortId: parseFloat(value) || 0,
                                 cls: 'pivot-value align-right',
                                 style: 'background-color:' + dataObject.getLegendColorByValue(parseFloat(value)),
-                                title: dataObject.getLegendNameByValue(parseFloat(value))
+                                title: t.uiManager.getElTitleByLegend(dataObject.getLegendByValue(parseFloat(value)))
                             }));
                         }
                     }

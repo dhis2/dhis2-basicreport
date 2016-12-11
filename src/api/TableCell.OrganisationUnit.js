@@ -22,6 +22,9 @@ OrganisationUnitTableCell = function(config) {
     };
 
     t.getUiManager = function() {
+console.log(t.uiManager);
+console.log(config.uiManager);
+console.log(t.klass.uiManager);
         return t.uiManager || config.uiManager || t.klass.uiManager;
     };
 };
