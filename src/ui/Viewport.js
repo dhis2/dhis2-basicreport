@@ -2008,7 +2008,7 @@ Viewport = function(c) {
                         isKeyword = true;
                     }
 
-                    if (record.id.indexOf('LEVEL')) {
+                    if (record.id.indexOf('LEVEL') !== -1) {
                         levels = [
                             ...levels,
                             ...getKeywordValues(record.id, 'LEVEL').map(level => parseInt(level))
@@ -2017,7 +2017,7 @@ Viewport = function(c) {
                         isKeyword = true;
                     }
 
-                    if (record.id.indexOf('OU_GROUP')) {
+                    if (record.id.indexOf('OU_GROUP') !== -1) {
                         groups = [
                             ...groups,
                             ...getKeywordValues(record.id, 'OU_GROUP')
