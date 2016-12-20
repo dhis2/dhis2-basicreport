@@ -24,6 +24,9 @@ export var Layout = function(refs, c, applyConfig, forceApplyConfig) {
 
     t.displayDensity = isString(c.displayDensity) && !isEmpty(c.displayDensity) ? c.displayDensity : refs.optionConfig.getDisplayDensity('normal').id;
     t.fontSize = isString(c.fontSize) && !isEmpty(c.fontSize) ? c.fontSize : refs.optionConfig.getFontSize('normal').id;
+
+    // transient
+    t.parentGraphMap = isObject(c.parentGraphMap) ? c.parentGraphMap : null;
 };
 
 Layout.prototype = d2aLayout.prototype;

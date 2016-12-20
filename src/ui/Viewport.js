@@ -1988,23 +1988,45 @@ Viewport = function(c) {
                     isOuc,
                     isOugc;
 
+                var getKeywordValues = function(id, keyword) {
+                    return id.split(';').filter(str => str.indexOf(keyword) !== -1).map(str => str.split('-')[1]);
+                };
+
                 records.forEach(function(record) {
-                    if (record.id === 'USER_ORGUNIT') {
+                    var isKeyword = false;
+
+                    if (record.id.indexOf('USER_ORGUNIT') !== -1) {
                         isOu = true;
+                        isKeyword = true;
                     }
-                    else if (record.id === 'USER_ORGUNIT_CHILDREN') {
+                    if (record.id.indexOf('USER_ORGUNIT_CHILDREN') !== -1) {
                         isOuc = true;
+                        isKeyword = true;
                     }
-                    else if (record.id === 'USER_ORGUNIT_GRANDCHILDREN') {
+                    if (record.id.indexOf('USER_ORGUNIT_GRANDCHILDREN') !== -1) {
                         isOugc = true;
+                        isKeyword = true;
                     }
-                    else if (record.id.substr(0,5) === 'LEVEL') {
-                        levels.push(parseInt(record.id.split('-')[1]));
+
+                    if (record.id.indexOf('LEVEL')) {
+                        levels = [
+                            ...levels,
+                            ...getKeywordValues(record.id, 'LEVEL').map(level => parseInt(level))
+                        ];
+
+                        isKeyword = true;
                     }
-                    else if (record.id === 'OU_GROUP') {
-                        groups.push(record.id.split('-')[1]);
+
+                    if (record.id.indexOf('OU_GROUP')) {
+                        groups = [
+                            ...groups,
+                            ...getKeywordValues(record.id, 'OU_GROUP')
+                        ];
+
+                        isKeyword = true;
                     }
-                    else {
+
+                    if (!isKeyword) {
                         ids.push(record.id);
                     }
                 });
