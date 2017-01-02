@@ -430,6 +430,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
                 numeratorTotal = response.getNumeratorTotal(idComb, dataObject);
                 denominatorTotal = response.getDenominatorTotal(idComb, dataObject);
 
+                // hide row
                 if (response.isHideRow(dataObject, layout, numeratorTotal, denominatorTotal)) {
                     continue;
                 }
@@ -586,26 +587,19 @@ TableManager.prototype.getTable = function(layout, fCallback) {
 
                 // pe-year
                 var peYearId = 'pe-year';
-                var peYearIndex;
-                var peYearValues = [];
-                var peYearUnique;
+                var peYearIndex = tableHeaders.find(header => header.id === peYearId).index;
+                var peYearValues = tableRows.map(row => row.period.year);
+                var isYearUnique;
 
-                tableHeaders.forEach(function(header, index) {
-                    if (header.id === peYearId) {
-                        peYearIndex = index;
-                    }
-                });
+                isYearUnique = arrayUnique(peYearValues).length < 2;
 
-                tableRows.forEach(function(row) {
-                    peYearValues.push(row.period.year);
-                });
-
-                peYearUnique = arrayUnique(peYearValues).length < 2;
-
-                if (peYearUnique) {
+                if (isYearUnique) {
 
                     // update headers
-                    tableHeaders = [].concat(tableHeaders.slice(0, peYearIndex), tableHeaders.slice(peYearIndex + 1));
+                    tableHeaders = [
+                        ...tableHeaders.slice(0, peYearIndex),
+                        ...tableHeaders.slice(peYearIndex + 1)
+                    ];
 
                     // update rows
                     tableRows.forEach(function(row) {
@@ -615,6 +609,8 @@ TableManager.prototype.getTable = function(layout, fCallback) {
             }
         })();
 
+        // table
+
         var table = new Table({
             tableHeaders: tableHeaders,
             tableRows: tableRows,
@@ -622,7 +618,6 @@ TableManager.prototype.getTable = function(layout, fCallback) {
             instanceManager: t.getInstanceManager(),
             tableManager: t
         });
-
 
         table.addOptionsCls(layout);
 

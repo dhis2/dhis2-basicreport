@@ -240,14 +240,15 @@ Table.prototype.reduce = function() {
         column.setCellAttributes();
     });
 
-    // index
-    arraySort(columns, 'ASC', 'tableCellGroupsLength');
+    //// sort columns
+    //arraySort(columns, 'ASC', 'tableCellGroupsLength');
 
-    columns.forEach(function(column, i) {
-        column.tableHeader.reduceIndex = i;
-    });
+    //// set index, sort headers
+    //columns.forEach(function(column, i) {
+        //column.tableHeader.reduceIndex = i;
+    //});
 
-    arraySort(this.tableHeaders, 'ASC', 'reduceIndex');
+    //arraySort(this.tableHeaders, 'ASC', 'reduceIndex');
 };
 
 // dep 2
