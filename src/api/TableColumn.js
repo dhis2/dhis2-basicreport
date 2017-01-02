@@ -65,8 +65,13 @@ TableColumn.prototype.createGroups = function() {
 TableColumn.prototype.setCellAttributes = function() {
     var t = this;
 
-    t.createGroups().forEach(function(group) {
+    if (!t.tableCellGroups) {
+        t.createGroups();
+    }
+
+    t.tableCellGroups.forEach(function(group) {
         group.setSpan();
+        group.setTitle();
         group.setDisplay();
     });
 };

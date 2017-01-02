@@ -30,3 +30,7 @@ TableCellGroup.prototype.setDisplay = function() {
 TableCellGroup.prototype.setSpan = function() {
     this.getFirst().span = this.cells.length;
 };
+
+TableCellGroup.prototype.setTitle = function() {
+    this.getFirst().title = this.getFirst().name;
+};
