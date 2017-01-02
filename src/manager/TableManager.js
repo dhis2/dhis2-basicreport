@@ -510,7 +510,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
 
                         else if (th.id === 'pe') {
                             row.addCell(th.id, new PeriodTableCell({
-                                name: period.displayName || period.name,
+                                name: period.displayName,
                                 sortId: period.typeSortId + period.sortId + dataObject.groupName + dataObject.name + allOuSortId,
                                 cls: 'pivot-value clickable',
                                 period: period,

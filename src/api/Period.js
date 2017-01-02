@@ -97,9 +97,7 @@ Period.prototype.getTypeById = function(id) {
         else if (id.indexOf('S') !== -1) {
             return 'SixMonthly';
         }
-    }
-    else if (id.length === 7) {
-        if (id.indexOf('B') !== -1) {
+        else if (id.indexOf('B') !== -1) {
             return 'BiMonthly';
         }
         else if (id.indexOf('Oct') !== -1) {
