@@ -2037,6 +2037,15 @@ Period.prototype.generateDisplayProperties = function() {
                 });
             })();
 
+            // monthly
+            (function() {
+                items.push({
+                    items: p.getItemsByTypeByQuarter('Monthly'),
+                    text: 'Show <span class="name">months</span> in <span class="name">' + p.name + '</span>',
+                    iconCls: 'ns-menu-item-float'
+                });
+            })();
+
             // weekly
             (function() {
                 items.push({

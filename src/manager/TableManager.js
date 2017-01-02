@@ -319,21 +319,25 @@ TableManager.prototype.getTable = function(layout, fCallback) {
             })();
 
             // pe headers
-            tableHeaders.push(new TableHeader({
-                id: 'pe-type',
-                name: 'Period type',
-                objectName: 'pe',
-                cls: 'pivot-dim',
-                index: index++
-            }));
+            if (!layout.reduceLayout) {
+                tableHeaders.push(new TableHeader({
+                    id: 'pe-type',
+                    name: 'Period type',
+                    objectName: 'pe',
+                    cls: 'pivot-dim',
+                    index: index++
+                }));
+            }
 
-            tableHeaders.push(new TableHeader({
-                id: 'pe-year',
-                name: 'Year',
-                objectName: 'pe',
-                cls: 'pivot-dim',
-                index: index++
-            }));
+            if (!layout.reduceLayout) {
+                tableHeaders.push(new TableHeader({
+                    id: 'pe-year',
+                    name: 'Year',
+                    objectName: 'pe',
+                    cls: 'pivot-dim',
+                    index: index++
+                }));
+            }
 
             tableHeaders.push(new TableHeader({
                 id: 'pe',
@@ -344,13 +348,16 @@ TableManager.prototype.getTable = function(layout, fCallback) {
             }));
 
             // dx headers
-            tableHeaders.push(new TableHeader({
-                id: 'dx-group',
-                name: 'Data group',
-                objectName: 'dx',
-                cls: 'pivot-dim',
-                index: index++
-            }));
+
+            if (!layout.reduceLayout) {
+                tableHeaders.push(new TableHeader({
+                    id: 'dx-group',
+                    name: 'Data group',
+                    objectName: 'dx',
+                    cls: 'pivot-dim',
+                    index: index++
+                }));
+            }
 
             tableHeaders.push(new TableHeader({
                 id: 'dx',
@@ -503,7 +510,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
 
                         else if (th.id === 'pe') {
                             row.addCell(th.id, new PeriodTableCell({
-                                name: period.displayName,
+                                name: period.displayName || period.name,
                                 sortId: period.typeSortId + period.sortId + dataObject.groupName + dataObject.name + allOuSortId,
                                 cls: 'pivot-value clickable',
                                 period: period,
@@ -582,32 +589,32 @@ TableManager.prototype.getTable = function(layout, fCallback) {
 
         // interceptor
 
-        (function() {
-            if (layout.reduceLayout) {
+        //(function() {
+            //if (layout.reduceLayout) {
 
-                // pe-year
-                var peYearId = 'pe-year';
-                var peYearIndex = tableHeaders.find(header => header.id === peYearId).index;
-                var peYearValues = tableRows.map(row => row.period.year);
-                var isYearUnique;
+                //// pe-year
+                //var peYearId = 'pe-year';
+                //var peYearIndex = tableHeaders.find(header => header.id === peYearId).index;
+                //var peYearValues = tableRows.map(row => row.period.year);
+                //var isYearUnique;
 
-                isYearUnique = arrayUnique(peYearValues).length < 2;
+                //isYearUnique = arrayUnique(peYearValues).length < 2;
 
-                if (isYearUnique) {
+                //if (isYearUnique) {
 
-                    // update headers
-                    tableHeaders = [
-                        ...tableHeaders.slice(0, peYearIndex),
-                        ...tableHeaders.slice(peYearIndex + 1)
-                    ];
+                    //// update headers
+                    //tableHeaders = [
+                        //...tableHeaders.slice(0, peYearIndex),
+                        //...tableHeaders.slice(peYearIndex + 1)
+                    //];
 
-                    // update rows
-                    tableRows.forEach(function(row) {
-                        delete row[peYearId];
-                    });
-                }
-            }
-        })();
+                    //// update rows
+                    //tableRows.forEach(function(row) {
+                        //delete row[peYearId];
+                    //});
+                //}
+            //}
+        //})();
 
         // table
 
