@@ -572,11 +572,14 @@ TableManager.prototype.getTable = function(layout, fCallback) {
                             }));
                         }
                         else if (th.id === 'dx-value') {
+                            var bgColor = dataObject.getLegendColorByValue(parseFloat(value));
+                            var color = t.uiManager.isColorBright(t.uiManager.hexToRgb(bgColor)) ? '#000000' : '#ffffff';
+
                             row.addCell(th.id, new TableCell({
                                 name: value || '',
                                 sortId: parseFloat(value) || 0,
                                 cls: 'pivot-value align-right',
-                                style: 'background-color:' + dataObject.getLegendColorByValue(parseFloat(value)),
+                                style: 'background-color:' + bgColor + '; color:' + color,
                                 title: t.uiManager.getElTitleByLegend(dataObject.getLegendByValue(parseFloat(value)))
                             }));
                         }

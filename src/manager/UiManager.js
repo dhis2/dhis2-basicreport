@@ -1,6 +1,6 @@
-import {UiManager} from 'd2-analysis';
+import { UiManager } from 'd2-analysis';
 
-export {UiManager};
+export { UiManager };
 
 UiManager.prototype.getContextMenuXY = function(extElement) {
     var height = extElement.getHeight(),
@@ -16,3 +16,24 @@ UiManager.prototype.getContextMenuXY = function(extElement) {
 UiManager.prototype.getElTitleByLegend = function(legend) {
     return legend ? `${legend.name} (${legend.startValue}-${legend.endValue})` : '';
 };
+
+UiManager.prototype.hexToRgb = function(hex) {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+
+    return result ? [
+        parseInt(result[1], 16),
+        parseInt(result[2], 16),
+        parseInt(result[3], 16)
+    ] : null;
+};
+
+UiManager.prototype.calculateColorBrightness = function(rgb) {
+    return Math.round(((parseInt(rgb[0]) * 299) + (parseInt(rgb[1]) * 587) + (parseInt(rgb[2]) * 114)) / 1000);
+};
+
+// dep 1
+
+UiManager.prototype.isColorBright = function(rgbColor) {
+    return this.calculateColorBrightness(rgbColor) > 125;
+};
+

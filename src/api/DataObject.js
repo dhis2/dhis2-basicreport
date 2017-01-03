@@ -55,17 +55,8 @@ DataObject = function(config, dataType) {
 
     t.typeName = t.type + (config.annualized ? ' (annualized)' : '');
 
-    t.defaultBgColor = '#fff';
+    t.defaultBgColor = '#ffffff';
     t.defaultName = '';
-    t.defaultLegendSet = {
-        name: 'Default percentage legend set',
-        legends: [
-            {name: 'Bad', startValue: 0, endValue: 50, color: '#ff0000'},
-            {name: 'Medium', startValue: 50, endValue: 80, color: '#ffff00'},
-            {name: 'Good', startValue: 80, endValue: 100, color: '#00bf00'},
-            {name: 'Too high', startValue: 100, endValue: 1000000000, color: '#f5f5f5'}
-        ]
-    };
 
     // uninitialized
     t.strippedNumerator;
@@ -139,13 +130,17 @@ DataObject.prototype.getDenominatorIds = function() {
 };
 
 DataObject.prototype.getLegendSet = function() {
-    return this.legendSet || (this.isIndicator ? this.defaultLegendSet : null);
+    return this.legendSet;
 };
 
 // dep 1
 
 DataObject.prototype.getLegendByValue = function(value) {
-    return (this.getLegendSet() || []).legends.filter(legend => (legend.startValue < value && legend.endValue >= value))[0];
+    if (!this.getLegendSet()) {
+        return;
+    }
+
+    return this.getLegendSet().legends.filter(legend => (legend.startValue < value && legend.endValue >= value))[0];
 };
 
 // dep 2
