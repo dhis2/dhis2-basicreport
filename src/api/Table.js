@@ -9,6 +9,7 @@ import {Sorting} from 'd2-analysis';
 
 import {OrganisationUnitTableCell} from './TableCell.OrganisationUnit';
 import {PeriodTableCell} from './TableCell.Period';
+import {ValueTableCell} from './TableCell.Value';
 import {TableColumn} from './TableColumn';
 
 export var Table;
@@ -295,6 +296,29 @@ Table.prototype.addPeClickListeners = function(layout, tableFn) {
                 return t.getTableManager().getContextMenu(items);
             });
         });
+    }
+};
+
+Table.prototype.addValueClickListeners = function(layout, tableFn) {
+    var t = this,
+        cells = this.getTableCellsByInstance(ValueTableCell);
+
+    for (var i = 0, cell, el; i < cells.length; i++) {
+        cell = cells[i];
+
+        if (cell.isEmpty) {
+            continue;
+        }
+
+        el = Ext.get(cell.elementId);
+        el.cell = cell;
+        el.row = t.getRowByCellId(cell.id);
+
+        (function(el) {
+            el.on('click', function(event) {
+                //console.log("row", el.cell.row);
+            });
+        })(el);
     }
 };
 

@@ -12,6 +12,7 @@ import {TableRow} from '../api/TableRow';
 import {TableCell} from '../api/TableCell';
 import {OrganisationUnitTableCell} from '../api/TableCell.OrganisationUnit';
 import {PeriodTableCell} from '../api/TableCell.Period';
+import {ValueTableCell} from '../api/TableCell.Value';
 import {Table} from '../api/Table';
 import {Period} from '../api/Period';
 import {OrganisationUnit} from '../api/OrganisationUnit';
@@ -573,14 +574,15 @@ TableManager.prototype.getTable = function(layout, fCallback) {
                         }
                         else if (th.id === 'dx-value') {
                             var bgColor = dataObject.getLegendColorByValue(parseFloat(value));
-                            var color = t.uiManager.isColorBright(t.uiManager.hexToRgb(bgColor)) ? '#000000' : '#ffffff';
+                            var color = t.uiManager.getContrastedColor(bgColor);
 
-                            row.addCell(th.id, new TableCell({
+                            row.addCell(th.id, new ValueTableCell({
                                 name: value || '',
                                 sortId: parseFloat(value) || 0,
-                                cls: 'pivot-value align-right',
+                                cls: 'pivot-value align-right clickable',
                                 style: 'background-color:' + bgColor + '; color:' + color,
-                                title: t.uiManager.getElTitleByLegend(dataObject.getLegendByValue(parseFloat(value)))
+                                title: t.uiManager.getElTitleByLegend(dataObject.getLegendByValue(parseFloat(value))),
+                                row: row
                             }));
                         }
                     }

@@ -198,6 +198,7 @@ function initialize() {
             table.addHeaderClickListeners();
             table.addOuClickListeners();
             table.addPeClickListeners();
+            table.addValueClickListeners();
         };
 
         table.update();

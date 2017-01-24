@@ -37,3 +37,9 @@ UiManager.prototype.isColorBright = function(rgbColor) {
     return this.calculateColorBrightness(rgbColor) > 125;
 };
 
+// dep 2
+
+UiManager.prototype.getContrastedColor = function(color) {
+    return this.isColorBright(this.hexToRgb(color)) ? '#000000' : '#ffffff';
+};
+
