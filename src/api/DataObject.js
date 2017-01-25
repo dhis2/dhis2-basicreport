@@ -1,3 +1,4 @@
+import arrayFrom from 'd2-utilizr/lib/arrayFrom';
 import isObject from 'd2-utilizr/lib/isObject';
 
 export var DataObject;
@@ -11,15 +12,17 @@ DataObject = function(config, dataType) {
         name: 'Indicator',
         sortId: 1,
         isIndicator: true
-    },
-    dataElement = {
+    };
+
+    var dataElement = {
         id: 'dataElement',
         objectName: 'de',
         name: 'Data element',
         sortId: 2,
         isDataElement: true
-    },
-    map = {
+    };
+
+    var map = {
         'indicator': indicator,
         'dataElement': dataElement
     };
@@ -141,6 +144,10 @@ DataObject.prototype.getLegendByValue = function(value) {
     }
 
     return this.getLegendSet().legends.filter(legend => (legend.startValue < value && legend.endValue >= value))[0];
+};
+
+DataObject.prototype.getIds = function() {
+    return this.isIndicator ? [].concat(this.getNumeratorIds(), this.getDenominatorIds()) : this.isDataElement ? arrayFrom(this.id) : null;
 };
 
 // dep 2

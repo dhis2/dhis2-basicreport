@@ -19,6 +19,7 @@ Table = function(config) {
 
     t.klass = Table;
 
+    t.appManager;
     t.instanceManager;
     t.tableManager;
 
@@ -45,6 +46,10 @@ Table = function(config) {
     t.html;
 
     t.update;
+
+    t.getAppManager = function() {
+        return t.appManager || config.appManager || t.klass.appManager;
+    };
 
     t.getInstanceManager = function() {
         return t.instanceManager || config.instanceManager || t.klass.instanceManager;
@@ -303,6 +308,8 @@ Table.prototype.addValueClickListeners = function(layout, tableFn) {
     var t = this,
         cells = this.getTableCellsByInstance(ValueTableCell);
 
+    var path = this.getAppManager().getPath();
+
     for (var i = 0, cell, el; i < cells.length; i++) {
         cell = cells[i];
 
@@ -316,7 +323,14 @@ Table.prototype.addValueClickListeners = function(layout, tableFn) {
 
         (function(el) {
             el.on('click', function(event) {
-                //console.log("row", el.cell.row);
+                console.log("getIds", el.cell.row.dataObject.getIds());
+                //console.log("dataObject", el.cell.row.dataObject);
+
+                //var ids = el.cell.row.dataObject.getIds();
+
+                //$.getJSON(encodeURI(path + '/api/analytics/rawData.json?dimension=dx:' + ids.join(';') + '&dimension=pe:LAST_12_MONTHS&dimension=ou:ImspTQPwCqd'), function(data) {
+                    //console.log(data);
+                //});
             });
         })(el);
     }
