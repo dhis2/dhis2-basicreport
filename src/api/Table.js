@@ -5,12 +5,12 @@ import isEmpty from 'd2-utilizr/lib/isEmpty';
 import arrayContains from 'd2-utilizr/lib/arrayContains';
 import arraySort from 'd2-utilizr/lib/arraySort';
 
-import {Sorting} from 'd2-analysis';
+import { Request, Response, Sorting } from 'd2-analysis';
 
-import {OrganisationUnitTableCell} from './TableCell.OrganisationUnit';
-import {PeriodTableCell} from './TableCell.Period';
-import {ValueTableCell} from './TableCell.Value';
-import {TableColumn} from './TableColumn';
+import { OrganisationUnitTableCell } from './TableCell.OrganisationUnit';
+import { PeriodTableCell } from './TableCell.Period';
+import { ValueTableCell } from './TableCell.Value';
+import { TableColumn } from './TableColumn';
 
 export var Table;
 
@@ -323,14 +323,45 @@ Table.prototype.addValueClickListeners = function(layout, tableFn) {
 
         (function(el) {
             el.on('click', function(event) {
-                console.log("getIds", el.cell.row.dataObject.getIds());
-                //console.log("dataObject", el.cell.row.dataObject);
+                console.log("getIds", el.cell.row.dataObject.getIds(), el.cell.row);
 
-                //var ids = el.cell.row.dataObject.getIds();
+                var row = el.cell.row;
 
-                //$.getJSON(encodeURI(path + '/api/analytics/rawData.json?dimension=dx:' + ids.join(';') + '&dimension=pe:LAST_12_MONTHS&dimension=ou:ImspTQPwCqd'), function(data) {
-                    //console.log(data);
-                //});
+                var dxIds = row.dataObject.getIds(),
+                    peId = row.period.id,
+                    ouId = row.organisationUnit.id;
+
+                var params = [
+                    'dimension=dx:' + dxIds.join(';'),
+                    'dimension=pe:' + peId,
+                    'dimension=ou:' + ouId,
+                    'aggregationType=COUNT'
+                ];
+
+                var countRequest = new Request({
+                    baseUrl: t.getAppManager().getApiPath() + '/analytics',
+                    params: params
+                });
+
+                var rawRequest = new Request({
+                    baseUrl: t.getAppManager().getPath() + '/api/26/analytics/rawData',
+                    params: params
+                });
+
+                countRequest.run().done(function(countResponse) {
+                    countResponse = new Response(countResponse);
+
+                    if (!countResponse) {
+                        return;
+                    }
+
+                    var count = countResponse.getTotal();
+                    console.log(count);
+
+                    rawRequest.run().done(function(rawResponse) {
+                        console.log(rawResponse);
+                    });
+                });
             });
         })(el);
     }

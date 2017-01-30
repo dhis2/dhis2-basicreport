@@ -69,6 +69,8 @@ refs.uiConfig = uiConfig;
 
     // app manager
 var appManager = new manager.AppManager();
+appManager.sessionName = 'basicreport';
+appManager.apiVersion = 25;
 refs.appManager = appManager;
 
     // calendar manager
@@ -131,24 +133,23 @@ var systemInfoUrl = '/api/system/info.json';
 var systemSettingsUrl = '/api/systemSettings.json?key=keyCalendar&key=keyDateFormat&key=keyAnalysisRelativePeriod&key=keyHideUnapprovedDataInAnalytics';
 var userAccountUrl = '/api/me/user-account.json';
 
-var systemInfoReq;
-var systemSettingsReq;
-var userAccountReq;
-
 manifestReq.done(function(text) {
     appManager.manifest = JSON.parse(text);;
     appManager.env = process.env.NODE_ENV;
     appManager.setAuth();
-    systemInfoReq = $.getJSON(appManager.getPath() + systemInfoUrl);
+
+    var systemInfoReq = $.getJSON(appManager.getPath() + systemInfoUrl);
 
 systemInfoReq.done(function(systemInfo) {
     appManager.systemInfo = systemInfo;
     appManager.path = systemInfo.contextPath;
-    systemSettingsReq = $.getJSON(appManager.getPath() + systemSettingsUrl);
+
+    var systemSettingsReq = $.getJSON(appManager.getPath() + systemSettingsUrl);
 
 systemSettingsReq.done(function(systemSettings) {
     appManager.systemSettings = systemSettings;
-    userAccountReq = $.getJSON(appManager.getPath() + userAccountUrl);
+
+    var userAccountReq = $.getJSON(appManager.getPath() + userAccountUrl);
 
 userAccountReq.done(function(userAccount) {
     appManager.userAccount = userAccount;
@@ -170,7 +171,6 @@ function initialize() {
 
     // app manager
     appManager.appName = 'Basic Report';
-    appManager.sessionName = 'basicreport';
 
     // instance manager
     instanceManager.apiResource = 'reportTables';
