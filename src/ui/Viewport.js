@@ -100,7 +100,7 @@ Viewport = function(c) {
             var store = this,
                 params = {},
                 baseUrl = path + '/api/indicators.json?',
-                fieldsUrl = 'fields=dimensionItem|rename(id),' + displayPropertyUrl,
+                fieldsUrl = 'fields=dimensionItem~rename(id),' + displayPropertyUrl,
                 filterUrl = filter ? '&filter=' + displayProperty + ':ilike:' + filter : '';
 
             var url = baseUrl + fieldsUrl + filterUrl;
@@ -171,7 +171,7 @@ Viewport = function(c) {
         fields: ['id', 'name', 'index'],
         proxy: {
             type: 'ajax',
-            url: encodeURI(path + '/api/indicatorGroups.json?fields=id,displayName|rename(name)&paging=false'),
+            url: encodeURI(path + '/api/indicatorGroups.json?fields=id,displayName~rename(name)&paging=false'),
             reader: {
                 type: 'json',
                 root: 'indicatorGroups'
@@ -265,7 +265,7 @@ Viewport = function(c) {
             var store = this,
                 params = {},
                 baseUrl = path + '/api/dataElements.json?',
-                fieldsUrl = 'fields=dimensionItem|rename(id),' + displayPropertyUrl,
+                fieldsUrl = 'fields=dimensionItem~rename(id),' + displayPropertyUrl,
                 filterUrl = '&filter=domainType:eq:AGGREGATE' + (filter ? '&filter=' + displayProperty + ':ilike:' + filter : '');
 
             var url = baseUrl + fieldsUrl + filterUrl;
@@ -309,10 +309,10 @@ Viewport = function(c) {
             }
 
             if (isString(uid)) {
-                url = '/dataElementOperands.json?fields=dimensionItem|rename(id),' + displayPropertyUrl + '&filter=dataElement.dataElementGroups.id:eq:' + uid + (filter ? '&filter=' + displayProperty + ':ilike:' + filter : '');
+                url = '/dataElementOperands.json?fields=dimensionItem~rename(id),' + displayPropertyUrl + '&filter=dataElement.dataElementGroups.id:eq:' + uid + (filter ? '&filter=' + displayProperty + ':ilike:' + filter : '');
             }
             else if (uid === 0) {
-                url = '/dataElementOperands.json?fields=dimensionItem|rename(id),' + displayPropertyUrl + '' + (filter ? '&filter=' + displayProperty + ':ilike:' + filter : '');
+                url = '/dataElementOperands.json?fields=dimensionItem~rename(id),' + displayPropertyUrl + '' + (filter ? '&filter=' + displayProperty + ':ilike:' + filter : '');
             }
 
             if (!url) {
@@ -1707,7 +1707,7 @@ Viewport = function(c) {
                 format: 'json',
                 noCache: false,
                 extraParams: {
-                    fields: 'children[id,' + displayPropertyUrl + ',children::isNotEmpty|rename(hasChildren)&paging=false'
+                    fields: 'children[id,' + displayPropertyUrl + ',children::isNotEmpty~rename(hasChildren)&paging=false'
                 },
                 url: path + '/api/organisationUnits',
                 reader: {

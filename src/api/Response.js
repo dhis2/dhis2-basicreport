@@ -62,7 +62,7 @@ Response.prototype.getHeaderIndexByName = function(name) {
 };
 
 Response.prototype.getNameById = function(id) {
-    return this.metaData.names[id];
+    return this.metaData.items[id].name;
 };
 
 Response.prototype.getIdByIdComb = function(idComb, dataType) {

@@ -5,27 +5,27 @@ import isString from 'd2-utilizr/lib/isString';
 import arrayFrom from 'd2-utilizr/lib/arrayFrom';
 import arrayTo from 'd2-utilizr/lib/arrayTo';
 
-import {api, manager, config, ui, init} from 'd2-analysis';
+import { api, manager, config, ui, init } from 'd2-analysis';
 
-import {DataObject} from './src/api/DataObject';
-import {OrganisationUnit} from './src/api/OrganisationUnit';
-import {Period} from './src/api/Period';
-import {Response} from './src/api/Response';
-import {Table} from './src/api/Table';
-import {TableCell} from './src/api/TableCell';
-import {OrganisationUnitTableCell} from './src/api/TableCell.OrganisationUnit';
-import {PeriodTableCell} from './src/api/TableCell.Period';
-import {TableHeader} from './src/api/TableHeader';
-import {TableRow} from './src/api/TableRow';
+import { DataObject } from './src/api/DataObject';
+import { OrganisationUnit } from './src/api/OrganisationUnit';
+import { Period } from './src/api/Period';
+import { Response } from './src/api/Response';
+import { Table } from './src/api/Table';
+import { TableCell } from './src/api/TableCell';
+import { OrganisationUnitTableCell } from './src/api/TableCell.OrganisationUnit';
+import { PeriodTableCell } from './src/api/TableCell.Period';
+import { TableHeader } from './src/api/TableHeader';
+import { TableRow } from './src/api/TableRow';
 
-import {Layout} from './src/api/Layout';
+import { Layout } from './src/api/Layout';
 
-import {InstanceManager} from './src/manager/InstanceManager';
-import {TableManager} from './src/manager/TableManager';
-import {UiManager} from './src/manager/UiManager';
+import { InstanceManager } from './src/manager/InstanceManager';
+import { TableManager } from './src/manager/TableManager';
+import { UiManager } from './src/manager/UiManager';
 
-import {OptionsWindow} from './src/ui/OptionsWindow';
-import {Viewport} from './src/ui/Viewport';
+import { OptionsWindow } from './src/ui/OptionsWindow';
+import { Viewport } from './src/ui/Viewport';
 
 // extend
 api.DataObject = DataObject;
@@ -48,7 +48,7 @@ manager.UiManager = UiManager;
 
 // references
 var refs = {
-    api: api
+    api
 };
 
     // dimension config
@@ -70,7 +70,7 @@ refs.uiConfig = uiConfig;
     // app manager
 var appManager = new manager.AppManager();
 appManager.sessionName = 'basicreport';
-appManager.apiVersion = 25;
+appManager.apiVersion = 26;
 refs.appManager = appManager;
 
     // calendar manager
@@ -99,20 +99,17 @@ refs.tableManager = tableManager;
 
     // instance manager
 var instanceManager = new manager.InstanceManager(refs);
+instanceManager.apiResource = 'reportTables';
+instanceManager.dataStatisticsEventType = 'DATA_TABLE_VIEW';
 refs.instanceManager = instanceManager;
 
 // dependencies
-
-    // instance manager
 uiManager.setInstanceManager(instanceManager);
-
-    // i18n manager
 dimensionConfig.setI18nManager(i18nManager);
 optionConfig.setI18nManager(i18nManager);
 periodConfig.setI18nManager(i18nManager);
 uiManager.setI18nManager(i18nManager);
 
-// apply to
 appManager.applyTo(arrayTo(api));
 instanceManager.applyTo(arrayTo(api));
 calendarManager.applyTo(arrayTo(api));
@@ -157,10 +154,10 @@ userAccountReq.done(function(userAccount) {
     calendarManager.setDateFormat(appManager.getDateFormat());
     calendarManager.init(appManager.systemSettings.keyCalendar);
 
-requestManager.add(new api.Request(init.i18nInit(refs)));
-requestManager.add(new api.Request(init.rootNodesInit(refs)));
-requestManager.add(new api.Request(init.organisationUnitLevelsInit(refs)));
-requestManager.add(new api.Request(init.legendSetsInit(refs)));
+requestManager.add(new api.Request(refs, init.i18nInit(refs)));
+requestManager.add(new api.Request(refs, init.rootNodesInit(refs)));
+requestManager.add(new api.Request(refs, init.organisationUnitLevelsInit(refs)));
+requestManager.add(new api.Request(refs, init.legendSetsInit(refs)));
 
 requestManager.set(initialize);
 requestManager.run();
@@ -168,6 +165,16 @@ requestManager.run();
 });});});});
 
 function initialize() {
+
+    // i18n init
+    var i18n = i18nManager.get();
+
+    optionConfig.init();
+    dimensionConfig.init();
+    periodConfig.init();
+
+    // ui config
+    uiConfig.checkout('aggregate');
 
     // app manager
     appManager.appName = 'Basic Report';
