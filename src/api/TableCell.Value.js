@@ -3,9 +3,9 @@ import { TableCell } from './TableCell';
 
 export var ValueTableCell;
 
-ValueTableCell = function(config) {
+ValueTableCell = function(refs, config) {
     var t = this,
-        s = new TableCell(config);
+        s = new TableCell(refs, config);
 
     $.extend(t, s);
 
@@ -20,6 +20,10 @@ ValueTableCell = function(config) {
 
     t.getUiManager = function() {
         return t.uiManager || config.uiManager || t.klass.uiManager;
+    };
+
+    t.getRefs = function() {
+        return refs;
     };
 };
 

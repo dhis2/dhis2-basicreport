@@ -3,9 +3,9 @@ import {TableCell} from './TableCell';
 
 export var OrganisationUnitTableCell;
 
-OrganisationUnitTableCell = function(config) {
+OrganisationUnitTableCell = function(refs, config) {
     var t = this,
-        s = new TableCell(config);
+        s = new TableCell(refs, config);
 
     Ext.apply(t, s);
 
@@ -23,6 +23,10 @@ OrganisationUnitTableCell = function(config) {
 
     t.getUiManager = function() {
         return t.uiManager || config.uiManager || t.klass.uiManager;
+    };
+
+    t.getRefs = function() {
+        return refs;
     };
 };
 

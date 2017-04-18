@@ -5,7 +5,7 @@ import {TableCellGroup} from './TableCellGroup';
 
 export var TableColumn;
 
-TableColumn = function(config) {
+TableColumn = function(refs, config) {
     var t = this;
 
     config = config || {};
@@ -17,6 +17,10 @@ TableColumn = function(config) {
     t.index = config.index || null;
     t.tableCellGroups;
     t.tableCellGroupsLength;
+
+    t.getRefs = function() {
+        return refs;
+    };
 };
 
 TableColumn.prototype.addTableHeader = function(header) {

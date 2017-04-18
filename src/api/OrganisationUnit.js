@@ -3,7 +3,7 @@ import arrayClean from 'd2-utilizr/lib/arrayClean';
 
 export var OrganisationUnit;
 
-OrganisationUnit = function(config) {
+OrganisationUnit = function(refs, config) {
     var t = this;
 
     t.klass = OrganisationUnit;
@@ -25,6 +25,10 @@ OrganisationUnit = function(config) {
     // support
     t.getValidLevel = function(level) {
         return (isNumber(level) && level > 0) ? level : 1;
+    };
+
+    t.getRefs = function() {
+        return refs;
     };
 };
 

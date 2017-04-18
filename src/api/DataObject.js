@@ -3,7 +3,7 @@ import isObject from 'd2-utilizr/lib/isObject';
 
 export var DataObject;
 
-DataObject = function(config, dataType) {
+DataObject = function(refs, config, dataType) {
     var t = this;
 
     var indicator = {
@@ -95,7 +95,11 @@ DataObject = function(config, dataType) {
         }
 
         return ids;
-    }
+    };
+
+    t.getRefs = function() {
+        return refs;
+    };
 };
 
 // base

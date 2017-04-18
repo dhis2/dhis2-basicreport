@@ -1,6 +1,6 @@
 export var TableCell;
 
-TableCell = function(config) {
+TableCell = function(refs, config) {
     var t = this,
         id = Ext.data.IdGenerator.get('uuid').generate();
 
@@ -26,6 +26,10 @@ TableCell = function(config) {
     t.span;
     t.display;
     t.html;
+
+    t.getRefs = function() {
+        return refs;
+    };
 };
 
 TableCell.prototype.getHtml = function() {

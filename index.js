@@ -180,8 +180,19 @@ function initialize() {
     appManager.appName = 'Basic Report';
 
     // instance manager
-    instanceManager.apiResource = 'reportTables';
-    instanceManager.dataStatisticsEventType = 'DATA_TABLE_VIEW';
+    instanceManager.setFn(function(table) {
+        table.update = function(isSorting) {
+            uiManager.update(table.getHtml());
+            table.addHeaderClickListeners();
+            table.addOuClickListeners();
+            table.addPeClickListeners();
+            table.addValueClickListeners();
+        };
+
+        table.update();
+
+        tableManager.unmask();
+    });
 
     // ui manager
     uiManager.disableRightClick();
@@ -197,21 +208,6 @@ function initialize() {
             '<div>- ' + i18nManager.get('example5') + '</div>' +
             '</div>';
     }());
-
-    // instance manager
-    instanceManager.setFn(function(table) {
-        table.update = function(isSorting) {
-            uiManager.update(table.getHtml());
-            table.addHeaderClickListeners();
-            table.addOuClickListeners();
-            table.addPeClickListeners();
-            table.addValueClickListeners();
-        };
-
-        table.update();
-
-        tableManager.unmask();
-    });
 
     // windows
     uiManager.reg(OptionsWindow(refs), 'optionsWindow').hide();

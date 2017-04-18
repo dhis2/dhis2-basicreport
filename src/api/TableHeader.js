@@ -2,7 +2,7 @@ import isNumeric from 'd2-utilizr/lib/isNumeric';
 
 export var TableHeader;
 
-TableHeader = function(config) {
+TableHeader = function(refs, config) {
     var t = this;
 
     t.id = config.id;
@@ -21,6 +21,10 @@ TableHeader = function(config) {
     // transient
     t.reduceIndex;
     t.html = '';
+
+    t.getRefs = function() {
+        return refs;
+    };
 };
 
 TableHeader.prototype.getHtml = function() {

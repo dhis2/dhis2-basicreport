@@ -3,10 +3,14 @@
 
 export var TableCellGroup;
 
-TableCellGroup = function() {
+TableCellGroup = function(refs) {
     var t = this;
 
     t.cells = [];
+
+    t.getRefs = function() {
+        return refs;
+    };
 };
 
 TableCellGroup.prototype.add = function(cell) {

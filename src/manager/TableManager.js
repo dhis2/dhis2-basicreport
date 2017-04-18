@@ -20,17 +20,13 @@ import {OrganisationUnitLevel} from '../api/OrganisationUnitLevel';
 
 export var TableManager;
 
-TableManager = function(c) {
+TableManager = function(refs) {
     var t = this;
-
-    t.appManager = c.appManager;
-    t.uiManager = c.uiManager;
-    t.dimensionConfig = c.dimensionConfig;
 
     t.instanceManager;
 
     t.getInstanceManager = function() {
-        return t.instanceManager || c.instanceManager;
+        return t.instanceManager || refs.instanceManager;
     };
 
     // config
@@ -44,7 +40,7 @@ TableManager = function(c) {
     t.loadMask;
 
     t.mask = function(elId) {
-        var el = Ext.get(elId) || t.uiManager.getUpdateComponent();
+        var el = Ext.get(elId) || refs.uiManager.getUpdateComponent();
 
         var tableEl = el.child('table');
 
@@ -66,6 +62,10 @@ TableManager = function(c) {
         t.loadMask && t.loadMask.hide();
         t.loadMask = null;
     };
+
+    t.getRefs = function() {
+        return refs;
+    };
 };
 
 TableManager.prototype.applyTo = function(modules) {
@@ -77,9 +77,10 @@ TableManager.prototype.applyTo = function(modules) {
 };
 
 TableManager.prototype.getTable = function(layout, fCallback) {
-    var t = this;
+    var t = this,
+        refs = this.getRefs();
 
-    var path = t.appManager.getPath();
+    var path = refs.appManager.getPath();
 
     var data,
         aInReqIds = [],
@@ -96,8 +97,8 @@ TableManager.prototype.getTable = function(layout, fCallback) {
         sDeName = 'dataElement',
         sDsName = 'dataSet';
 
-    var peDimName = t.dimensionConfig.get('period').dimensionName,
-        ouDimName = t.dimensionConfig.get('organisationUnit').dimensionName;
+    var peDimName = refs.dimensionConfig.get('period').dimensionName,
+        ouDimName = refs.dimensionConfig.get('organisationUnit').dimensionName;
 
     oDimNameReqItemArrayMap[peDimName] = aPeReqIds;
     oDimNameReqItemArrayMap[ouDimName] = aOuReqIds;
@@ -176,7 +177,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
         $.getJSON(encodeURI(path + '/api/indicators.json?paging=false&filter=id:in:[' + aInReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,description,indicatorType[id,displayName~rename(name)],annualized,indicatorGroups[id,displayName~rename(name)],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[id,displayName~rename(name),legends[id,displayName~rename(name),startValue,endValue,color]]'), function(r) {
             if (r.indicators) {
                 for (var i = 0, obj; i < r.indicators.length; i++) {
-                    obj = new DataObject(r.indicators[i], sInName);
+                    obj = new DataObject(refs, r.indicators[i], sInName);
 
                     idDataObjectMap[obj.id] = obj;
                     aInReqItems.push(obj);
@@ -197,7 +198,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
         $.getJSON(encodeURI(path + '/api/dataElements.json?paging=false&filter=id:in:[' + aDeReqIds.join(',') + ']&fields=id,name,displayName,displayShortName,description,aggregationType,dataElementGroups[id,displayName~rename(name)],numerator,numeratorDescription,denominator,denominatorDescription,legendSet[id,displayName~rename(name),legends[id,displayName~rename(name),startValue,endValue,color]]'), function(r) {
             if (r.dataElements) {
                 for (var i = 0, obj; i < r.dataElements.length; i++) {
-                    obj = new DataObject(r.dataElements[i], sDeName);
+                    obj = new DataObject(refs, r.dataElements[i], sDeName);
 
                     idDataObjectMap[obj.id] = obj;
                     aDeReqItems.push(obj);
@@ -289,7 +290,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
     };
 
     getTable = function(analyticsData) {
-        var response = new Response(analyticsData),
+        var response = new Response(refs, analyticsData),
             aDxResIds = aDxReqIds,
             aPeResIds = response.metaData.dimensions.pe,
             aOuResIds = response.metaData.dimensions.ou,
@@ -310,18 +311,18 @@ TableManager.prototype.getTable = function(layout, fCallback) {
             // ou headers
             (function() {
                 for (var level; startOuLevel < maxOuLevel; startOuLevel++) {
-                    level = new OrganisationUnitLevel(t.appManager.organisationUnitLevels[startOuLevel]);
+                    level = new OrganisationUnitLevel(refs, refs.appManager.organisationUnitLevels[startOuLevel]);
                     level.objectName = 'ou';
                     level.cls = 'pivot-dim';
                     level.index = index++;
 
-                    tableHeaders.push(new TableHeader(level));
+                    tableHeaders.push(new TableHeader(refs, level));
                 }
             })();
 
             // pe headers
             if (!layout.reduceLayout) {
-                tableHeaders.push(new TableHeader({
+                tableHeaders.push(new TableHeader(refs, {
                     id: 'pe-type',
                     name: 'Period type',
                     objectName: 'pe',
@@ -331,7 +332,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
             }
 
             if (!layout.reduceLayout) {
-                tableHeaders.push(new TableHeader({
+                tableHeaders.push(new TableHeader(refs, {
                     id: 'pe-year',
                     name: 'Year',
                     objectName: 'pe',
@@ -340,7 +341,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
                 }));
             }
 
-            tableHeaders.push(new TableHeader({
+            tableHeaders.push(new TableHeader(refs, {
                 id: 'pe',
                 name: 'Period',
                 objectName: 'pe',
@@ -351,7 +352,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
             // dx headers
 
             if (!layout.reduceLayout) {
-                tableHeaders.push(new TableHeader({
+                tableHeaders.push(new TableHeader(refs, {
                     id: 'dx-group',
                     name: 'Data group',
                     objectName: 'dx',
@@ -360,7 +361,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
                 }));
             }
 
-            tableHeaders.push(new TableHeader({
+            tableHeaders.push(new TableHeader(refs, {
                 id: 'dx',
                 name: 'Data',
                 objectName: 'dx',
@@ -369,7 +370,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
             }));
 
             if (layout.showDataDescription) {
-                tableHeaders.push(new TableHeader({
+                tableHeaders.push(new TableHeader(refs, {
                     id: 'dx-datatype',
                     name: 'Data type',
                     objectName: 'dx',
@@ -378,7 +379,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
                 }));
             }
 
-            tableHeaders.push(new TableHeader({
+            tableHeaders.push(new TableHeader(refs, {
                 id: 'dx-type',
                 name: 'Type',
                 objectName: 'dx',
@@ -387,7 +388,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
             }));
 
             if (layout.showDataDescription) {
-                tableHeaders.push(new TableHeader({
+                tableHeaders.push(new TableHeader(refs, {
                     id: 'dx-description',
                     name: 'Description',
                     objectName: 'dx',
@@ -396,7 +397,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
                 }));
             }
 
-            tableHeaders.push(new TableHeader({
+            tableHeaders.push(new TableHeader(refs, {
                 id: 'dx-numerator',
                 name: 'Numerator',
                 objectName: 'dx',
@@ -404,7 +405,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
                 index: index++
             }));
 
-            tableHeaders.push(new TableHeader({
+            tableHeaders.push(new TableHeader(refs, {
                 id: 'dx-denominator',
                 name: 'Denominator',
                 objectName: 'dx',
@@ -412,7 +413,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
                 index: index++
             }));
 
-            tableHeaders.push(new TableHeader({
+            tableHeaders.push(new TableHeader(refs, {
                 id: 'dx-value',
                 name: 'Value',
                 objectName: 'dx',
@@ -444,7 +445,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
                 }
 
                 // period
-                period = new Period({
+                period = new Period(refs, {
                     id: peId,
                     name: response.getNameById(peId)
                 });
@@ -452,7 +453,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
                 period.generateDisplayProperties();
 
                 // organisation unit
-                orgUnit = new OrganisationUnit({
+                orgUnit = new OrganisationUnit(refs, {
                     id: ouId,
                     name: response.getNameById(ouId),
                     level: response.getLevelById(ouId),
@@ -465,7 +466,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
                 value = response.getValueByIdComb(idComb);
 
                 // row
-                row = new TableRow({
+                row = new TableRow(refs, {
                     dataObject: dataObject,
                     period: period,
                     organisationUnit: orgUnit
@@ -478,7 +479,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
 
                     // ou
                     if (th.objectName === 'ou') {
-                        row.addCell(th.id, new OrganisationUnitTableCell(th.level > orgUnit.level ? {
+                        row.addCell(th.id, new OrganisationUnitTableCell(refs, th.level > orgUnit.level ? {
                             isEmpty: true,
                             instanceManager: t.getInstanceManager()
                         } : {
@@ -494,7 +495,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
                     // pe
                     else if (th.objectName === 'pe') {
                         if (th.id === 'pe-type') {
-                            row.addCell(th.id, new TableCell({
+                            row.addCell(th.id, new TableCell(refs, {
                                 name: period.typeName,
                                 sortId: period.typeSortId + period.sortId + dataObject.groupName + dataObject.name + allOuSortId,
                                 cls: 'pivot-value td-nobreak'
@@ -502,7 +503,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
                         }
 
                         if (th.id === 'pe-year') {
-                            row.addCell(th.id, new TableCell({
+                            row.addCell(th.id, new TableCell(refs, {
                                 name: period.year,
                                 sortId: period.year + period.typeSortId + period.sortId + dataObject.groupName + dataObject.name + allOuSortId,
                                 cls: 'pivot-value'
@@ -510,7 +511,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
                         }
 
                         else if (th.id === 'pe') {
-                            row.addCell(th.id, new PeriodTableCell({
+                            row.addCell(th.id, new PeriodTableCell(refs, {
                                 name: layout.reduceLayout ? period.name : period.displayName,
                                 sortId: period.typeSortId + period.sortId + dataObject.groupName + dataObject.name + allOuSortId,
                                 cls: 'pivot-value clickable',
@@ -524,49 +525,49 @@ TableManager.prototype.getTable = function(layout, fCallback) {
                     else if (th.objectName === 'dx') {
 
                         if (th.id === 'dx-group') {
-                            row.addCell(th.id, new TableCell({
+                            row.addCell(th.id, new TableCell(refs, {
                                 name: dataObject.groupName,
                                 sortId: dataObject.groupName + dataObject.name + allOuSortId + period.typeSortId + period.sortId,
                                 cls: 'pivot-value'
                             }));
                         }
                         else if (th.id === 'dx') {
-                            row.addCell(th.id, new TableCell({
+                            row.addCell(th.id, new TableCell(refs, {
                                 name: dataObject.name,
                                 sortId: dataObject.name + allOuSortId + period.typeSortId + period.sortId,
                                 cls: 'pivot-value'
                             }));
                         }
                         else if (th.id === 'dx-datatype') {
-                            row.addCell(th.id, new TableCell({
+                            row.addCell(th.id, new TableCell(refs, {
                                 name: dataObject.dataTypeDisplayName,
                                 sortId: dataObject.dataTypeSortId + dataObject.groupName + dataObject.name + allOuSortId + period.typeSortId + period.sortId,
                                 cls: 'pivot-value'
                             }));
                         }
                         else if (th.id === 'dx-type') {
-                            row.addCell(th.id, new TableCell({
+                            row.addCell(th.id, new TableCell(refs, {
                                 name: dataObject.typeName,
                                 sortId: dataObject.typeName + dataObject.groupName + dataObject.name + allOuSortId + period.typeSortId + period.sortId,
                                 cls: 'pivot-value' + (dataObject.type.length === 1 ? ' td-nobreak' : '')
                             }));
                         }
                         else if (th.id === 'dx-description') {
-                            row.addCell(th.id, new TableCell({
+                            row.addCell(th.id, new TableCell(refs, {
                                 name: dataObject.description,
                                 sortId: dataObject.description + dataObject.groupName + dataObject.name + allOuSortId + period.typeSortId + period.sortId,
                                 cls: 'pivot-value'
                             }));
                         }
                         else if (th.id === 'dx-numerator') {
-                            row.addCell(th.id, new TableCell({
+                            row.addCell(th.id, new TableCell(refs, {
                                 name: isNumeric(numeratorTotal) ? parseFloat(numeratorTotal) : '',
                                 sortId: isNumeric(numeratorTotal) ? parseFloat(numeratorTotal) : 0,
                                 cls: 'pivot-value align-right'
                             }));
                         }
                         else if (th.id === 'dx-denominator') {
-                            row.addCell(th.id, new TableCell({
+                            row.addCell(th.id, new TableCell(refs, {
                                 name: denominatorTotal || '',
                                 sortId: denominatorTotal || 0,
                                 cls: 'pivot-value align-right' + (dataObject.isDataElement ? ' dataelementdenom' : '')
@@ -574,14 +575,14 @@ TableManager.prototype.getTable = function(layout, fCallback) {
                         }
                         else if (th.id === 'dx-value') {
                             var bgColor = dataObject.getLegendColorByValue(parseFloat(value));
-                            var color = t.uiManager.getContrastedColor(bgColor);
+                            var color = refs.uiManager.getContrastedColor(bgColor);
 
-                            row.addCell(th.id, new ValueTableCell({
+                            row.addCell(th.id, new ValueTableCell(refs, {
                                 name: value || '',
                                 sortId: parseFloat(value) || 0,
                                 cls: 'pivot-value align-right clickable',
                                 style: 'background-color:' + bgColor + '; color:' + color,
-                                title: t.uiManager.getElTitleByLegend(dataObject.getLegendByValue(parseFloat(value))),
+                                title: refs.uiManager.getElTitleByLegend(dataObject.getLegendByValue(parseFloat(value))),
                                 row: row
                             }));
                         }
@@ -623,7 +624,7 @@ TableManager.prototype.getTable = function(layout, fCallback) {
 
         // table
 
-        var table = new Table({
+        var table = new Table(refs, {
             tableHeaders: tableHeaders,
             tableRows: tableRows,
             sorting: layout.sorting,

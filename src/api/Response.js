@@ -16,7 +16,7 @@ import ResponseRowIdCombination from 'd2-analysis/lib/api/ResponseRowIdCombinati
 
 export var Response;
 
-Response = function(config) {
+Response = function(refs, config) {
     var t = this;
 
     t.headers = config.headers;
@@ -51,6 +51,10 @@ Response = function(config) {
             t.nameHeaderMap[t.headers[i].name] = t.headers[i];
         }
     })();
+
+    t.getRefs = function() {
+        return refs;
+    };
 };
 
 Response.prototype.getHeaderByName = function(name) {

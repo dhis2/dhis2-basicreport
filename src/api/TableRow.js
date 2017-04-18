@@ -1,6 +1,6 @@
 export var TableRow;
 
-TableRow = function(config) {
+TableRow = function(refs, config) {
     var t = this;
 
     t.dataObject = config.dataObject;
@@ -10,6 +10,10 @@ TableRow = function(config) {
     // transient
 
     t.cellMap = {};
+
+    t.getRefs = function() {
+        return refs;
+    };
 };
 
 // base

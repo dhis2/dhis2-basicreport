@@ -118,9 +118,9 @@ function _load(layouts) {
         calendarManager.setBaseUrl(appManager.getPath());
         calendarManager.init();
 
-        requestManager.add(new api.Request(init.legendSetsInit(refs)));
-        requestManager.add(new api.Request(init.organisationUnitLevelsInit(refs)));
-        requestManager.add(new api.Request(init.dimensionsInit(refs)));
+        requestManager.add(new api.Request(refs, init.legendSetsInit(refs)));
+        requestManager.add(new api.Request(refs, init.organisationUnitLevelsInit(refs)));
+        requestManager.add(new api.Request(refs, init.dimensionsInit(refs)));
 
         requestManager.set(_initialize, layouts);
         requestManager.run();

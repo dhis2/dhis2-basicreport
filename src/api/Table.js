@@ -14,7 +14,7 @@ import { TableColumn } from './TableColumn';
 
 export var Table;
 
-Table = function(config) {
+Table = function(refs, config) {
     var t = this;
 
     t.klass = Table;
@@ -57,6 +57,10 @@ Table = function(config) {
 
     t.getTableManager = function() {
         return t.tableManager || config.tableManager || t.klass.tableManager;
+    };
+
+    t.getRefs = function() {
+        return refs;
     };
 };
 
@@ -306,6 +310,7 @@ Table.prototype.addPeClickListeners = function(layout, tableFn) {
 
 Table.prototype.addValueClickListeners = function(layout, tableFn) {
     var t = this,
+        refs = this.getRefs(),
         cells = this.getTableCellsByInstance(ValueTableCell);
 
     var path = this.getAppManager().getPath();
@@ -338,18 +343,18 @@ Table.prototype.addValueClickListeners = function(layout, tableFn) {
                     'aggregationType=COUNT'
                 ];
 
-                var countRequest = new Request({
+                var countRequest = new Request(refs, {
                     baseUrl: t.getAppManager().getApiPath() + '/analytics',
                     params: params
                 });
 
-                var rawRequest = new Request({
+                var rawRequest = new Request(refs, {
                     baseUrl: t.getAppManager().getPath() + '/api/26/analytics/rawData',
                     params: params
                 });
 
                 countRequest.run().done(function(countResponse) {
-                    countResponse = new Response(countResponse);
+                    countResponse = new Response(refs, countResponse);
 
                     if (!countResponse) {
                         return;

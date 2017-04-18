@@ -1,6 +1,6 @@
 export var OrganisationUnitLevel;
 
-OrganisationUnitLevel = function(config) {
+OrganisationUnitLevel = function(refs, config) {
     var t = this;
 
     // constructor
@@ -11,6 +11,10 @@ OrganisationUnitLevel = function(config) {
     t.objectName = config.objectName;
     t.cls = config.cls;
     t.index = config.index;
+
+    t.getRefs = function() {
+        return refs;
+    };
 };
 
 OrganisationUnitLevel.prototype.clone = function() {

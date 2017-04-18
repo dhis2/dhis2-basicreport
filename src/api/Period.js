@@ -7,7 +7,7 @@ import numberConstrain from 'd2-utilizr/lib/numberConstrain';
 
 export var Period;
 
-Period = function(config) {
+Period = function(refs, config) {
     var t = this;
 
     t.klass = Period;
@@ -32,6 +32,10 @@ Period = function(config) {
     t.displayName;
 
     t.getContextMenuItemsConfig;
+
+    t.getRefs = function() {
+        return refs;
+    };
 };
 
 Period.prototype.getPrefixedNumber = function(number) {

@@ -3,9 +3,9 @@ import { TableCell } from './TableCell';
 
 export var PeriodTableCell;
 
-PeriodTableCell = function(config) {
+PeriodTableCell = function(refs, config) {
     var t = this,
-        s = new TableCell(config);
+        s = new TableCell(refs, config);
 
     $.extend(t, s);
 
@@ -22,6 +22,10 @@ PeriodTableCell = function(config) {
 
     t.getUiManager = function() {
         return t.uiManager || config.uiManager || t.klass.uiManager;
+    };
+
+    t.getRefs = function() {
+        return refs;
     };
 };
 
