@@ -331,7 +331,7 @@ Table.prototype.addValueClickListeners = function(layout, tableFn) {
                 console.log("getIds", el.cell.row.dataObject.getIds(), el.cell.row);
 
                 var row = el.cell.row;
-
+console.log("row.dataObject", row.dataObject);
                 var dxIds = row.dataObject.getIds(),
                     peId = row.period.id,
                     ouId = row.organisationUnit.id;
@@ -349,7 +349,7 @@ Table.prototype.addValueClickListeners = function(layout, tableFn) {
                 });
 
                 var rawRequest = new Request(refs, {
-                    baseUrl: t.getAppManager().getPath() + '/api/26/analytics/rawData',
+                    baseUrl: t.getAppManager().getPath() + '/api/26/analytics/rawData.json',
                     params: params
                 });
 
@@ -361,10 +361,32 @@ Table.prototype.addValueClickListeners = function(layout, tableFn) {
                     }
 
                     var count = countResponse.getTotal();
-                    console.log(count);
+                    console.log("number of raw values: ", count);
 
                     rawRequest.run().done(function(rawResponse) {
                         console.log(rawResponse);
+
+                        rawResponse = new Response(refs, rawResponse);
+
+                        var extremalRows = rawResponse.getExtremalRows();
+
+                        var len = extremalRows.length;
+                        var limit = 10;
+
+                        var msg = 'Number of raw data values: ' + count;
+                        msg += '<br><br>';
+                        msg += 'Top 10: ';
+                        msg += '<br><br>';
+                        msg += '<table>' + extremalRows.slice(0, limit).map(row => row.getRowHtml(rawResponse)).join('') + '</table>';
+                        msg += '<br>';
+                        msg += 'Bottom 10: ';
+                        msg += '<br><br>';
+                        msg += '<table>' + extremalRows.slice(len - limit, len).map(row => row.getRowHtml(rawResponse)).join('') + '</table>';
+
+                        var title = 'Raw data';
+                        var btnText = 'Show all values';
+
+                        refs.uiManager.confirmCustom(title, msg, btnText, Function.prototype);
                     });
                 });
             });

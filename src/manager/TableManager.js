@@ -5,18 +5,18 @@ import arrayTo from 'd2-utilizr/lib/arrayTo';
 import arraySort from 'd2-utilizr/lib/arraySort';
 import arrayUnique from 'd2-utilizr/lib/arrayUnique';
 
-import {DataObject} from '../api/DataObject';
-import {Response} from '../api/Response';
-import {TableHeader} from '../api/TableHeader';
-import {TableRow} from '../api/TableRow';
-import {TableCell} from '../api/TableCell';
-import {OrganisationUnitTableCell} from '../api/TableCell.OrganisationUnit';
-import {PeriodTableCell} from '../api/TableCell.Period';
-import {ValueTableCell} from '../api/TableCell.Value';
-import {Table} from '../api/Table';
-import {Period} from '../api/Period';
-import {OrganisationUnit} from '../api/OrganisationUnit';
-import {OrganisationUnitLevel} from '../api/OrganisationUnitLevel';
+import { DataObject } from '../api/DataObject';
+import { Response } from '../api/Response';
+import { TableHeader } from '../api/TableHeader';
+import { TableRow } from '../api/TableRow';
+import { TableCell } from '../api/TableCell';
+import { OrganisationUnitTableCell } from '../api/TableCell.OrganisationUnit';
+import { PeriodTableCell } from '../api/TableCell.Period';
+import { ValueTableCell } from '../api/TableCell.Value';
+import { Table } from '../api/Table';
+import { Period } from '../api/Period';
+import { OrganisationUnit } from '../api/OrganisationUnit';
+import { OrganisationUnitLevel } from '../api/OrganisationUnitLevel';
 
 export var TableManager;
 
