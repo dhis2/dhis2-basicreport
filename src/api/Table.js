@@ -313,8 +313,100 @@ Table.prototype.addValueClickListeners = function(layout, tableFn) {
         refs = this.getRefs(),
         cells = this.getTableCellsByInstance(ValueTableCell);
 
-    var path = this.getAppManager().getPath();
+    var apiPath = this.getAppManager().getApiPath();
 
+    var valueClickHandler = function(el) {
+console.log("getIds", el.cell.row.dataObject.getIds(), el.cell.row);
+
+        var row = el.cell.row;
+console.log("row.dataObject", row.dataObject);
+        var dxIds = row.dataObject.getIds(),
+            peId = row.period.id,
+            ouId = row.organisationUnit.id;
+
+        var params = [
+            'dimension=dx:' + dxIds.join(';'),
+            'dimension=pe:' + peId,
+            'dimension=ou:' + ouId,
+            'aggregationType=COUNT'
+        ];
+
+        var countRequest = new Request(refs, {
+            baseUrl: apiPath + '/analytics',
+            params: params
+        });
+
+        var rawRequest = new Request(refs, {
+            baseUrl: apiPath + '/analytics/rawData.json',
+            params: params
+        });
+
+        countRequest.run().done(function(countResponse) {
+            countResponse = new Response(refs, countResponse);
+
+            if (!countResponse) {
+                return;
+            }
+
+            var count = countResponse.getTotal();
+console.log("number of raw values: ", count);
+
+            rawRequest.run().done(function(rawResponse) {
+console.log(rawResponse);
+
+                rawResponse = new Response(refs, rawResponse);
+
+                var extremalRows = rawResponse.getExtremalRows();
+
+                var ouIndex = rawResponse.getHeaderIndexByName('ou');
+                var ouIds = extremalRows.map(row => row[ouIndex]);
+
+                var ouRequest = new Request(refs, {
+                    baseUrl: apiPath + '/organisationUnits.json',
+                    params: [
+                        'fields=id,displayName~rename(name)',
+                        'filter=id:in:[' + ouIds.join(',') + ']',
+                        'paging=false'
+                    ]
+                });
+
+                ouRequest.run().done(function(ouResponse) {
+console.log("ouResponse", ouResponse);
+
+                    var ouMetaDataItems = ouResponse.organisationUnits.reduce((map, ou) => {
+                        map[ou.id] = {
+                            name: ou.name
+                        };
+
+                        return map;
+                    }, {});
+
+                    var len = extremalRows.length;
+                    var limit = 10;
+
+                    rawResponse.addMetaDataItems(ouMetaDataItems);
+
+                    var msg = rawResponse.getNameById(peId);
+                    msg += '<br><br>';
+                    msg += 'Top/bottom 10: ';
+                    msg += '<br><br>';
+                    msg += '<table>';
+                    msg += extremalRows.slice(0, limit).map(row => row.getRowHtml(rawResponse)).join('');
+                    msg += '<tr style="height:12px"><td></td></tr>';
+                    msg += extremalRows.slice(len - limit, len).map(row => row.getRowHtml(rawResponse)).join('');
+                    msg += '</table>';
+                    msg += '<br>';
+                    msg += 'Total number of values: ' + count;
+                    var title = 'Raw data';
+                    var btnText = 'Show all values';
+
+                    refs.uiManager.confirmCustom(title, msg, btnText, Function.prototype);
+                });
+            });
+        });
+    };
+
+    // set listeners
     for (var i = 0, cell, el; i < cells.length; i++) {
         cell = cells[i];
 
@@ -328,67 +420,7 @@ Table.prototype.addValueClickListeners = function(layout, tableFn) {
 
         (function(el) {
             el.on('click', function(event) {
-                console.log("getIds", el.cell.row.dataObject.getIds(), el.cell.row);
-
-                var row = el.cell.row;
-console.log("row.dataObject", row.dataObject);
-                var dxIds = row.dataObject.getIds(),
-                    peId = row.period.id,
-                    ouId = row.organisationUnit.id;
-
-                var params = [
-                    'dimension=dx:' + dxIds.join(';'),
-                    'dimension=pe:' + peId,
-                    'dimension=ou:' + ouId,
-                    'aggregationType=COUNT'
-                ];
-
-                var countRequest = new Request(refs, {
-                    baseUrl: t.getAppManager().getApiPath() + '/analytics',
-                    params: params
-                });
-
-                var rawRequest = new Request(refs, {
-                    baseUrl: t.getAppManager().getPath() + '/api/26/analytics/rawData.json',
-                    params: params
-                });
-
-                countRequest.run().done(function(countResponse) {
-                    countResponse = new Response(refs, countResponse);
-
-                    if (!countResponse) {
-                        return;
-                    }
-
-                    var count = countResponse.getTotal();
-                    console.log("number of raw values: ", count);
-
-                    rawRequest.run().done(function(rawResponse) {
-                        console.log(rawResponse);
-
-                        rawResponse = new Response(refs, rawResponse);
-
-                        var extremalRows = rawResponse.getExtremalRows();
-
-                        var len = extremalRows.length;
-                        var limit = 10;
-
-                        var msg = 'Number of raw data values: ' + count;
-                        msg += '<br><br>';
-                        msg += 'Top 10: ';
-                        msg += '<br><br>';
-                        msg += '<table>' + extremalRows.slice(0, limit).map(row => row.getRowHtml(rawResponse)).join('') + '</table>';
-                        msg += '<br>';
-                        msg += 'Bottom 10: ';
-                        msg += '<br><br>';
-                        msg += '<table>' + extremalRows.slice(len - limit, len).map(row => row.getRowHtml(rawResponse)).join('') + '</table>';
-
-                        var title = 'Raw data';
-                        var btnText = 'Show all values';
-
-                        refs.uiManager.confirmCustom(title, msg, btnText, Function.prototype);
-                    });
-                });
+                valueClickHandler(el);
             });
         })(el);
     }
