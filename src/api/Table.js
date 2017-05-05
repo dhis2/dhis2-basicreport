@@ -358,6 +358,18 @@ console.log(rawResponse);
 
                 var extremalRows = rawResponse.getExtremalRows();
 
+                var dxIndex = rawResponse.getHeaderIndexByName('dx');
+                var dxIds = extremalRows.map(row => row[dxIndex]);
+
+                var dxRequest = new Request(refs, {
+                    baseUrl: apiPath + '/dataElements.json',
+                    params: [
+                        'fields=id,displayName~rename(name)',
+                        'filter=id:in:[' + dxIds.join(',') + ']',
+                        'paging=false'
+                    ]
+                });
+
                 var ouIndex = rawResponse.getHeaderIndexByName('ou');
                 var ouIds = extremalRows.map(row => row[ouIndex]);
 
@@ -370,37 +382,41 @@ console.log(rawResponse);
                     ]
                 });
 
-                ouRequest.run().done(function(ouResponse) {
-console.log("ouResponse", ouResponse);
+                dxRequest.run().done(function(dxResponse) {
+console.log("dxResponse", dxResponse);
 
-                    var ouMetaDataItems = ouResponse.organisationUnits.reduce((map, ou) => {
-                        map[ou.id] = {
-                            name: ou.name
-                        };
+                    ouRequest.run().done(function(ouResponse) {
+    console.log("ouResponse", ouResponse);
 
-                        return map;
-                    }, {});
+                        var metaDataItems = [].concat(dxResponse.dataElements, ouResponse.organisationUnits).reduce((map, item) => {
+                            map[item.id] = {
+                                name: item.name
+                            };
 
-                    var len = extremalRows.length;
-                    var limit = 10;
+                            return map;
+                        }, {});
 
-                    rawResponse.addMetaDataItems(ouMetaDataItems);
+                        var len = extremalRows.length;
+                        var limit = 10;
 
-                    var msg = rawResponse.getNameById(peId);
-                    msg += '<br><br>';
-                    msg += 'Top/bottom 10: ';
-                    msg += '<br><br>';
-                    msg += '<table>';
-                    msg += extremalRows.slice(0, limit).map(row => row.getRowHtml(rawResponse)).join('');
-                    msg += '<tr style="height:12px"><td></td></tr>';
-                    msg += extremalRows.slice(len - limit, len).map(row => row.getRowHtml(rawResponse)).join('');
-                    msg += '</table>';
-                    msg += '<br>';
-                    msg += 'Total number of values: ' + count;
-                    var title = 'Raw data';
-                    var btnText = 'Show all values';
+                        rawResponse.addMetaDataItems(metaDataItems);
 
-                    refs.uiManager.confirmCustom(title, msg, btnText, Function.prototype);
+                        var msg = rawResponse.getNameById(peId);
+                        msg += '<br><br>';
+                        msg += 'Top/bottom 10: ';
+                        msg += '<br><br>';
+                        msg += '<table>';
+                        msg += extremalRows.slice(0, limit).map(row => row.getRowHtml(rawResponse)).join('');
+                        msg += '<tr style="height:12px"><td></td></tr>';
+                        msg += extremalRows.slice(len - limit, len).map(row => row.getRowHtml(rawResponse)).join('');
+                        msg += '</table>';
+                        msg += '<br>';
+                        msg += 'Total number of values: ' + count;
+                        var title = 'Raw data';
+                        var btnText = 'Show all values';
+
+                        refs.uiManager.confirmCustom(title, msg, btnText, Function.prototype);
+                    });
                 });
             });
         });
