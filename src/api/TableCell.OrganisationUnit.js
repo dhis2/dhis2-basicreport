@@ -31,7 +31,8 @@ OrganisationUnitTableCell = function(refs, config) {
 };
 
 OrganisationUnitTableCell.prototype.showContextMenu = function(row, menuFn) {
-    var t = this;
+    var t = this,
+        refs = this.getRefs();
 
     var instanceManager = t.getInstanceManager(),
         uiManager = t.getUiManager();
@@ -62,7 +63,7 @@ OrganisationUnitTableCell.prototype.showContextMenu = function(row, menuFn) {
                     items: [{id: this.ouReqId}]
                 };
 
-                layout.rows = new Axis([
+                layout.rows = new Axis(refs, [
                     layout.rows[0],
                     ouDimension
                 ]);

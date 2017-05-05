@@ -30,7 +30,8 @@ PeriodTableCell = function(refs, config) {
 };
 
 PeriodTableCell.prototype.showContextMenu = function(row, menuFn) {
-    var t = this;
+    var t = this,
+        refs = this.getRefs();
 
     var instanceManager = t.getInstanceManager(),
         uiManager = t.getUiManager();
@@ -61,7 +62,7 @@ PeriodTableCell.prototype.showContextMenu = function(row, menuFn) {
                     items: this.peReqItems
                 };
 
-                layout.rows = new Axis([
+                layout.rows = new Axis(refs, [
                     peDimension,
                     layout.rows[1]
                 ]);
