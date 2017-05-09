@@ -315,8 +315,16 @@ Table.prototype.addValueClickListeners = function(layout, tableFn) {
 
     var apiPath = this.getAppManager().getApiPath();
 
+    var uiManager = refs.uiManager;
+
+    var onError = function() {
+        uiManager.unmask();
+    };
+
     var valueClickHandler = function(el) {
 console.log("getIds", el.cell.row.dataObject.getIds(), el.cell.row);
+
+        uiManager.mask();
 
         var row = el.cell.row;
 console.log("row.dataObject", row.dataObject);
@@ -333,12 +341,14 @@ console.log("row.dataObject", row.dataObject);
 
         var countRequest = new Request(refs, {
             baseUrl: apiPath + '/analytics',
-            params: params
+            params: params,
+            error: onError
         });
 
         var rawRequest = new Request(refs, {
             baseUrl: apiPath + '/analytics/rawData.json',
-            params: params
+            params: params,
+            error: onError
         });
 
         countRequest.run().done(function(countResponse) {
@@ -367,7 +377,8 @@ console.log(rawResponse);
                         'fields=id,displayName~rename(name)',
                         'filter=id:in:[' + dxIds.join(',') + ']',
                         'paging=false'
-                    ]
+                    ],
+                    error: onError
                 });
 
                 var ouIndex = rawResponse.getHeaderIndexByName('ou');
@@ -379,7 +390,8 @@ console.log(rawResponse);
                         'fields=id,displayName~rename(name)',
                         'filter=id:in:[' + ouIds.join(',') + ']',
                         'paging=false'
-                    ]
+                    ],
+                    error: onError
                 });
 
                 dxRequest.run().done(function(dxResponse) {
@@ -398,6 +410,7 @@ console.log("dxResponse", dxResponse);
 
                         var len = extremalRows.length;
                         var limit = 10;
+                        var peIndex = rawResponse.getHeaderIndexByName('pe');
 
                         rawResponse.addMetaDataItems(metaDataItems);
 
@@ -406,16 +419,31 @@ console.log("dxResponse", dxResponse);
                         msg += 'Top/bottom 10: ';
                         msg += '<br><br>';
                         msg += '<table>';
-                        msg += extremalRows.slice(0, limit).map(row => row.getRowHtml(rawResponse)).join('');
+                        msg += extremalRows.slice(0, limit).map(row => row.getRowHtml(rawResponse, null, null, [peIndex])).join('');
                         msg += '<tr style="height:12px"><td></td></tr>';
-                        msg += extremalRows.slice(len - limit, len).map(row => row.getRowHtml(rawResponse)).join('');
+                        msg += extremalRows.slice(len - limit, len).map(row => row.getRowHtml(rawResponse, null, null, [peIndex])).join('');
                         msg += '</table>';
                         msg += '<br>';
                         msg += 'Total number of values: ' + count;
                         var title = 'Raw data';
                         var btnText = 'Show all values';
 
-                        refs.uiManager.confirmCustom(title, msg, btnText, Function.prototype);
+                        uiManager.unmask();
+
+                        refs.uiManager.confirmCustom('Raw data (top/bottom 10)', msg, 'Show all values', function() {
+                            var html = '<table>' + rawResponse.rows.reduce((total, row) => total += row.getRowHtml(rawResponse, null, null, [peIndex]), '') + '</table>';
+
+                            refs.uiManager.confirmCustom('Raw data', html);
+
+                            //var win = Ext.create('Ext.window.Window', {
+                                //height: 500,
+                                //autoScroll: true,
+                                //bodyStyle: 'background-color:#fff',
+                                //html: html
+                            //});
+
+                            //win.show();
+                        });
                     });
                 });
             });
