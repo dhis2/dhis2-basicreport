@@ -416,8 +416,6 @@ console.log("dxResponse", dxResponse);
 
                         var msg = rawResponse.getNameById(peId);
                         msg += '<br><br>';
-                        msg += 'Top/bottom 10: ';
-                        msg += '<br><br>';
                         msg += '<table>';
                         msg += extremalRows.slice(0, limit).map(row => row.getRowHtml(rawResponse, null, null, [peIndex])).join('');
                         msg += '<tr style="height:12px"><td></td></tr>';
@@ -431,9 +429,12 @@ console.log("dxResponse", dxResponse);
                         uiManager.unmask();
 
                         refs.uiManager.confirmCustom('Raw data (top/bottom 10)', msg, 'Show all values', function() {
-                            var html = '<table>' + rawResponse.rows.reduce((total, row) => total += row.getRowHtml(rawResponse, null, null, [peIndex]), '') + '</table>';
+                            var html = '<table>' + rawResponse.getSortedRows().reduce((total, row) => total += row.getRowHtml(rawResponse, null, null, [peIndex]), '') + '</table>';
 
-                            refs.uiManager.confirmCustom('Raw data', html);
+                            refs.uiManager.confirmCustom('Raw data', html, null, null, {
+                                height: 700,
+                                autoScroll: true
+                            });
 
                             //var win = Ext.create('Ext.window.Window', {
                                 //height: 500,
