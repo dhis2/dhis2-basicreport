@@ -179,7 +179,8 @@ Table.prototype.getTableCellsByInstance = function(type) {
 };
 
 Table.prototype.addHeaderClickListeners = function() {
-    var t = this;
+    var t = this,
+        refs = this.getRefs();
 
     var instanceManager = t.getInstanceManager();
     var el;
@@ -191,7 +192,7 @@ Table.prototype.addHeaderClickListeners = function() {
         el.tableHeaderId = th.id;
 
         el.on('click', function() {
-            instanceManager.getReport(instanceManager.getStateCurrent().setOrToggleSorting(new Sorting({
+            instanceManager.getReport(instanceManager.getStateCurrent().setOrToggleSorting(new Sorting(refs, {
                 id: this.tableHeaderId,
                 direction: 'ASC'
             }), true));

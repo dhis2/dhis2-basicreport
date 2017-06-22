@@ -1,7 +1,7 @@
 {
-    "version": "26.0.0",
-    "name": "Basic Report NDOH SA",
-    "description": "Basic report app",
+    "version": "27.0.0",
+    "name": "NDOH SA Data Table",
+    "description": "Data table app",
     "launch_path": "/index.html",
     "icons": {
         "48": "icons/br-48.png",

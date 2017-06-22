@@ -1,7 +1,7 @@
 {
   "name": "dhis2-basicreport",
   "version": "1.0.0",
-  "description": "Basic Report",
+  "description": "Basic report app",
   "main": "webpack-base-config.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -21,8 +21,8 @@
   },
   "homepage": "https://github.com/dhis2/dhis2-basicreport#readme",
   "dependencies": {
-    "d2-utilizr": "0.2.11",
-    "d2-analysis": "25.0.4"
+    "d2-utilizr": "0.2.13",
+    "d2-analysis": "27.0.58"
   },
   "devDependencies": {
     "babel-core": "^6.3.13",
