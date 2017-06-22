@@ -322,15 +322,19 @@ Table.prototype.addValueClickListeners = function(layout, tableFn) {
     };
 
     var valueClickHandler = function(el) {
-console.log("getIds", el.cell.row.dataObject.getIds(), el.cell.row);
-
-        uiManager.mask();
-
         var row = el.cell.row;
-console.log("row.dataObject", row.dataObject);
-        var dxIds = row.dataObject.getIds(),
-            peId = row.period.id,
-            ouId = row.organisationUnit.id;
+
+        var dx = row.dataObject;
+        var pe = row.period;
+        var ou = row.organisationUnit;
+
+        var dxIds = dx.getIds();
+        var peId = pe.id;
+        var ouId = ou.id;
+
+console.log("dx", dx);
+console.log("pe", pe);
+console.log("ou", ou);
 
         var params = [
             'dimension=dx:' + dxIds.join(';'),
@@ -359,48 +363,48 @@ console.log("row.dataObject", row.dataObject);
             }
 
             var count = countResponse.getTotal();
-console.log("number of raw values: ", count);
+            console.log("number of raw values: ", count);
 
             rawRequest.run().done(function(rawResponse) {
-console.log(rawResponse);
+                console.log(rawResponse);
 
                 rawResponse = new Response(refs, rawResponse);
 
                 var extremalRows = rawResponse.getExtremalRows();
 
-                var dxIndex = rawResponse.getHeaderIndexByName('dx');
-                var dxIds = extremalRows.map(row => row[dxIndex]);
+                var rawDxIndex = rawResponse.getHeaderIndexByName('dx');
+                var rawDxIds = extremalRows.map(row => row[rawDxIndex]);
 
-                var dxRequest = new Request(refs, {
+                var nameDxRequest = new Request(refs, {
                     baseUrl: apiPath + '/dataElements.json',
                     params: [
                         'fields=id,displayName~rename(name)',
-                        'filter=id:in:[' + dxIds.join(',') + ']',
+                        'filter=id:in:[' + rawDxIds.join(',') + ']',
                         'paging=false'
                     ],
                     error: onError
                 });
 
-                var ouIndex = rawResponse.getHeaderIndexByName('ou');
-                var ouIds = extremalRows.map(row => row[ouIndex]);
+                var rawOuIndex = rawResponse.getHeaderIndexByName('ou');
+                var rawOuIds = extremalRows.map(row => row[rawOuIndex]);
 
-                var ouRequest = new Request(refs, {
+                var nameOuRequest = new Request(refs, {
                     baseUrl: apiPath + '/organisationUnits.json',
                     params: [
                         'fields=id,displayName~rename(name)',
-                        'filter=id:in:[' + ouIds.join(',') + ']',
+                        'filter=id:in:[' + rawOuIds.join(',') + ']',
                         'paging=false'
                     ],
                     error: onError
                 });
 
-                dxRequest.run().done(function(dxResponse) {
-console.log("dxResponse", dxResponse);
+                nameDxRequest.run().done(function(rawDxResponse) {
+                    console.log("rawDxResponse", rawDxResponse);
 
-                    ouRequest.run().done(function(ouResponse) {
-    console.log("ouResponse", ouResponse);
+                    nameOuRequest.run().done(function(rawOuResponse) {
+                        console.log("rawOuResponse", rawOuResponse);
 
-                        var metaDataItems = [].concat(dxResponse.dataElements, ouResponse.organisationUnits).reduce((map, item) => {
+                        var rawMetaDataItems = [].concat(rawDxResponse.dataElements, rawOuResponse.organisationUnits).reduce((map, item) => {
                             map[item.id] = {
                                 name: item.name
                             };
@@ -408,28 +412,30 @@ console.log("dxResponse", dxResponse);
                             return map;
                         }, {});
 
-                        var len = extremalRows.length;
-                        var limit = 10;
-                        var peIndex = rawResponse.getHeaderIndexByName('pe');
+                        var extLen = extremalRows.length;
+                        var extLimit = 10;
+                        var rawPeIndex = rawResponse.getHeaderIndexByName('pe');
 
-                        rawResponse.addMetaDataItems(metaDataItems);
+                        rawResponse.addMetaDataItems(rawMetaDataItems);
 
-                        var msg = rawResponse.getNameById(peId);
+                        var msg = dx.name + ', ' + pe.name + ', ' + ou.name;
+                        msg += '<br><br>';
+                        msg += 'Total number of values: ' + count;
                         msg += '<br><br>';
                         msg += '<table>';
-                        msg += extremalRows.slice(0, limit).map(row => row.getRowHtml(rawResponse, null, null, [peIndex])).join('');
-                        msg += '<tr style="height:12px"><td></td></tr>';
-                        msg += extremalRows.slice(len - limit, len).map(row => row.getRowHtml(rawResponse, null, null, [peIndex])).join('');
+                        msg += extremalRows.slice(0, extLimit).map(row => row.getRowHtml(rawResponse, null, null, [rawPeIndex])).join('');
+                        msg += '<tr style="height:12px"><td colspan="3" style="text-align:center; padding-bottom:6px">. . .</td></tr>';
+                        msg += extremalRows.slice(extLen - extLimit, extLen).map(row => row.getRowHtml(rawResponse, null, null, [rawPeIndex])).join('');
                         msg += '</table>';
                         msg += '<br>';
-                        msg += 'Total number of values: ' + count;
-                        var title = 'Raw data';
-                        var btnText = 'Show all values';
+
+                        var summaryTitle = 'Raw data summary';
+                        var summaryBtnText = 'Show all values';
 
                         uiManager.unmask();
 
-                        refs.uiManager.confirmCustom('Raw data (top/bottom 10)', msg, 'Show all values', function() {
-                            var html = '<table>' + rawResponse.getSortedRows().reduce((total, row) => total += row.getRowHtml(rawResponse, null, null, [peIndex]), '') + '</table>';
+                        refs.uiManager.confirmCustom(summaryTitle, msg, summaryBtnText, function() {
+                            var html = '<table>' + rawResponse.getSortedRows().reduce((total, row) => total += row.getRowHtml(rawResponse, null, null, [rawPeIndex]), '') + '</table>';
 
                             refs.uiManager.confirmCustom('Raw data', html, null, null, {
                                 height: 700,
