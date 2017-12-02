@@ -342,7 +342,7 @@ console.log("ou", ou);
             'dimension=pe:' + peId,
             'dimension=ou:' + ouId,
             'aggregationType=COUNT',
-            'includeOrgUnitNames=true'
+            'outputIdScheme=NAME'
         ];
 
         var countRequest = new Request(refs, {
@@ -374,94 +374,94 @@ console.log("ou", ou);
 
                 var extremalRows = rawResponse.getExtremalRows();
 
-                var rawDxIndex = rawResponse.getHeaderIndexByName('dx');
-                var rawDxIds = extremalRows.map(row => row[rawDxIndex]);
+                //var rawDxIndex = rawResponse.getHeaderIndexByName('dx');
+                //var rawDxIds = extremalRows.map(row => row[rawDxIndex]);
 
-                var nameDxRequest = new Request(refs, {
-                    baseUrl: apiPath + '/dataElements.json',
-                    params: [
-                        'fields=id,displayName~rename(name)',
-                        'filter=id:in:[' + rawDxIds.join(',') + ']',
-                        'paging=false'
-                    ],
-                    error: onError
-                });
+                //var nameDxRequest = new Request(refs, {
+                    //baseUrl: apiPath + '/dataElements.json',
+                    //params: [
+                        //'fields=id,displayName~rename(name)',
+                        //'filter=id:in:[' + rawDxIds.join(',') + ']',
+                        //'paging=false'
+                    //],
+                    //error: onError
+                //});
 
-                var rawOuIndex = rawResponse.getHeaderIndexByName('ou');
-                var rawOuIds = extremalRows.map(row => row[rawOuIndex]);
+                //var rawOuIndex = rawResponse.getHeaderIndexByName('ou');
+                //var rawOuIds = extremalRows.map(row => row[rawOuIndex]);
 
-                var nameOuRequest = new Request(refs, {
-                    baseUrl: apiPath + '/organisationUnits.json',
-                    params: [
-                        'fields=id,displayName~rename(name)',
-                        'filter=id:in:[' + rawOuIds.join(',') + ']',
-                        'paging=false'
-                    ],
-                    error: onError
-                });
+                //var nameOuRequest = new Request(refs, {
+                    //baseUrl: apiPath + '/organisationUnits.json',
+                    //params: [
+                        //'fields=id,displayName~rename(name)',
+                        //'filter=id:in:[' + rawOuIds.join(',') + ']',
+                        //'paging=false'
+                    //],
+                    //error: onError
+                //});
 
-                nameDxRequest.run().done(function(rawDxResponse) {
-                    console.log("rawDxResponse", rawDxResponse);
+                //nameDxRequest.run().done(function(rawDxResponse) {
+                    //console.log("rawDxResponse", rawDxResponse);
 
-                    nameOuRequest.run().done(function(rawOuResponse) {
-                        console.log("rawOuResponse", rawOuResponse);
+                    //nameOuRequest.run().done(function(rawOuResponse) {
+                        //console.log("rawOuResponse", rawOuResponse);
 
-                        var rawMetaDataItems = [].concat(rawDxResponse.dataElements, rawOuResponse.organisationUnits).reduce((map, item) => {
-                            map[item.id] = {
-                                name: item.name
-                            };
+                        //var rawMetaDataItems = [].concat(rawDxResponse.dataElements, rawOuResponse.organisationUnits).reduce((map, item) => {
+                            //map[item.id] = {
+                                //name: item.name
+                            //};
 
-                            return map;
-                        }, {});
+                            //return map;
+                        //}, {});
 
-                        var extLen = extremalRows.length;
-                        var extLimit = 10;
-                        var rawPeIndex = rawResponse.getHeaderIndexByName('pe');
+				var extLen = extremalRows.length;
+				var extLimit = 10;
+				var rawPeIndex = rawResponse.getHeaderIndexByName('pe');
 
-                        rawResponse.addMetaDataItems(rawMetaDataItems);
+				//rawResponse.addMetaDataItems(rawMetaDataItems);
+				
+				var msgIntro = dx.name + ', ' + pe.name + ', ' + ou.name;
+				msgIntro += '<br><br>';
+				msgIntro += 'Total number of values: ' + count;
+				msgIntro += '<br><br>';
 
-                        var msgIntro = dx.name + ', ' + pe.name + ', ' + ou.name;
-                        msgIntro += '<br><br>';
-                        msgIntro += 'Total number of values: ' + count;
-                        msgIntro += '<br><br>';
+				var msg = '<table>';
+				//msg += extremalRows.slice(0, extLimit).map(row => row.getRowHtml(rawResponse, null, null, [rawPeIndex])).join('');
+				msg += extremalRows.slice(0, extLimit).map(row => '<tr>' + row.map((cell, i) => i === rawPeIndex ? '' : '<td style="padding:0 5px">' + cell + '</td>').join('') + '</tr>').join('');
+				msg += '<tr style="height:12px"><td colspan="3" style="text-align:center; padding-bottom:6px">. . .</td></tr>';
+				//msg += extremalRows.slice(extLen - extLimit, extLen).map(row => row.getRowHtml(rawResponse, null, null, [rawPeIndex])).join('');
+				msg += extremalRows.slice(extLen - extLimit, extLen).map(row => '<tr>' + row.map((cell, i) => i === rawPeIndex ? '' : '<td>' + cell + '</td>').join('') + '</tr>').join('');
+				msg += '</table>';
+				msg += '<br>';
 
-						var msg = '<table>';
-                        msg += extremalRows.slice(0, extLimit).map(row => row.getRowHtml(rawResponse, null, null, [rawPeIndex])).join('');
-                        msg += '<tr style="height:12px"><td colspan="3" style="text-align:center; padding-bottom:6px">. . .</td></tr>';
-                        msg += extremalRows.slice(extLen - extLimit, extLen).map(row => row.getRowHtml(rawResponse, null, null, [rawPeIndex])).join('');
-                        msg += '</table>';
-                        msg += '<br>';
+				var summaryTitle = 'Raw data summary';
+				var summaryBtnText = 'Show all values';
 
-                        var summaryTitle = 'Raw data summary';
-                        var summaryBtnText = 'Show all values';
+				uiManager.unmask();
 
-                        uiManager.unmask();
+				var dialog = refs.ui.DataConfirmWindow(refs, summaryTitle, (msgIntro + msg), summaryBtnText, function() {
+					var html = '<table>' + rawResponse.getSortedRows().reduce((total, row) => total += row.getRowHtml(rawResponse, null, null, [rawPeIndex]), '') + '</table>';
 
-                        var dialog = refs.ui.DataConfirmWindow(refs, summaryTitle, (msgIntro + msg), summaryBtnText, function() {
-                            var html = '<table>' + rawResponse.getSortedRows().reduce((total, row) => total += row.getRowHtml(rawResponse, null, null, [rawPeIndex]), '') + '</table>';
+					dialog.updateMsg(msgIntro + html);
+					dialog.removeConfirmButton();
 
-                            dialog.updateMsg(msgIntro + html);
-                            dialog.removeConfirmButton();
+					//refs.uiManager.confirmCustom('Raw data', html, null, null, {
+					//    height: 700,
+					//    autoScroll: true
+					//});
 
-                            //refs.uiManager.confirmCustom('Raw data', html, null, null, {
-                            //    height: 700,
-                            //    autoScroll: true
-                            //});
+					//var win = Ext.create('Ext.window.Window', {
+						//height: 500,
+						//autoScroll: true,
+						//bodyStyle: 'background-color:#fff',
+						//html: html
+					//});
 
-                            //var win = Ext.create('Ext.window.Window', {
-                                //height: 500,
-                                //autoScroll: true,
-                                //bodyStyle: 'background-color:#fff',
-                                //html: html
-                            //});
-
-                            //win.show();
-                        }, {
-							height: 570,
-							autoScroll: true
-						}).show();
-                    });
-                });
+					//win.show();
+				}, {
+					height: 570,
+					autoScroll: true
+				}).show();
             });
         });
     };
