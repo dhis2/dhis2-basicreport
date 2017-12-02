@@ -341,7 +341,8 @@ console.log("ou", ou);
             'dimension=dx:' + dxIds.join(';'),
             'dimension=pe:' + peId,
             'dimension=ou:' + ouId,
-            'aggregationType=COUNT'
+            'aggregationType=COUNT',
+            'includeOrgUnitNames=true'
         ];
 
         var countRequest = new Request(refs, {
@@ -419,11 +420,12 @@ console.log("ou", ou);
 
                         rawResponse.addMetaDataItems(rawMetaDataItems);
 
-                        var msg = dx.name + ', ' + pe.name + ', ' + ou.name;
-                        msg += '<br><br>';
-                        msg += 'Total number of values: ' + count;
-                        msg += '<br><br>';
-                        msg += '<table>';
+                        var msgIntro = dx.name + ', ' + pe.name + ', ' + ou.name;
+                        msgIntro += '<br><br>';
+                        msgIntro += 'Total number of values: ' + count;
+                        msgIntro += '<br><br>';
+
+						var msg = '<table>';
                         msg += extremalRows.slice(0, extLimit).map(row => row.getRowHtml(rawResponse, null, null, [rawPeIndex])).join('');
                         msg += '<tr style="height:12px"><td colspan="3" style="text-align:center; padding-bottom:6px">. . .</td></tr>';
                         msg += extremalRows.slice(extLen - extLimit, extLen).map(row => row.getRowHtml(rawResponse, null, null, [rawPeIndex])).join('');
@@ -435,13 +437,16 @@ console.log("ou", ou);
 
                         uiManager.unmask();
 
-                        refs.uiManager.confirmCustom(summaryTitle, msg, summaryBtnText, function() {
+                        var dialog = refs.ui.DataConfirmWindow(refs, summaryTitle, (msgIntro + msg), summaryBtnText, function() {
                             var html = '<table>' + rawResponse.getSortedRows().reduce((total, row) => total += row.getRowHtml(rawResponse, null, null, [rawPeIndex]), '') + '</table>';
 
-                            refs.uiManager.confirmCustom('Raw data', html, null, null, {
-                                height: 700,
-                                autoScroll: true
-                            });
+                            dialog.updateMsg(msgIntro + html);
+                            dialog.removeConfirmButton();
+
+                            //refs.uiManager.confirmCustom('Raw data', html, null, null, {
+                            //    height: 700,
+                            //    autoScroll: true
+                            //});
 
                             //var win = Ext.create('Ext.window.Window', {
                                 //height: 500,
@@ -451,7 +456,10 @@ console.log("ou", ou);
                             //});
 
                             //win.show();
-                        });
+                        }, {
+							height: 570,
+							autoScroll: true
+						}).show();
                     });
                 });
             });

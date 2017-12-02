@@ -24,6 +24,7 @@ import { InstanceManager } from './src/manager/InstanceManager';
 import { TableManager } from './src/manager/TableManager';
 import { UiManager } from './src/manager/UiManager';
 
+import { DataConfirmWindow } from './src/ui/DataConfirmWindow';
 import { OptionsWindow } from './src/ui/OptionsWindow';
 import { Viewport } from './src/ui/Viewport';
 
@@ -39,6 +40,8 @@ api.PeriodTableCell = PeriodTableCell;
 api.TableHeader = TableHeader;
 api.TableRow = TableRow;
 
+ui.DataConfirmWindow = DataConfirmWindow;
+
 // override
 api.Layout = Layout;
 
@@ -48,7 +51,8 @@ manager.UiManager = UiManager;
 
 // references
 var refs = {
-    api
+    api,
+	ui
 };
 
     // dimension config
@@ -70,7 +74,7 @@ refs.uiConfig = uiConfig;
     // app manager
 var appManager = new manager.AppManager();
 appManager.sessionName = 'basicreport';
-appManager.apiVersion = 26;
+appManager.apiVersion = 27;
 refs.appManager = appManager;
 
     // calendar manager
